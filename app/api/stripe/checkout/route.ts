@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
 
-    const stripe = new Stripe(config.STRIPE_SECRET_KEY, { apiVersion: "2026-02-25.clover" });
+    const stripe = new Stripe(config.STRIPE_SECRET_KEY);
     const origin = new URL(request.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

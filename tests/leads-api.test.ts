@@ -24,10 +24,30 @@ describe("POST /api/leads", () => {
       body: "{\"badJson\":",
     }));
 
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(400);
     const payload = await response.json();
     expect(payload).toEqual({
-      error: "Server error",
+      error: "Invalid input",
+      request_id: expect.any(String),
+    });
+  });
+
+  it("returns 200 and does not process honeypot submissions", async () => {
+    const response = await POST(new Request("http://localhost/api/leads", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        first_name: "Bot",
+        last_name: "Traffic",
+        email: "bot@example.com",
+        company_website: "https://spam.example.com",
+      }),
+    }));
+
+    expect(response.status).toBe(200);
+    const payload = await response.json();
+    expect(payload).toEqual({
+      ok: true,
       request_id: expect.any(String),
     });
   });
