@@ -46,8 +46,9 @@ export default function AssetsManager() {
     fetch(`/api/admin/assets?${params}`)
       .then((r) => r.json())
       .then((j) => {
-        setAssets(j.data ?? []);
-        setTotal(j.total ?? 0);
+        // Supports both legacy ({data,total}) and paginated ({items,count}) payloads.
+        setAssets(j.data ?? j.items ?? []);
+        setTotal(j.total ?? j.count ?? 0);
       })
       .finally(() => setLoading(false));
   }, [buildParams]);

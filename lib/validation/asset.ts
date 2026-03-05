@@ -6,18 +6,18 @@ export const ASSET_LOCATIONS = ["Medellín", "Manizales", "Other"] as const;
 export const AssetCategorySchema = z.enum(ASSET_CATEGORIES);
 export const AssetLocationSchema = z.enum(ASSET_LOCATIONS);
 
+const AssetTagSchema = z.string().trim().min(1).max(100);
+const AssetTagsSchema = z.array(AssetTagSchema).max(20);
+const AssetAltTextSchema = z.string().trim().min(1).max(500);
+const AssetSourceUrlSchema = z.string().url().max(2000).nullable();
+
 export const AssetMetadataSchema = z.object({
-  title: z.string().min(1).max(300),
+  title: z.string().trim().min(1).max(300),
   category: AssetCategorySchema,
   location: AssetLocationSchema,
-  tags: z.array(z.string().min(1).max(50)).default([]),
-  alt_text: z.string().min(1).max(500),
-  source_url: z.string().url().optional(),
-});
-
-export const AssetUpdateSchema = AssetMetadataSchema.partial().extend({
-  approved: z.boolean().optional(),
-  published: z.boolean().optional(),
+  tags: AssetTagsSchema,
+  alt_text: AssetAltTextSchema,
+  source_url: AssetSourceUrlSchema,
 });
 
 export const AssetFilterSchema = z.object({
@@ -31,14 +31,23 @@ export const AssetFilterSchema = z.object({
 });
 
 export const AssetUploadSchema = z.object({
-  title: z.string().min(1).max(300),
+  title: z.string().trim().min(1).max(300),
   category: AssetCategorySchema,
   location: AssetLocationSchema,
-  tags: z.string().max(500).transform((s) => s.split(",").map((t) => t.trim()).filter(Boolean)),
-  alt_text: z.string().min(1).max(500),
+  tags: z.string().max(500).transform((s) => s.split(",").map((t) => t.trim()).filter(Boolean)).pipe(AssetTagsSchema),
+  alt_text: AssetAltTextSchema,
   source_url: z.string().url().max(2000).optional().or(z.literal("")),
+}).transform((input) => ({
+  ...input,
+  source_url: input.source_url || null,
+}));
+
+export const AssetUpdateSchema = AssetMetadataSchema.partial().extend({
+  approved: z.boolean().optional(),
+  published: z.boolean().optional(),
 });
 
+export type AssetMetadataInput = z.infer<typeof AssetMetadataSchema>;
 export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
 export type AssetUpdateInput = z.infer<typeof AssetUpdateSchema>;
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
+import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 
 const UpdateLeadSchema = z.object({
@@ -10,26 +11,34 @@ const UpdateLeadSchema = z.object({
 type Props = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Props) {
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const { id } = await params;
-  const body = await request.json().catch(() => ({}));
-  const parsed = UpdateLeadSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  try {
+    const { id } = await params;
+    const body = await request.json().catch(() => ({}));
+    const parsed = UpdateLeadSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    }
+    const supabase = getServerSupabase();
+    const { data, error } = await supabase
+      .from("leads")
+      .update({ status: parsed.data.status, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select("id, status")
+      .single();
+    if (error) {
+      log.error("Failed to update lead", { id, error: error.message });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    }
+    return NextResponse.json(data);
+  } catch (err) {
+    log.error("Admin lead PATCH endpoint failed", { err: String(err) });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
-  const supabase = getServerSupabase();
-  const { data, error } = await supabase
-    .from("leads")
-    .update({ status: parsed.data.status, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select("id, status")
-    .single();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-  return NextResponse.json(data);
 }
