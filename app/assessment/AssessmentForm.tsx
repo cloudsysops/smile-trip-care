@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { PackageRow } from "@/lib/packages";
 
-type Props = { packages: PackageRow[]; prefillPackageSlug?: string };
+type Props = Readonly<{ packages: PackageRow[]; prefillPackageSlug?: string }>;
 
 export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Props) {
+  const router = useRouter();
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -38,6 +40,11 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
       if (!res.ok) {
         setStatus("error");
         setErrorMessage((data.error as string) || "Something went wrong. Please try again.");
+        return;
+      }
+      const leadId = typeof data.lead_id === "string" ? data.lead_id : null;
+      if (leadId) {
+        router.push(`/thank-you?lead_id=${encodeURIComponent(leadId)}`);
         return;
       }
       setStatus("success");

@@ -17,6 +17,7 @@
 - **packages**: `slug`, `name`, `location`, `duration_days`, `deposit_cents`, `included` (array), `itinerary_outline`, `published`.
 - **leads**: `first_name`, `last_name`, `email`, `phone`, `country`, `package_slug`, `message`, `status` (new → deposit_paid → …).
 - **payments**: `lead_id`, `stripe_checkout_session_id`, `stripe_payment_intent_id`, `amount_cents`, `status`.
+- **assets**: `storage_path`, `title`, `category` (clinic\|finca\|lodging\|tour\|team\|other), `location` (Medellín\|Manizales\|Other), `tags` (text[]), `alt_text`, `approved`, `published`, `deleted_at`.
 
 ## Admin helper
 

@@ -1,74 +1,80 @@
-import { getServerConfigSafe } from "@/lib/config/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 
-const BUCKET = "assets";
-const SIGNED_URL_EXPIRY = 3600; // 1 hour
-
-export type PublishedAsset = {
+export type PublicAsset = {
   id: string;
-  slug: string;
   title: string | null;
   category: string | null;
   location: string | null;
   tags: string[] | null;
   alt_text: string | null;
-  url: string; // signed or public URL for rendering
+  url: string | null;
+};
+
+type GetPublishedAssetsParams = {
+  limit?: number;
+  category?: string;
+  location?: string;
 };
 
 /**
- * Fetch assets that are approved AND published only.
- * Uses server Supabase; filters explicitly. For private bucket, attaches signed URLs.
+ * Fetch approved+published assets for public rendering.
+ * Uses service-role Supabase client on the server and signed URLs.
  */
-export async function getPublishedAssets(filters?: {
-  category?: string;
-  location?: string;
-  tags?: string[];
-  limit?: number;
-}): Promise<PublishedAsset[]> {
-  const config = getServerConfigSafe();
-  if (!config.success || !config.data.SUPABASE_URL || !config.data.SUPABASE_SERVICE_ROLE_KEY) {
-    return [];
-  }
+export async function getPublishedAssets(
+  params: GetPublishedAssetsParams = {},
+): Promise<PublicAsset[]> {
+  const { limit = 6, category, location } = params;
   try {
     const supabase = getServerSupabase();
-    let q = supabase
+    let query = supabase
       .from("assets")
-      .select("id, slug, title, category, location, tags, alt_text, storage_path")
+      .select(
+        "id, title, category, location, tags, alt_text, storage_path, approved, published, deleted_at",
+      )
       .eq("approved", true)
       .eq("published", true)
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
-      .limit(Math.min(filters?.limit ?? 24, 50));
-    if (filters?.category) q = q.eq("category", filters.category);
-    if (filters?.location) q = q.eq("location", filters.location);
-    if (filters?.tags?.length) {
-      q = q.overlaps("tags", filters.tags);
+      .limit(limit);
+
+    if (category) {
+      query = query.eq("category", category);
     }
-    const { data, error } = await q;
-    if (error) return [];
-    const rows = (data ?? []) as { id: string; slug: string; title: string | null; category: string | null; location: string | null; tags: string[] | null; alt_text: string | null; storage_path: string | null }[];
-    if (rows.length === 0) return [];
-    const withUrls: PublishedAsset[] = [];
-    for (const r of rows) {
-      let url = "";
-      if (r.storage_path) {
-        const { data: signed } = await supabase.storage
-          .from(BUCKET)
-          .createSignedUrl(r.storage_path, SIGNED_URL_EXPIRY);
-        url = signed?.signedUrl ?? "";
-      }
-      withUrls.push({
-        id: r.id,
-        slug: r.slug,
-        title: r.title,
-        category: r.category,
-        location: r.location,
-        tags: r.tags,
-        alt_text: r.alt_text,
-        url,
-      });
+    if (location) {
+      query = query.eq("location", location);
     }
+
+    const { data, error } = await query;
+    if (error || !data) {
+      return [];
+    }
+
+    const storage = supabase.storage.from("assets");
+    const withUrls = await Promise.all(
+      data.map(async (row) => {
+        let url: string | null = null;
+        if (row.storage_path) {
+          const { data: signed, error: signedError } =
+            await storage.createSignedUrl(row.storage_path as string, 3600);
+          if (!signedError && signed?.signedUrl) {
+            url = signed.signedUrl;
+          }
+        }
+        return {
+          id: row.id as string,
+          title: (row.title as string | null) ?? null,
+          category: (row.category as string | null) ?? null,
+          location: (row.location as string | null) ?? null,
+          tags: (row.tags as string[] | null) ?? null,
+          alt_text: (row.alt_text as string | null) ?? null,
+          url,
+        };
+      }),
+    );
+
     return withUrls;
   } catch {
     return [];
   }
 }
+

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "smoke:assets": "node scripts/smoke_assets_validation.js"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",

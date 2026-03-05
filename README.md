@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smile Transformation Platform
 
-## Getting Started
+Plataforma web para coordinación y hospitalidad de experiencias (USA LLC). Los servicios médicos son facturados por clínicas en Colombia. Stack: **Next.js 16** (App Router), **TypeScript**, **Supabase** (Auth, Postgres, Storage), **Stripe**, **Vercel**.
 
-First, run the development server:
+## Arrancar en local
 
 ```bash
+npm install
+cp .env.example .env.local   # rellenar Supabase (y Stripe cuando aplique)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Comando | Descripción |
+|--------|-------------|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run lint` | ESLint |
+| `npm run smoke:assets` | Validación básica de assets (admin) |
 
-## Learn More
+## Variables de entorno
 
-To learn more about Next.js, take a look at the following resources:
+- `.env.example` y `.env.local.example` listan las variables necesarias.
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Stripe (cuando se use): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, etc.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentación
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Estado de módulos](STATUS.md)
+- [Modelo de datos (MVP)](docs/DATA_MODEL.md)
+- [Pasos de prueba](docs/TEST_STEPS.md)
+- **[Usar Cursor desde el móvil (GitHub + Cursor Mobile)](docs/CURSOR_MOBILE.md)**
+- **[Conectar GitHub con Vercel y desplegar](docs/VERCEL_DEPLOY.md)**
 
-## Deploy on Vercel
+## Usar con Cursor (desktop o móvil)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Reglas del proyecto para la IA: `.cursor/rules.md`.
+- Para **abrir este proyecto en Cursor Mobile** (iPhone/Android) o en **Cursor Agents** (web): sigue la guía [docs/CURSOR_MOBILE.md](docs/CURSOR_MOBILE.md) (crear repo en GitHub, conectar remoto, push, abrir desde la app o la web).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+
+Compatible con Vercel. Configurar env en el dashboard y desplegar desde la rama `main`.

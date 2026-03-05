@@ -1,75 +1,106 @@
 import { NextResponse } from "next/server";
-import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
+import { getServerSupabase } from "@/lib/supabase/server";
 import { AssetUpdateSchema } from "@/lib/validation/asset";
-import { createLogger } from "@/lib/logger";
 
-const BUCKET = "assets";
+type RouteContext = { params: Promise<{ id: string }> };
 
-type Props = { params: Promise<{ id: string }> };
-
-export async function PATCH(request: Request, { params }: Props) {
-  const log = createLogger(crypto.randomUUID());
+export async function PATCH(request: Request, { params }: RouteContext) {
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  const { id } = await params;
-  const body = await request.json().catch(() => ({}));
-  const parsed = AssetUpdateSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid body", details: parsed.error.flatten() }, { status: 400 });
-  }
-  const supabase = getServerSupabase();
-  const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (parsed.data.title !== undefined) updates.title = parsed.data.title;
-  if (parsed.data.category !== undefined) updates.category = parsed.data.category;
-  if (parsed.data.location !== undefined) updates.location = parsed.data.location;
-  if (parsed.data.tags !== undefined) updates.tags = parsed.data.tags;
-  if (parsed.data.alt_text !== undefined) updates.alt_text = parsed.data.alt_text;
-  if (parsed.data.source_url !== undefined) updates.source_url = parsed.data.source_url;
-  if (parsed.data.approved !== undefined) updates.approved = parsed.data.approved;
-  if (parsed.data.published !== undefined) updates.published = parsed.data.published;
 
+  const { id } = await params;
+  const json = await request.json().catch(() => ({}));
+  const parsed = AssetUpdateSchema.safeParse(json);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid body", details: parsed.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  const updates: Record<string, unknown> = {};
+  const body = parsed.data;
+
+  if (body.title !== undefined) updates.title = body.title;
+  if (body.category !== undefined) updates.category = body.category;
+  if (body.location !== undefined) updates.location = body.location;
+  if (body.alt_text !== undefined) updates.alt_text = body.alt_text;
+  if (body.source_url !== undefined) updates.source_url = body.source_url ?? null;
+  if (body.tags !== undefined) {
+    updates.tags = body.tags.map((t) => t.toLowerCase());
+  }
+  if (body.approved !== undefined) updates.approved = body.approved;
+  if (body.published !== undefined) updates.published = body.published;
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: "No updates provided" }, { status: 400 });
+  }
+
+  updates.updated_at = new Date().toISOString();
+
+  const supabase = getServerSupabase();
   const { data, error } = await supabase
     .from("assets")
     .update(updates)
     .eq("id", id)
-    .select()
+    .select(
+      "id, title, category, location, tags, approved, published, storage_path, alt_text, created_at",
+    )
     .single();
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  log.info("Asset updated", { id });
+
   return NextResponse.json(data);
 }
 
-export async function DELETE(request: Request, { params }: Props) {
-  const log = createLogger(crypto.randomUUID());
+export async function DELETE(_request: Request, { params }: RouteContext) {
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
   const { id } = await params;
   const supabase = getServerSupabase();
-  const { data: asset, error: fetchError } = await supabase
+  const { data: asset, error } = await supabase
     .from("assets")
-    .select("storage_path")
+    .select("id, storage_path")
     .eq("id", id)
-    .single();
-  if (fetchError || !asset) {
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (!asset) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  if (asset.storage_path) {
-    await supabase.storage.from(BUCKET).remove([asset.storage_path]);
+
+  const storagePath = asset.storage_path as string | null;
+  if (storagePath) {
+    await supabase.storage.from("assets").remove([storagePath]);
   }
-  const { error: deleteError } = await supabase.from("assets").delete().eq("id", id);
-  if (deleteError) {
-    log.error("Asset row delete failed", { error: deleteError.message });
-    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+
+  const { error: updateError } = await supabase
+    .from("assets")
+    .update({
+      deleted_at: new Date().toISOString(),
+      approved: false,
+      published: false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id);
+
+  if (updateError) {
+    return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
-  log.info("Asset deleted", { id });
-  return new NextResponse(null, { status: 204 });
+
+  return NextResponse.json({ ok: true });
 }
+

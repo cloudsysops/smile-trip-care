@@ -75,6 +75,18 @@ npm run dev
 
 ---
 
+## M8 Admin assets manager
+1. Sign in as admin and go to http://localhost:3000/admin/assets/new.
+2. Upload a JPEG/PNG/WebP image with title, category, location, tags and alt text. Submit.
+3. Confirm the success message and that the new asset appears in http://localhost:3000/admin/assets with `approved=false` and `published=false`.
+4. Check that the image is **not** visible on the landing gallery or package pages yet.
+5. From /admin/assets, toggle **Approved** and **Published** for that asset.
+6. Refresh the landing page and the corresponding package page: the asset should now appear in the gallery.
+7. Use the **Edit** action to change title/alt text/tags and Save; verify updates in the table.
+8. Use **Delete** on an asset; confirm it disappears from the table and no longer appears on public pages.
+
+---
+
 ## Final local checklist (URLs + curl)
 | # | Action | Expected |
 |---|--------|----------|
@@ -84,4 +96,5 @@ npm run dev
 | 4 | `curl -X POST .../api/leads` (valid body) | 200, lead_id |
 | 5 | Open /admin/login, sign in | /admin/leads |
 | 6 | Open /admin/leads/[id], Collect deposit | Stripe Checkout → pay → webhook updates DB |
-| 7 | `npm run lint && npm run build` | Pass |
+| 7 | /admin/assets + /admin/assets/new | Admin assets manager works as above |
+| 8 | `npm run lint && npm run build` | Pass |

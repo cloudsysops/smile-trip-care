@@ -1,5 +1,7 @@
 # Smile Transformation — Cursor Rules
 
+- **Cursor Mobile / Agents:** Las mismas reglas aplican al trabajar desde la app móvil o desde cursor.com/agents. Ver `docs/CURSOR_MOBILE.md` para conectar el repo con GitHub y abrirlo en el móvil.
+
 ## Project
 - Next.js App Router + TypeScript. Supabase (Postgres/Auth/Storage), Stripe, Vercel.
 - USA LLC: coordination & hospitality only. Medical services billed by clinics in Colombia. No medical promises.
