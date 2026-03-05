@@ -5,12 +5,13 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { z } from "zod";
+import { UuidSchema } from "@/lib/validation/common";
 
 const BodySchema = z.object({
-  lead_id: z.string().uuid(),
-  amount_cents: z.number().int().positive(),
-  success_url: z.string().url(),
-  cancel_url: z.string().url(),
+  lead_id: UuidSchema,
+  amount_cents: z.number().int().positive().max(10_000_000),
+  success_url: z.string().url().optional(),
+  cancel_url: z.string().url().optional(),
 });
 
 export async function POST(request: Request) {

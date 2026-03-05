@@ -3,6 +3,12 @@ import Stripe from "stripe";
 import { getServerConfig } from "@/lib/config/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
+import { z } from "zod";
+import { UuidSchema } from "@/lib/validation/common";
+
+const CheckoutSessionMetadataSchema = z.object({
+  lead_id: UuidSchema,
+});
 
 /** Stripe webhook: MUST use raw body for signature verification. */
 export async function POST(request: Request) {
@@ -41,11 +47,12 @@ export async function POST(request: Request) {
   }
   const session = event.data.object as Stripe.Checkout.Session;
   const sessionId = session.id;
-  const leadId = session.metadata?.lead_id as string | undefined;
-  if (!leadId) {
-    log.warn("checkout.session.completed without lead_id in metadata");
+  const metadataParsed = CheckoutSessionMetadataSchema.safeParse(session.metadata ?? {});
+  if (!metadataParsed.success) {
+    log.warn("checkout.session.completed with invalid lead_id metadata");
     return NextResponse.json({ received: true });
   }
+  const { lead_id: leadId } = metadataParsed.data;
   const supabase = getServerSupabase();
   const { data: payment, error: updatePayError } = await supabase
     .from("payments")
