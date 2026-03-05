@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 type AssetRow = {
@@ -47,11 +47,7 @@ export default function AssetsPage() {
   const [editAlt, setEditAlt] = useState("");
   const [editTags, setEditTags] = useState("");
 
-  useEffect(() => {
-    void fetchAssets();
-  }, [page, filters.category, filters.location, filters.approved, filters.published, filters.q]);
-
-  async function fetchAssets() {
+  const fetchAssets = useCallback(async () => {
     setLoading(true);
     setError(null);
     const params = new URLSearchParams();
@@ -75,7 +71,14 @@ export default function AssetsPage() {
       setError("Network error.");
     }
     setLoading(false);
-  }
+  }, [filters.approved, filters.category, filters.location, filters.published, filters.q, page, pageSize]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void fetchAssets();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchAssets]);
 
   async function patchAsset(id: string, patch: Record<string, unknown>) {
     const res = await fetch(`/api/admin/assets/${id}`, {

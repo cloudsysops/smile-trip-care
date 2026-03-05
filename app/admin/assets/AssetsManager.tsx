@@ -40,7 +40,7 @@ export default function AssetsManager() {
     return params;
   }, [category, location, approved, published, search]);
 
-  function fetchAssets() {
+  const fetchAssets = useCallback(() => {
     setLoading(true);
     const params = buildParams();
     fetch(`/api/admin/assets?${params}`)
@@ -50,25 +50,14 @@ export default function AssetsManager() {
         setTotal(j.total ?? 0);
       })
       .finally(() => setLoading(false));
-  }
+  }, [buildParams]);
 
   useEffect(() => {
-    let active = true;
-    const params = buildParams();
-    fetch(`/api/admin/assets?${params}`)
-      .then((r) => r.json())
-      .then((j) => {
-        if (!active) return;
-        setAssets(j.data ?? []);
-        setTotal(j.total ?? 0);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [buildParams]);
+    const timer = window.setTimeout(() => {
+      fetchAssets();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchAssets]);
 
   async function toggleApproved(id: string, value: boolean) {
     const res = await fetch(`/api/admin/assets/${id}`, {

@@ -6,6 +6,8 @@ const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+  OPENAI_API_KEY: z.string().startsWith("sk-").optional(),
+  OPENAI_MODEL: z.string().min(1).optional(),
 });
 
 export type ServerConfig = z.infer<typeof serverSchema>;
@@ -17,6 +19,8 @@ function parse(): z.SafeParseReturnType<unknown, ServerConfig> {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_MODEL: process.env.OPENAI_MODEL,
   });
 }
 

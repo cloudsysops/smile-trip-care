@@ -87,6 +87,32 @@ npm run dev
 
 ---
 
+## M9 AI agents (admin connected)
+1. Add `OPENAI_API_KEY` in `.env.local` (optional: `OPENAI_MODEL`).
+2. Ensure Supabase migration `supabase/migrations/0003_m9_ai_admin_connected.sql` is applied.
+3. Start dev server:
+   ```bash
+   npm run dev
+   ```
+4. Sign in as admin and open `/admin/leads/[id]`.
+5. Click:
+   - `Generate Triage`
+   - `Generate Reply`
+   - `Generate Itinerary`
+6. Validate UI:
+   - triage panel shows priority/recommended city/questions
+   - reply panel shows WhatsApp + Email with copy buttons
+   - itinerary history shows latest first and Copy JSON works
+7. Validate DB:
+   - `lead_ai.triage_json` and `lead_ai.messages_json` populated
+   - `itineraries.content_json` inserted with `lead_id` and `city`
+8. Final check:
+   ```bash
+   npm run lint && npm run build
+   ```
+
+---
+
 ## Final local checklist (URLs + curl)
 | # | Action | Expected |
 |---|--------|----------|
@@ -97,4 +123,5 @@ npm run dev
 | 5 | Open /admin/login, sign in | /admin/leads |
 | 6 | Open /admin/leads/[id], Collect deposit | Stripe Checkout → pay → webhook updates DB |
 | 7 | /admin/assets + /admin/assets/new | Admin assets manager works as above |
-| 8 | `npm run lint && npm run build` | Pass |
+| 8 | /admin/leads/[id], run AI buttons | Triage/reply/itinerary rendered and persisted |
+| 9 | `npm run lint && npm run build` | Pass |
