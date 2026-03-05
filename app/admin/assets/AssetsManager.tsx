@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 type Asset = {
@@ -30,14 +30,19 @@ export default function AssetsManager() {
   const [published, setPublished] = useState("");
   const [search, setSearch] = useState("");
 
-  function fetchAssets() {
-    setLoading(true);
+  const buildParams = useCallback(() => {
     const params = new URLSearchParams();
     if (category) params.set("category", category);
     if (location) params.set("location", location);
     if (approved) params.set("approved", approved);
     if (published) params.set("published", published);
     if (search.trim()) params.set("search", search.trim());
+    return params;
+  }, [category, location, approved, published, search]);
+
+  function fetchAssets() {
+    setLoading(true);
+    const params = buildParams();
     fetch(`/api/admin/assets?${params}`)
       .then((r) => r.json())
       .then((j) => {
@@ -48,8 +53,22 @@ export default function AssetsManager() {
   }
 
   useEffect(() => {
-    fetchAssets();
-  }, [category, location, approved, published]);
+    let active = true;
+    const params = buildParams();
+    fetch(`/api/admin/assets?${params}`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (!active) return;
+        setAssets(j.data ?? []);
+        setTotal(j.total ?? 0);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [buildParams]);
 
   async function toggleApproved(id: string, value: boolean) {
     const res = await fetch(`/api/admin/assets/${id}`, {

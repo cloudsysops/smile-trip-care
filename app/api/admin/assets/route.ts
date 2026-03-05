@@ -21,7 +21,7 @@ export type AssetRow = {
   published: boolean;
   created_at: string;
   updated_at: string;
-  signed_url?: string;
+  signed_url?: string | null;
 };
 
 export async function GET(request: Request) {
