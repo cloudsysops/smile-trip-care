@@ -3,9 +3,8 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
-import { getAgentSystemPrompt } from "@/lib/ai/prompts";
-import { callAgent } from "@/lib/ai/openai";
-import { LeadTriageOutputSchema, SalesResponderOutputSchema } from "@/lib/ai/schemas";
+import { callSalesResponder } from "@/lib/ai/openai";
+import { LeadTriageOutputSchema } from "@/lib/ai/schemas";
 
 const BodySchema = z.object({
   lead_id: z.string().uuid(),
@@ -61,38 +60,30 @@ export async function POST(request: Request) {
     const triageMaybe = LeadTriageOutputSchema.safeParse(aiRow?.triage_json);
 
     const ctaUrl = parsedBody.data.cta_url ?? `${new URL(request.url).origin}/assessment`;
-    const systemPrompt = await getAgentSystemPrompt("sales-responder");
-    const responseRaw = await callAgent({
-      agentName: "sales-responder",
-      systemPrompt,
-      userJson: {
-        lead: {
-          name: `${lead.first_name} ${lead.last_name}`.trim(),
-          email: lead.email,
-          phone: lead.phone,
-          country: lead.country,
-          package_slug: lead.package_slug,
-          notes: lead.message,
-        },
-        triage: triageMaybe.success ? triageMaybe.data : null,
-        cta_url: ctaUrl,
+    const reply = await callSalesResponder({
+      lead: {
+        name: `${lead.first_name} ${lead.last_name}`.trim(),
+        email: lead.email,
+        phone: lead.phone,
+        country: lead.country,
+        package_slug: lead.package_slug,
+        notes: lead.message,
       },
+      triage: triageMaybe.success ? triageMaybe.data : null,
+      cta_url: ctaUrl,
     });
 
-    const messageParsed = SalesResponderOutputSchema.safeParse(responseRaw);
-    if (!messageParsed.success) {
-      log.warn("Sales responder schema validation failed", { issues: messageParsed.error.issues });
-      return NextResponse.json(
-        { error: "Invalid AI response format", request_id: requestId },
-        { status: 502 },
-      );
-    }
-
-    const message = messageParsed.data;
+    const generatedAt = new Date().toISOString();
     const messagePayload = {
-      ...message,
-      cta_url: ctaUrl,
-      generated_at: new Date().toISOString(),
+      ...reply,
+      generated_at: generatedAt,
+      lead_snapshot_minimal: {
+        lead_id: lead.id as string,
+        name: `${lead.first_name} ${lead.last_name}`.trim(),
+        email: lead.email as string,
+        country: (lead.country as string | null) ?? null,
+        package_slug: (lead.package_slug as string | null) ?? null,
+      },
     };
 
     const now = new Date().toISOString();
@@ -117,7 +108,7 @@ export async function POST(request: Request) {
     }
 
     log.info("Lead response generated", { lead_id: parsedBody.data.lead_id });
-    return NextResponse.json({ message: messagePayload, request_id: requestId });
+    return NextResponse.json({ reply: messagePayload, request_id: requestId });
   } catch (err) {
     log.error("Respond route error", { err: String(err) });
     return NextResponse.json({ error: "Server error", request_id: requestId }, { status: 500 });

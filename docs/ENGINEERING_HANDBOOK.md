@@ -9,7 +9,7 @@
 ## Env
 - **Server** (`lib/config/server.ts`): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_*`. Never expose to client.
 - **Public** (`lib/config/public.ts`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
-- **AI Server vars**: `OPENAI_API_KEY` (required for M9), optional `OPENAI_MODEL` override.
+- **AI Server vars**: `OPENAI_API_KEY` (required for M9/M9.1), optional `OPENAI_MODEL` override. Keep server-only; never expose in client code.
 - Copy `.env.local.example` to `.env.local` and fill for local dev.
 
 ## Conventions
@@ -35,3 +35,4 @@
   - `POST /api/ai/itinerary`
 - Outputs are validated with Zod schemas in `lib/ai/schemas.ts` before persistence.
 - Agent specs are versioned under `agents/*.md` to keep behavior stable across environments.
+- Sales responder persists output into `lead_ai.messages_json` and returns `{ reply, request_id }` to the admin UI.

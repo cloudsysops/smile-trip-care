@@ -1,3 +1,6 @@
+import { getAgentSystemPrompt } from "@/lib/ai/prompts";
+import { SalesResponderOutputSchema, type LeadTriageOutput, type SalesResponderOutput } from "@/lib/ai/schemas";
+
 type OpenAIMessage = {
   role: "system" | "user";
   content: string;
@@ -18,6 +21,19 @@ export type CallAgentArgs = {
   agentName: string;
   systemPrompt: string;
   userJson: unknown;
+};
+
+export type SalesResponderInput = {
+  lead: {
+    name: string;
+    email: string;
+    phone: string | null;
+    country: string | null;
+    package_slug: string | null;
+    notes: string | null;
+  };
+  triage: LeadTriageOutput | null;
+  cta_url: string;
 };
 
 function extractJsonText(raw: string): string {
@@ -98,4 +114,18 @@ export async function callAgent({ agentName, systemPrompt, userJson }: CallAgent
   } catch (err) {
     throw new Error(`Failed to parse JSON for ${agentName}: ${String(err)}`);
   }
+}
+
+export async function callSalesResponder(input: SalesResponderInput): Promise<SalesResponderOutput> {
+  const systemPrompt = await getAgentSystemPrompt("sales-responder");
+  const raw = await callAgent({
+    agentName: "sales-responder",
+    systemPrompt,
+    userJson: input,
+  });
+  const parsed = SalesResponderOutputSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error(`Invalid sales-responder output: ${JSON.stringify(parsed.error.flatten())}`);
+  }
+  return parsed.data;
 }

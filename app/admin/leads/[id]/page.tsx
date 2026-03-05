@@ -12,6 +12,15 @@ type Props = { params: Promise<{ id: string }> };
 const StoredMessageSchema = SalesResponderOutputSchema.extend({
   cta_url: z.string().url().optional(),
   generated_at: z.string().optional(),
+  lead_snapshot_minimal: z
+    .object({
+      lead_id: z.string().uuid(),
+      name: z.string().min(1),
+      email: z.string().email(),
+      country: z.string().nullable(),
+      package_slug: z.string().nullable(),
+    })
+    .optional(),
 });
 
 export default async function AdminLeadDetailPage({ params }: Props) {

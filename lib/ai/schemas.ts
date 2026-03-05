@@ -14,7 +14,7 @@ export const SalesResponderOutputSchema = z.object({
   whatsapp_message: z.string().min(1),
   email_subject: z.string().min(1),
   email_body: z.string().min(1),
-  followup_in_hours: z.number().int().min(1).max(168),
+  followup_in_hours: z.literal(24),
   tone: z.enum(["premium", "friendly"]),
 }).strict();
 
