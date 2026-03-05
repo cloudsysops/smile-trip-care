@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AdminShell from "../../_components/AdminShell";
 
 const CATEGORIES = ["clinic", "finca", "lodging", "tour", "team", "other"];
 const LOCATIONS = ["Medellín", "Manizales", "Other"];
@@ -62,14 +63,18 @@ export default function NewAssetPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <Link href="/admin/assets" className="text-sm text-zinc-600 hover:underline">← Assets</Link>
-          <h1 className="text-xl font-semibold">Upload asset</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-2xl px-6 py-8">
+    <AdminShell
+      title="Upload asset"
+      currentSection="assets"
+      headerLeading={
+        <Link href="/admin/assets" className="text-sm text-zinc-600 hover:underline">
+          ← Assets
+        </Link>
+      }
+      headerContainerClassName="max-w-2xl"
+      mainContainerClassName="max-w-2xl"
+    >
+      <div>
         {success && (
           <div className="mb-6 rounded-lg bg-emerald-50 p-4 text-emerald-800">
             Asset uploaded. It will not appear on the site until approved and published.
@@ -123,7 +128,7 @@ export default function NewAssetPage() {
             <Link href="/admin/assets" className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">Cancel</Link>
           </div>
         </form>
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }

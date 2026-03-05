@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import AdminShell from "../_components/AdminShell";
 
 type AssetRow = {
   id: string;
@@ -141,22 +142,21 @@ export default function AssetsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <h1 className="text-xl font-semibold">Admin — Assets</h1>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin/assets/new"
-              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-            >
-              Upload asset
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-6 py-8 space-y-4">
+    <AdminShell
+      title="Admin — Assets"
+      currentSection="assets"
+      headerContainerClassName="max-w-5xl"
+      mainContainerClassName="max-w-5xl"
+      headerActions={
+        <Link
+          href="/admin/assets/new"
+          className="rounded-full bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
+        >
+          Upload asset
+        </Link>
+      }
+    >
+      <div className="space-y-4">
         <section className="rounded-lg border border-zinc-200 bg-white p-4 flex flex-wrap gap-3 items-end">
           <div>
             <label className="block text-xs font-medium text-zinc-600">Category</label>
@@ -379,8 +379,8 @@ export default function AssetsPage() {
             </button>
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }
 
