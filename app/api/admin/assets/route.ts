@@ -1,29 +1,11 @@
 import { NextResponse } from "next/server";
-import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
+import { getServerSupabase } from "@/lib/supabase/server";
+import { AssetFilterSchema } from "@/lib/validation/asset";
 
 const BUCKET = "assets";
 const SIGNED_EXPIRY = 3600;
-
-export type AssetRow = {
-  id: string;
-  slug: string;
-  kind: string;
-  url: string | null;
-  title: string | null;
-  storage_path: string | null;
-  category: string | null;
-  location: string | null;
-  tags: string[] | null;
-  alt_text: string | null;
-  source_url: string | null;
-  approved: boolean;
-  published: boolean;
-  created_at: string;
-  updated_at: string;
-  signed_url?: string | null;
-};
 
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID();
@@ -35,45 +17,84 @@ export async function GET(request: Request) {
   }
 
   try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category") ?? undefined;
-    const location = searchParams.get("location") ?? undefined;
-    const approved = searchParams.get("approved");
-    const published = searchParams.get("published");
-    const search = searchParams.get("search")?.trim();
-    const limit = Math.min(Number(searchParams.get("limit")) || 50, 100);
-    const offset = Math.max(0, Number(searchParams.get("offset")) || 0);
+    const url = new URL(request.url);
+    const params = {
+      category: url.searchParams.get("category") || undefined,
+      location: url.searchParams.get("location") || undefined,
+      approved:
+        url.searchParams.get("approved") != null
+          ? url.searchParams.get("approved") === "true"
+          : undefined,
+      published:
+        url.searchParams.get("published") != null
+          ? url.searchParams.get("published") === "true"
+          : undefined,
+      q: url.searchParams.get("q") || undefined,
+      page: url.searchParams.get("page") || undefined,
+      pageSize: url.searchParams.get("pageSize") || undefined,
+    };
+
+    const parsed = AssetFilterSchema.safeParse(params);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid filters" }, { status: 400 });
+    }
+
+    const { category, location, approved, published, q, page, pageSize } = parsed.data;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
 
     const supabase = getServerSupabase();
-    let q = supabase
+    let query = supabase
       .from("assets")
-      .select("id, slug, kind, url, title, storage_path, category, location, tags, alt_text, source_url, approved, published, created_at, updated_at", { count: "exact" })
+      .select(
+        "id, title, category, location, tags, approved, published, storage_path, alt_text, created_at, deleted_at",
+        { count: "exact" },
+      )
+      .is("deleted_at", null)
       .order("created_at", { ascending: false })
-      .range(offset, offset + limit - 1);
-    if (category) q = q.eq("category", category);
-    if (location) q = q.eq("location", location);
-    if (approved === "true") q = q.eq("approved", true);
-    if (approved === "false") q = q.eq("approved", false);
-    if (published === "true") q = q.eq("published", true);
-    if (published === "false") q = q.eq("published", false);
-    if (search) {
-      q = q.or(`title.ilike.%${search}%,alt_text.ilike.%${search}%`);
+      .range(from, to);
+
+    if (category) query = query.eq("category", category);
+    if (location) query = query.eq("location", location);
+    if (typeof approved === "boolean") query = query.eq("approved", approved);
+    if (typeof published === "boolean") query = query.eq("published", published);
+    if (q) {
+      const term = q.trim();
+      if (term.length > 0) {
+        query = query.or(`title.ilike.%${term}%,alt_text.ilike.%${term}%`);
+      }
     }
-    const { data, error, count } = await q;
+
+    const { data, error, count } = await query;
     if (error) {
       log.error("Failed to list assets", { error: error.message });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
-    const rows = (data ?? []) as (AssetRow & { storage_path?: string | null })[];
-    for (const row of rows) {
-      if (row.storage_path) {
-        const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(row.storage_path, SIGNED_EXPIRY);
-        row.signed_url = signed?.signedUrl ?? null;
-      }
-    }
-    return NextResponse.json({ data: rows, total: count ?? 0 });
+
+    const storage = supabase.storage.from(BUCKET);
+    const items = await Promise.all(
+      (data ?? []).map(async (row) => {
+        let signed_url: string | null = null;
+        if (row.storage_path) {
+          const { data: signed } = await storage.createSignedUrl(row.storage_path as string, SIGNED_EXPIRY);
+          signed_url = signed?.signedUrl ?? null;
+        }
+        return {
+          ...row,
+          signed_url,
+        };
+      }),
+    );
+
+    return NextResponse.json({
+      items,
+      count: count ?? 0,
+      page,
+      pageSize,
+    });
   } catch (err) {
     log.error("Assets list endpoint failed", { err: String(err) });
     return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
 }
+

@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+/**
+ * Liveness probe: app process is running.
+ * Use for load balancers / orchestrators (e.g. GET /api/health).
+ */
 export async function GET() {
   const commit =
     process.env.VERCEL_GIT_COMMIT_SHA
@@ -8,8 +12,9 @@ export async function GET() {
 
   return NextResponse.json({
     ok: true,
-    service: "smile-transformation",
+    status: "ok",
     timestamp: new Date().toISOString(),
+    service: "smile-transformation",
     ...(commit ? { commit } : {}),
   });
 }
