@@ -1,11 +1,18 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import LeadStatusForm from "../LeadStatusForm";
 import DepositButton from "../DepositButton";
+import AiActionsPanel from "./AiActionsPanel";
+import { ItineraryOutputSchema, LeadTriageOutputSchema, SalesResponderOutputSchema } from "@/lib/ai/schemas";
 
 type Props = { params: Promise<{ id: string }> };
+const StoredMessageSchema = SalesResponderOutputSchema.extend({
+  cta_url: z.string().url().optional(),
+  generated_at: z.string().optional(),
+});
 
 export default async function AdminLeadDetailPage({ params }: Props) {
   try {
@@ -21,6 +28,32 @@ export default async function AdminLeadDetailPage({ params }: Props) {
     .eq("id", id)
     .single();
   if (error || !lead) notFound();
+
+  const { data: aiRows } = await supabase
+    .from("lead_ai")
+    .select("triage_json, messages_json")
+    .eq("lead_id", id)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const latestAi = aiRows?.[0];
+  const triageMaybe = LeadTriageOutputSchema.safeParse(latestAi?.triage_json);
+  const messagesMaybe = StoredMessageSchema.safeParse(latestAi?.messages_json);
+
+  const { data: itineraryRows } = await supabase
+    .from("itineraries")
+    .select("id, city, content_json, created_at")
+    .eq("lead_id", id)
+    .order("created_at", { ascending: false });
+
+  const parsedItineraries = (itineraryRows ?? []).map((row) => {
+    const parsed = ItineraryOutputSchema.safeParse(row.content_json);
+    return {
+      id: row.id as string,
+      city: (row.city as string | null) ?? null,
+      content_json: parsed.success ? parsed.data : null,
+      created_at: row.created_at as string,
+    };
+  });
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -48,6 +81,12 @@ export default async function AdminLeadDetailPage({ params }: Props) {
           <p className="mt-1 text-sm text-zinc-600">Create a checkout session for the deposit.</p>
           <DepositButton leadId={lead.id} />
         </div>
+        <AiActionsPanel
+          leadId={lead.id}
+          initialTriage={triageMaybe.success ? triageMaybe.data : null}
+          initialMessage={messagesMaybe.success ? messagesMaybe.data : null}
+          initialItineraries={parsedItineraries}
+        />
       </main>
     </div>
   );

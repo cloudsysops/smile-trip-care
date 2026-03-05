@@ -10,6 +10,8 @@
 | **M5.1** `/api/leads` | ✅ Done | Server-side POST, Zod, service role only; honeypot rejection |
 | **M6** Admin leads | ⏳ Pending | Auth + role gate, leads list |
 | **M7** Stripe checkout + webhook | ⏳ Pending | Checkout session, webhook with raw body verification |
+| **M8** Admin assets manager | ✅ Done | Upload/edit/delete with Supabase Storage, filters and moderation toggles |
+| **M9** AI agents (admin connected) | ✅ Done | `/api/ai/{triage,respond,itinerary}`, Zod-validated strict JSON, persisted + visible in `/admin/leads/[id]` |
 
 ## Run after migration
 ```bash
