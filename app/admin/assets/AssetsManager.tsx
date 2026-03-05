@@ -30,14 +30,19 @@ export default function AssetsManager() {
   const [published, setPublished] = useState("");
   const [search, setSearch] = useState("");
 
-  const fetchAssets = useCallback(() => {
-    setLoading(true);
+  const buildParams = useCallback(() => {
     const params = new URLSearchParams();
     if (category) params.set("category", category);
     if (location) params.set("location", location);
     if (approved) params.set("approved", approved);
     if (published) params.set("published", published);
     if (search.trim()) params.set("search", search.trim());
+    return params;
+  }, [category, location, approved, published, search]);
+
+  const fetchAssets = useCallback(() => {
+    setLoading(true);
+    const params = buildParams();
     fetch(`/api/admin/assets?${params}`)
       .then((r) => r.json())
       .then((j) => {
@@ -45,7 +50,7 @@ export default function AssetsManager() {
         setTotal(j.total ?? 0);
       })
       .finally(() => setLoading(false));
-  }, [approved, category, location, published, search]);
+  }, [buildParams]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
