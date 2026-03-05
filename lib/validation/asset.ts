@@ -3,26 +3,38 @@ import { z } from "zod";
 export const ASSET_CATEGORIES = ["clinic", "finca", "lodging", "tour", "team", "other"] as const;
 export const ASSET_LOCATIONS = ["Medellín", "Manizales", "Other"] as const;
 
-export const AssetUploadSchema = z.object({
-  title: z.string().min(1).max(300),
+const AssetTagSchema = z.string().trim().min(1).max(100);
+const AssetTagsSchema = z.array(AssetTagSchema).max(20);
+const AssetAltTextSchema = z.string().trim().min(1).max(500);
+const AssetSourceUrlSchema = z.string().url().max(2000).nullable();
+
+export const AssetMetadataSchema = z.object({
+  title: z.string().trim().min(1).max(300),
   category: z.enum(ASSET_CATEGORIES),
   location: z.enum(ASSET_LOCATIONS),
-  tags: z.string().max(500).transform((s) => s.split(",").map((t) => t.trim()).filter(Boolean)),
-  alt_text: z.string().min(1).max(500),
-  source_url: z.string().url().max(2000).optional().or(z.literal("")),
+  tags: AssetTagsSchema,
+  alt_text: AssetAltTextSchema,
+  source_url: AssetSourceUrlSchema,
 });
 
-export const AssetUpdateSchema = z.object({
-  title: z.string().min(1).max(300).optional(),
-  category: z.enum(ASSET_CATEGORIES).optional(),
-  location: z.enum(ASSET_LOCATIONS).optional(),
-  tags: z.array(z.string().max(100)).optional(),
-  alt_text: z.string().min(1).max(500).optional(),
-  source_url: z.string().url().max(2000).optional().nullable(),
+export const AssetUploadSchema = z.object({
+  title: z.string().trim().min(1).max(300),
+  category: z.enum(ASSET_CATEGORIES),
+  location: z.enum(ASSET_LOCATIONS),
+  tags: z.string().max(500).transform((s) => s.split(",").map((t) => t.trim()).filter(Boolean)).pipe(AssetTagsSchema),
+  alt_text: AssetAltTextSchema,
+  source_url: z.string().url().max(2000).optional().or(z.literal("")),
+}).transform((input) => ({
+  ...input,
+  source_url: input.source_url || null,
+}));
+
+export const AssetUpdateSchema = AssetMetadataSchema.partial().extend({
   approved: z.boolean().optional(),
   published: z.boolean().optional(),
 });
 
+export type AssetMetadataInput = z.infer<typeof AssetMetadataSchema>;
 export type AssetUploadInput = z.infer<typeof AssetUploadSchema>;
 export type AssetUpdateInput = z.infer<typeof AssetUpdateSchema>;
 

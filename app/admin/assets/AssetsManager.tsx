@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 
 type Asset = {
@@ -30,7 +30,7 @@ export default function AssetsManager() {
   const [published, setPublished] = useState("");
   const [search, setSearch] = useState("");
 
-  function fetchAssets() {
+  const fetchAssets = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams();
     if (category) params.set("category", category);
@@ -45,11 +45,14 @@ export default function AssetsManager() {
         setTotal(j.total ?? 0);
       })
       .finally(() => setLoading(false));
-  }
+  }, [approved, category, location, published, search]);
 
   useEffect(() => {
-    fetchAssets();
-  }, [category, location, approved, published]);
+    const timer = setTimeout(() => {
+      fetchAssets();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [fetchAssets]);
 
   async function toggleApproved(id: string, value: boolean) {
     const res = await fetch(`/api/admin/assets/${id}`, {

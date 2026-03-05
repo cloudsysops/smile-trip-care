@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     .single();
   if (updatePayError || !payment) {
     log.error("Failed to update payment", { error: String(updatePayError) });
-    return NextResponse.json({ error: "DB update failed" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
   const { error: leadError } = await supabase
     .from("leads")
