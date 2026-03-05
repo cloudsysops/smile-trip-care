@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getServerConfig } from "@/lib/config/server";
-import { createApiRequestContext, getErrorMessage, internalServerError } from "@/lib/api-errors";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
+import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 
 const BodySchema = z.object({
@@ -14,14 +14,13 @@ const BodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const { requestId, log } = createApiRequestContext();
-
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-
   try {
     const config = getServerConfig();
     if (!config.STRIPE_SECRET_KEY) {
@@ -34,8 +33,7 @@ export async function POST(request: Request) {
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
 
-    // Use the Stripe SDK default API version for package compatibility.
-    const stripe = new Stripe(config.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(config.STRIPE_SECRET_KEY, { apiVersion: "2026-02-25.clover" });
     const origin = new URL(request.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -63,12 +61,12 @@ export async function POST(request: Request) {
     });
     if (error) {
       log.error("Failed to persist checkout session", { error: error.message, lead_id });
-      return internalServerError(requestId);
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
 
     return NextResponse.json({ url: session.url });
-  } catch (error) {
-    log.error("Unhandled Stripe checkout error", { error: getErrorMessage(error) });
-    return internalServerError(requestId);
+  } catch (err) {
+    log.error("Stripe checkout endpoint failed", { err: String(err) });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
 }

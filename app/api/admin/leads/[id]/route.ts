@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { createApiRequestContext, getErrorMessage, internalServerError } from "@/lib/api-errors";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
+import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 
 const UpdateLeadSchema = z.object({
@@ -11,14 +11,13 @@ const UpdateLeadSchema = z.object({
 type Props = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Props) {
-  const { requestId, log } = createApiRequestContext();
-
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-
   try {
     const { id } = await params;
     const body = await request.json().catch(() => ({}));
@@ -34,12 +33,12 @@ export async function PATCH(request: Request, { params }: Props) {
       .select("id, status")
       .single();
     if (error) {
-      log.error("Failed to update lead status", { error: error.message, lead_id: id });
-      return internalServerError(requestId);
+      log.error("Failed to update lead", { id, error: error.message });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
     return NextResponse.json(data);
-  } catch (error) {
-    log.error("Unhandled lead PATCH error", { error: getErrorMessage(error) });
-    return internalServerError(requestId);
+  } catch (err) {
+    log.error("Admin lead PATCH endpoint failed", { err: String(err) });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
 }

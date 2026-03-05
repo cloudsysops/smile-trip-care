@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
-import { createApiRequestContext, getErrorMessage, internalServerError } from "@/lib/api-errors";
+import { createLogger } from "@/lib/logger";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AssetFilterSchema } from "@/lib/validation/asset";
 
-export async function GET(request: Request) {
-  const { requestId, log } = createApiRequestContext();
+const BUCKET = "assets";
+const SIGNED_EXPIRY = 3600;
 
+export async function GET(request: Request) {
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   try {
     await requireAdmin();
   } catch {
@@ -33,10 +36,7 @@ export async function GET(request: Request) {
 
     const parsed = AssetFilterSchema.safeParse(params);
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid filters", details: parsed.error.flatten() },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid filters" }, { status: 400 });
     }
 
     const { category, location, approved, published, q, page, pageSize } = parsed.data;
@@ -58,45 +58,43 @@ export async function GET(request: Request) {
     if (location) query = query.eq("location", location);
     if (typeof approved === "boolean") query = query.eq("approved", approved);
     if (typeof published === "boolean") query = query.eq("published", published);
-    if (q) query = query.ilike("title", `%${q}%`);
+    if (q) {
+      const term = q.trim();
+      if (term.length > 0) {
+        query = query.or(`title.ilike.%${term}%,alt_text.ilike.%${term}%`);
+      }
+    }
 
     const { data, error, count } = await query;
     if (error) {
-      log.error("Admin assets query failed", { error: error.message });
-      return internalServerError(requestId);
+      log.error("Failed to list assets", { error: error.message });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
 
-    const storage = supabase.storage.from("assets");
-    const items =
-      data &&
-      (await Promise.all(
-        data.map(async (row) => {
-          let signedUrl: string | null = null;
-          if (row.storage_path) {
-            const { data: signed, error: signedError } = await storage.createSignedUrl(
-              row.storage_path as string,
-              3600,
-            );
-            if (!signedError && signed?.signedUrl) {
-              signedUrl = signed.signedUrl;
-            }
-          }
-          return {
-            ...row,
-            signed_url: signedUrl,
-          };
-        }),
-      ));
+    const storage = supabase.storage.from(BUCKET);
+    const items = await Promise.all(
+      (data ?? []).map(async (row) => {
+        let signed_url: string | null = null;
+        if (row.storage_path) {
+          const { data: signed } = await storage.createSignedUrl(row.storage_path as string, SIGNED_EXPIRY);
+          signed_url = signed?.signedUrl ?? null;
+        }
+        return {
+          ...row,
+          signed_url,
+        };
+      }),
+    );
 
     return NextResponse.json({
-      items: items ?? [],
+      items,
       count: count ?? 0,
       page,
       pageSize,
     });
-  } catch (error) {
-    log.error("Unhandled admin assets list error", { error: getErrorMessage(error) });
-    return internalServerError(requestId);
+  } catch (err) {
+    log.error("Assets list endpoint failed", { err: String(err) });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
 }
 

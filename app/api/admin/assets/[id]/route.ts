@@ -1,41 +1,36 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
-import { createApiRequestContext, getErrorMessage, internalServerError } from "@/lib/api-errors";
+import { createLogger } from "@/lib/logger";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AssetUpdateSchema } from "@/lib/validation/asset";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: RouteContext) {
-  const { requestId, log } = createApiRequestContext();
-
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-
   try {
     const { id } = await params;
     const json = await request.json().catch(() => ({}));
     const parsed = AssetUpdateSchema.safeParse(json);
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid body", details: parsed.error.flatten() },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
     }
 
-    const updates: Record<string, unknown> = {};
     const body = parsed.data;
-
+    const updates: Record<string, unknown> = {};
     if (body.title !== undefined) updates.title = body.title;
     if (body.category !== undefined) updates.category = body.category;
     if (body.location !== undefined) updates.location = body.location;
     if (body.alt_text !== undefined) updates.alt_text = body.alt_text;
     if (body.source_url !== undefined) updates.source_url = body.source_url ?? null;
     if (body.tags !== undefined) {
-      updates.tags = body.tags.map((t) => t.toLowerCase());
+      updates.tags = body.tags.map((tag) => tag.toLowerCase());
     }
     if (body.approved !== undefined) updates.approved = body.approved;
     if (body.published !== undefined) updates.published = body.published;
@@ -51,32 +46,33 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       .from("assets")
       .update(updates)
       .eq("id", id)
-      .select(
-        "id, title, category, location, tags, approved, published, storage_path, alt_text, created_at",
-      )
-      .single();
+      .is("deleted_at", null)
+      .select("id, title, category, location, tags, approved, published, storage_path, alt_text, source_url, created_at")
+      .maybeSingle();
 
     if (error) {
-      log.error("Failed to update asset", { error: error.message, asset_id: id });
-      return internalServerError(requestId);
+      log.error("Failed to update asset", { id, error: error.message });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    }
+    if (!data) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     return NextResponse.json(data);
-  } catch (error) {
-    log.error("Unhandled asset PATCH error", { error: getErrorMessage(error) });
-    return internalServerError(requestId);
+  } catch (err) {
+    log.error("Asset PATCH endpoint failed", { err: String(err) });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
 }
 
 export async function DELETE(_request: Request, { params }: RouteContext) {
-  const { requestId, log } = createApiRequestContext();
-
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   try {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-
   try {
     const { id } = await params;
     const supabase = getServerSupabase();
@@ -84,13 +80,13 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
       .from("assets")
       .select("id, storage_path")
       .eq("id", id)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (error) {
-      log.error("Failed to load asset for delete", { error: error.message, asset_id: id });
-      return internalServerError(requestId);
+      log.error("Failed to lookup asset for delete", { id, error: error.message });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
-
     if (!asset) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -108,17 +104,18 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
         published: false,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", id);
+      .eq("id", id)
+      .is("deleted_at", null);
 
     if (updateError) {
-      log.error("Failed to soft-delete asset", { error: updateError.message, asset_id: id });
-      return internalServerError(requestId);
+      log.error("Failed to soft delete asset", { id, error: updateError.message });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true });
-  } catch (error) {
-    log.error("Unhandled asset DELETE error", { error: getErrorMessage(error) });
-    return internalServerError(requestId);
+  } catch (err) {
+    log.error("Asset DELETE endpoint failed", { err: String(err) });
+    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
   }
 }
 
