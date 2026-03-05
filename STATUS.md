@@ -23,6 +23,7 @@
 | **M8** Admin assets manager | ✅ Done | Upload/edit/delete with Supabase Storage, filters and moderation toggles |
 | **M8.1** CTO hardening | ✅ Done | `/api/health`, readiness checks, migration `0002` unificada, manejo de errores mejorado |
 | **M9** AI agents (admin connected) | ✅ Done | `/api/ai/{triage,respond,itinerary}`, Zod-validated strict JSON, persisted + visible in `/admin/leads/[id]` |
+| **M9.1** AI lead responder (selling mode) | ✅ Done | “Generate Reply” returns WhatsApp + email drafts, copy-ready UI, persisted in `lead_ai.messages_json` |
 
 ## Run after migration
 ```bash

@@ -6,6 +6,13 @@ import type { ItineraryOutput, LeadTriageOutput, SalesResponderOutput } from "@/
 type StoredMessage = SalesResponderOutput & {
   cta_url?: string;
   generated_at?: string;
+  lead_snapshot_minimal?: {
+    lead_id: string;
+    name: string;
+    email: string;
+    country: string | null;
+    package_slug: string | null;
+  };
 };
 
 type StoredItinerary = {
@@ -78,7 +85,7 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
       setError(data?.error ?? "Failed to generate reply");
       return;
     }
-    setMessage(data.message ?? null);
+    setMessage(data.reply ?? data.message ?? null);
   }
 
   async function handleGenerateItinerary() {
@@ -170,6 +177,10 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
         <h3 className="font-semibold">Latest sales reply</h3>
         {message ? (
           <div className="space-y-4 text-sm">
+            <p className="text-xs text-zinc-500">
+              Tone: {message.tone} · Follow-up: {message.followup_in_hours}h
+              {message.generated_at ? ` · Generated: ${new Date(message.generated_at).toLocaleString()}` : ""}
+            </p>
             <div>
               <div className="mb-1 flex items-center justify-between gap-2">
                 <p className="font-medium text-zinc-600">WhatsApp message</p>
