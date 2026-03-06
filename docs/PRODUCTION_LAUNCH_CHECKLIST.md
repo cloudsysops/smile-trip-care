@@ -135,6 +135,9 @@ where email = 'admin@your-domain.com';
    Expect: `POST /api/automation/worker` claims jobs, executes agents, retries failures with backoff, and marks exhausted jobs as `dead_letter`.
 10. Create and process one outbound draft in admin lead detail
    Expect: message transitions `draft -> approved -> queued/sent` and updates lead contact telemetry.
+11. Validate outbound command center APIs (admin session)
+   - `GET /api/admin/outbound/metrics` returns KPI + SLA risk payload
+   - `GET /api/admin/outbound/queue` returns approved/queued/failed action queue
 
 ---
 

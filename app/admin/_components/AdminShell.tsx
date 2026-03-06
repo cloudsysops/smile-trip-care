@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-type AdminSection = "leads" | "assets" | "status";
+type AdminSection = "leads" | "outbound" | "assets" | "status";
 
 type Props = {
   title: ReactNode;
@@ -19,6 +19,7 @@ type Props = {
 
 const NAV_ITEMS: Array<{ section: AdminSection; href: string; label: string }> = [
   { section: "leads", href: "/admin/leads", label: "Leads" },
+  { section: "outbound", href: "/admin/outbound", label: "Outbound" },
   { section: "assets", href: "/admin/assets", label: "Assets" },
   { section: "status", href: "/admin/status", label: "Status" },
 ];

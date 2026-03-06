@@ -69,3 +69,6 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
    - `leads.status = deposit_paid`
 5. **Logs**
    - Revisar Vercel Functions logs para errores 4xx/5xx y fallos de firma de webhook.
+6. **Outbound command center**
+   - Confirmar acceso admin a `/admin/outbound`.
+   - Confirmar `GET /api/admin/outbound/metrics` y `/api/admin/outbound/queue` con sesión admin.

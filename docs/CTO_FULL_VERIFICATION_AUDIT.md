@@ -32,6 +32,15 @@
   - transition statuses with tracking
 - Added contact telemetry update: outbound statuses `sent/delivered/replied` update `leads.last_contacted_at`.
 
+## 0.2) M17 addendum — Outbound command center (2026-03-06)
+
+- Added admin outbound command center page: `/admin/outbound`.
+- Added admin APIs:
+  - `GET /api/admin/outbound/metrics`
+  - `GET /api/admin/outbound/queue`
+- Added KPI view for outbound lifecycle and SLA-risk leads to prioritize follow-up.
+- Added quick action queue controls linked to outbound status transitions.
+
 ---
 
 ## 1) Executive summary

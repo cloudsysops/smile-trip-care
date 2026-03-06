@@ -91,3 +91,5 @@ AI responders still generate drafts into `lead_ai.messages_json`, and admin now 
   - `cancelled`
 
 This keeps execution human-supervised while enabling measurable conversion tracking per lead.
+
+M17 adds an admin outbound command center (`/admin/outbound`) and API metrics endpoints so sales operators can prioritize queue actions and SLA-risk leads from AI-generated drafts.

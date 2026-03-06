@@ -30,6 +30,7 @@
 | **M13** Agent automation foundation | ✅ Done | Internal server-side triggers run triage/respond after lead creation, itinerary/ops after deposit_paid, plus cron-safe 24h/48h follow-up drafts |
 | **M14** Durable automation queue | ✅ Done | Trigger events enqueue jobs in `ai_automation_jobs`; worker endpoint executes jobs with locks, retries, and dead-letter handling |
 | **M16** Assisted outbound conversion engine | ✅ Done | Admin queue for outbound drafts (AI/manual), approval/send/reply tracking, and lead contact logging via `outbound_messages` |
+| **M17** Outbound command center | ✅ Done | Admin outbound dashboard with actionable queue and SLA-risk metrics to prioritize follow-up actions |
 
 ## Run after migration
 ```bash
