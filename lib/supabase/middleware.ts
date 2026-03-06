@@ -3,6 +3,11 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  if (pathname.startsWith("/admin/login")) {
+    return NextResponse.next({ request });
+  }
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
@@ -25,13 +30,10 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    if (!user) {
-      const redirect = new URL("/admin/login", request.url);
-      redirect.searchParams.set("next", pathname);
-      return NextResponse.redirect(redirect);
-    }
+  if (!user) {
+    const redirect = new URL("/admin/login", request.url);
+    redirect.searchParams.set("next", pathname);
+    return NextResponse.redirect(redirect);
   }
 
   return response;

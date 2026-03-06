@@ -36,4 +36,5 @@
 - `supabase/migrations/0005_leads_follow_up_queue.sql`: adds sales follow-up queue fields and index (`next_follow_up_at`) on leads.
 - `supabase/migrations/0006_ai_automation_foundation.sql`: extends `lead_ai` with automation outputs and status flags for trigger-based AI execution.
 - `supabase/migrations/0007_ai_automation_jobs.sql`: creates durable trigger queue table with idempotency and retry/dead-letter lifecycle fields.
+- `supabase/migrations/0008_payments_stripe_uniqueness.sql`: enforces unique Stripe session/payment intent IDs in `payments` to harden webhook idempotency.
 - `scripts/seed_packages.sql`: inserts `smile-medellin` and `smile-manizales` as published packages.

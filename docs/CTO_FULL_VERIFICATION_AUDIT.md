@@ -20,6 +20,21 @@
   - marks `dead_letter` on max-attempt exhaustion
 - Added queue idempotency via unique key `(lead_id, trigger_type, job_type)` and enqueue upsert with `ignoreDuplicates`.
 
+## 0.1) M15 addendum — Revenue conversion hardening (2026-03-06)
+
+- Conversion/mobile:
+  - Simplified bottom CTA zone on landing (single fixed bar with primary assessment CTA plus secondary WhatsApp).
+  - Reduced mobile form friction in `/assessment` with autofill hints and stronger conversion copy.
+- Automation reliability:
+  - Worker now reclaims stale `processing` jobs after lock lease expiry.
+  - Inactive follow-up scanner now paginates lead batches (instead of fixed 200 row window).
+- Payment integrity and security:
+  - Stripe webhook now enforces `checkout.session.mode === "payment"` and `payment_status === "paid"` before state transitions.
+  - Added migration `0008_payments_stripe_uniqueness.sql` to enforce DB-level uniqueness for Stripe session/payment intent IDs.
+- Deployment readiness:
+  - Added `vercel.json` cron schedules for queue worker and follow-ups.
+  - Added `CRON_SECRET` support (fallback) for Vercel Cron Bearer auth compatibility.
+
 ---
 
 ## 1) Executive summary

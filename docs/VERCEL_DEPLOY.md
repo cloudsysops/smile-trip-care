@@ -66,6 +66,8 @@ Opcional (M9 AI):
 | `OPENAI_API_KEY` | Production (y Preview si pruebas AI en preview) |
 | `OPENAI_MODEL` | Production, Preview |
 | `RATE_LIMIT_PROVIDER` | Production, Preview (`memory` por defecto) |
+| `AUTOMATION_CRON_SECRET` | Production (secreto para endpoints internos de automation) |
+| `CRON_SECRET` | Production (usar mismo valor que `AUTOMATION_CRON_SECRET` para Vercel Cron) |
 
 - Marca **Production** (y **Preview** si quieres que los deploys de PR también tengan env).
 - No subas `.env` al repo; solo configúralas en Vercel.
@@ -117,6 +119,9 @@ Después de cada deploy a Production:
    - el webhook devuelve 2xx
    - `payments.status` cambia a `succeeded`
    - `leads.status` cambia a `deposit_paid`.
+4. Ejecuta cron manual desde Vercel (o `curl` con Bearer secret) y confirma:
+   - `/api/automation/worker` procesa jobs
+   - `/api/automation/followups` encola drafts de seguimiento.
 
 ---
 

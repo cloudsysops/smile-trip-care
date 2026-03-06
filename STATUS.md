@@ -29,6 +29,7 @@
 | **M12** Deposit pricing governance | ✅ Done | Stripe checkout amount is resolved server-side from package pricing, client amount ignored, admin deposit CTA reflects effective amount |
 | **M13** Agent automation foundation | ✅ Done | Internal server-side triggers run triage/respond after lead creation, itinerary/ops after deposit_paid, plus cron-safe 24h/48h follow-up drafts |
 | **M14** Durable automation queue | ✅ Done | Trigger events enqueue jobs in `ai_automation_jobs`; worker endpoint executes jobs with locks, retries, and dead-letter handling |
+| **M15** Revenue conversion hardening | ✅ Done | Landing/mobile CTA simplification, follow-up scan pagination, stale-job reclaim, Stripe webhook paid-state validation, and Vercel cron scheduling |
 
 ## Run after migration
 ```bash
@@ -40,7 +41,8 @@
 # 5. supabase/migrations/0005_leads_follow_up_queue.sql
 # 6. supabase/migrations/0006_ai_automation_foundation.sql
 # 7. supabase/migrations/0007_ai_automation_jobs.sql
-# 8. scripts/seed_packages.sql
+# 8. supabase/migrations/0008_payments_stripe_uniqueness.sql
+# 9. scripts/seed_packages.sql
 ```
 
 ## Env

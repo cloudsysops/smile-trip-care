@@ -9,6 +9,7 @@ const serverSchema = z.object({
   OPENAI_API_KEY: z.string().startsWith("sk-").optional(),
   OPENAI_MODEL: z.string().min(1).optional(),
   AUTOMATION_CRON_SECRET: z.string().min(16).optional(),
+  CRON_SECRET: z.string().min(16).optional(),
 });
 
 export type ServerConfig = z.infer<typeof serverSchema>;
@@ -23,6 +24,7 @@ function parse(): z.SafeParseReturnType<unknown, ServerConfig> {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     OPENAI_MODEL: process.env.OPENAI_MODEL,
     AUTOMATION_CRON_SECRET: process.env.AUTOMATION_CRON_SECRET,
+    CRON_SECRET: process.env.CRON_SECRET,
   });
 }
 

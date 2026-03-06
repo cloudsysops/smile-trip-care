@@ -38,6 +38,7 @@ AI execution is queued via `ai_automation_jobs` and executed by `/api/automation
 ### Trigger: inactive lead 24h/48h
 
 - Source: `POST /api/automation/followups` (secret-protected cron endpoint)
+- Lead scan is processed in paginated batches to reduce starvation on large lead volumes.
 - Enqueued jobs:
   - `sales-responder` for `lead_inactive_24h`
   - `sales-responder` for `lead_inactive_48h`
@@ -55,6 +56,7 @@ Statuses in `ai_automation_jobs`:
 Worker behavior:
 
 1. Claim due jobs (`pending` / `retry_scheduled` with `run_after <= now`)
+   - Reclaim stale jobs stuck in `processing` when lock lease expires
 2. Lock and execute
 3. On success → `completed`
 4. On failure:
@@ -71,4 +73,4 @@ Worker behavior:
 - `POST /api/automation/followups`
 - `POST /api/automation/worker`
 
-Both require `AUTOMATION_CRON_SECRET` via `x-automation-secret` or Bearer token.
+Both require `AUTOMATION_CRON_SECRET` (or `CRON_SECRET`) via `x-automation-secret` or Bearer token.

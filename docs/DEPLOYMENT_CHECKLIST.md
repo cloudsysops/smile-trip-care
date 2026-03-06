@@ -13,10 +13,12 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
 - [ ] Proyecto conectado al repo correcto.
 - [ ] Auto-deploy habilitado (Production: `main`, Preview: PRs/branches).
 - [ ] Variables de entorno configuradas por entorno (Production/Preview).
+- [ ] `CRON_SECRET` configurado (usar el mismo valor que `AUTOMATION_CRON_SECRET` recomendado).
+- [ ] `vercel.json` con cron jobs activo para `/api/automation/worker` y `/api/automation/followups`.
 - [ ] Deploy más reciente en estado `Ready`.
 
 ### Supabase
-- [ ] Migraciones aplicadas (`0001`, `0002`, `0003` según módulo).
+- [ ] Migraciones aplicadas (`0001` → `0008` según orden de `STATUS.md`).
 - [ ] RLS habilitado y policies validadas.
 - [ ] Claves correctas en Vercel (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, públicas `NEXT_PUBLIC_*`).
 
@@ -44,6 +46,8 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
 - `docs/VERCEL_DEPLOY.md`
   - Ruta de webhook corregida a `/api/stripe/webhook`.
   - Guía extendida con variables opcionales de AI y verificación post-deploy.
+- `vercel.json`
+  - Cron jobs configurados para worker (`*/5`) y followups (`0 * * * *`).
 
 ## 3) Verification steps
 

@@ -56,6 +56,20 @@ export async function POST(request: Request) {
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
+  if (session.mode !== "payment") {
+    log.info("Ignoring non-payment checkout session webhook", {
+      session_id: session.id,
+      mode: session.mode,
+    });
+    return NextResponse.json({ received: true });
+  }
+  if (session.payment_status !== "paid") {
+    log.info("Ignoring checkout session without paid status", {
+      session_id: session.id,
+      payment_status: session.payment_status,
+    });
+    return NextResponse.json({ received: true });
+  }
   const sessionId = session.id;
   const metadataParsed = CheckoutSessionMetadataSchema.safeParse(session.metadata ?? {});
   if (!metadataParsed.success) {
@@ -168,21 +182,21 @@ export async function POST(request: Request) {
       log.error("Failed to update lead status", { error: leadError.message });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
-    void enqueueDepositPaidAutomationJobs(leadIdToUpdate)
-      .then((jobs) => {
-        log.info("Automation jobs enqueued", {
-          lead_id: leadIdToUpdate,
-          trigger_type: "lead_deposit_paid",
-          job_count: jobs.length,
-        });
-      })
-      .catch((err) => {
-        log.error("Deposit-paid automation enqueue failed", {
-          lead_id: leadIdToUpdate,
-          trigger_type: "lead_deposit_paid",
-          error: err instanceof Error ? err.message : String(err),
-        });
+    try {
+      const jobs = await enqueueDepositPaidAutomationJobs(leadIdToUpdate);
+      log.info("Automation jobs enqueued", {
+        lead_id: leadIdToUpdate,
+        trigger_type: "lead_deposit_paid",
+        job_count: jobs.length,
       });
+    } catch (err) {
+      log.error("Deposit-paid automation enqueue failed", {
+        lead_id: leadIdToUpdate,
+        trigger_type: "lead_deposit_paid",
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    }
   } else {
     log.warn("No lead id available for succeeded payment", {
       payment_id: paymentId,

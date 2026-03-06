@@ -94,6 +94,8 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
               type="text"
               required
               maxLength={200}
+              autoComplete="given-name"
+              enterKeyHint="next"
               className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
             />
           </div>
@@ -107,6 +109,8 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
               type="text"
               required
               maxLength={200}
+              autoComplete="family-name"
+              enterKeyHint="next"
               className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
             />
           </div>
@@ -121,6 +125,9 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
             name="email"
             type="email"
             required
+            autoComplete="email"
+            inputMode="email"
+            enterKeyHint="next"
             className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
           />
         </div>
@@ -134,6 +141,9 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
             name="phone"
             type="tel"
             maxLength={50}
+            autoComplete="tel"
+            inputMode="tel"
+            enterKeyHint="next"
             className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
           />
         </div>
@@ -147,6 +157,8 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
             name="country"
             type="text"
             maxLength={100}
+            autoComplete="country-name"
+            enterKeyHint="next"
             className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
           />
         </div>
@@ -191,6 +203,8 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
             name="message"
             rows={4}
             maxLength={2000}
+            placeholder="Share your goals, preferred dates, or questions (optional)"
+            enterKeyHint="send"
             className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
           />
         </div>
@@ -206,7 +220,7 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
           disabled={status === "loading"}
           className="w-full rounded-full bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 py-3 font-medium hover:opacity-90 disabled:opacity-50"
         >
-          {status === "loading" ? "Sending…" : "Submit"}
+          {status === "loading" ? "Sending…" : "Get my personalized plan"}
         </button>
       </form>
     </>

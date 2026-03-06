@@ -25,6 +25,7 @@ Operational checklist to launch safely on Vercel + Supabase + Stripe.
 | `OPENAI_API_KEY` | Server secret | AI endpoints (`/api/ai/*`) |
 | `OPENAI_MODEL` | Server | AI model override |
 | `AUTOMATION_CRON_SECRET` | Server secret | Protects internal AI automation cron endpoint |
+| `CRON_SECRET` | Server secret | Vercel cron Bearer token (set equal to `AUTOMATION_CRON_SECRET` or use as fallback) |
 | `COMMIT_SHA` | Server | Version fallback for `/api/health` |
 | `RATE_LIMIT_PROVIDER` | Server | `memory` or `upstash` |
 | `UPSTASH_REDIS_REST_URL` | Server secret | Multi-instance rate limit backend |
@@ -44,8 +45,9 @@ Operational checklist to launch safely on Vercel + Supabase + Stripe.
    - `supabase/migrations/0005_leads_follow_up_queue.sql`
    - `supabase/migrations/0006_ai_automation_foundation.sql`
    - `supabase/migrations/0007_ai_automation_jobs.sql`
+   - `supabase/migrations/0008_payments_stripe_uniqueness.sql`
 2. Validate RLS is enabled for:
-   - `profiles`, `packages`, `leads`, `payments`, `assets`, `itineraries`, `lead_ai`
+   - `profiles`, `packages`, `leads`, `payments`, `assets`, `itineraries`, `lead_ai`, `ai_automation_jobs`
 3. Validate policy behavior:
    - Public can read only published packages and approved+published assets.
    - Admin-only access for leads, payments, itineraries, lead_ai.
@@ -132,6 +134,9 @@ where email = 'admin@your-domain.com';
    Expect: `POST /api/automation/followups` returns 200 and generates 24h/48h drafts only for inactive active-status leads.
 9. Trigger queue worker with secret  
    Expect: `POST /api/automation/worker` claims jobs, executes agents, retries failures with backoff, and marks exhausted jobs as `dead_letter`.
+10. Confirm scheduler wiring (`vercel.json`)
+   - Worker runs every 5 minutes: `/api/automation/worker?limit=20`
+   - Followups run hourly: `/api/automation/followups`
 
 ---
 

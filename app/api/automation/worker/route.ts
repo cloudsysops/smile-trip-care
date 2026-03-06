@@ -9,6 +9,7 @@ import {
   scheduleAutomationJobRetry,
 } from "@/lib/automation/queue";
 import { executeAutomationJob } from "@/lib/ai/automation";
+import { timingSafeSecretCompare } from "@/lib/security/secret";
 
 export const runtime = "nodejs";
 
@@ -44,13 +45,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Not configured", request_id: requestId }, { status: 500 });
   }
 
-  const secret = config.data.AUTOMATION_CRON_SECRET;
+  const secret = config.data.AUTOMATION_CRON_SECRET ?? config.data.CRON_SECRET;
   if (!secret) {
     log.warn("Automation worker endpoint disabled: secret missing");
     return NextResponse.json({ error: "Not configured", request_id: requestId }, { status: 503 });
   }
   const provided = readProvidedSecret(request);
-  if (!provided || provided !== secret) {
+  if (!timingSafeSecretCompare(provided, secret)) {
     return NextResponse.json({ error: "Unauthorized", request_id: requestId }, { status: 401 });
   }
 

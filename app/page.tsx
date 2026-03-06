@@ -127,7 +127,7 @@ export default async function Home() {
                 href="/assessment"
                 className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-8 py-4 text-base font-semibold text-white hover:opacity-90 dark:bg-zinc-100 dark:text-zinc-900"
               >
-                Start free assessment
+                Get my personalized plan
               </Link>
               <Link
                 href={whatsappHref}
@@ -254,7 +254,7 @@ export default async function Home() {
                       href={`/assessment?package=${encodeURIComponent(pkg.slug)}`}
                       className="inline-flex rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:opacity-90 dark:bg-zinc-100 dark:text-zinc-900"
                     >
-                      Start assessment
+                      Get personalized plan
                     </Link>
                   </div>
                 </li>
@@ -315,26 +315,24 @@ export default async function Home() {
         </footer>
       </main>
 
-      <Link
-        href={whatsappHref}
-        target={whatsappHref.startsWith("https://") ? "_blank" : undefined}
-        rel={whatsappHref.startsWith("https://") ? "noopener noreferrer" : undefined}
-        className="fixed bottom-24 right-4 z-40 inline-flex h-12 items-center justify-center rounded-full bg-emerald-600 px-4 text-sm font-semibold text-white shadow-lg hover:bg-emerald-700 sm:right-6"
-        aria-label="Chat on WhatsApp"
-      >
-        WhatsApp
-      </Link>
-
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 p-3 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/95">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 sm:justify-between sm:gap-3">
           <p className="hidden text-sm text-zinc-600 sm:block dark:text-zinc-300">
             Ready to start? Get your personalized plan today.
           </p>
           <Link
-            href="/assessment"
-            className="ml-auto inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-semibold text-white hover:opacity-90 dark:bg-zinc-100 dark:text-zinc-900"
+            href={whatsappHref}
+            target={whatsappHref.startsWith("https://") ? "_blank" : undefined}
+            rel={whatsappHref.startsWith("https://") ? "noopener noreferrer" : undefined}
+            className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-300 px-4 text-sm font-semibold text-zinc-800 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
-            Start free assessment
+            WhatsApp
+          </Link>
+          <Link
+            href="/assessment"
+            className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-6 text-sm font-semibold text-white hover:opacity-90 dark:bg-zinc-100 dark:text-zinc-900"
+          >
+            Get my personalized plan
           </Link>
         </div>
       </div>
