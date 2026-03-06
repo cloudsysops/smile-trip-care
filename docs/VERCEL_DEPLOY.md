@@ -59,6 +59,14 @@ Opcional (cuando tengas Stripe):
 | `STRIPE_WEBHOOK_SECRET` | Production (y Preview si configuras webhook de preview) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Production, Preview |
 
+Opcional (M9 AI):
+
+| Variable | Entornos |
+|----------|----------|
+| `OPENAI_API_KEY` | Production (y Preview si pruebas AI en preview) |
+| `OPENAI_MODEL` | Production, Preview |
+| `RATE_LIMIT_PROVIDER` | Production, Preview (`memory` por defecto) |
+
 - Marca **Production** (y **Preview** si quieres que los deploys de PR también tengan env).
 - No subas `.env` al repo; solo configúralas en Vercel.
 
@@ -90,8 +98,25 @@ No hace falta hacer nada más; cada push dispara un nuevo deploy.
 Cuando tengas el flujo de pago:
 
 1. En Stripe Dashboard → Developers → Webhooks, crea un endpoint.
-2. URL en producción: `https://tu-dominio.vercel.app/api/webhooks/stripe` (o la ruta que uses).
+2. URL en producción: `https://tu-dominio.vercel.app/api/stripe/webhook`.
 3. Copia el **Signing secret** y ponlo en Vercel como `STRIPE_WEBHOOK_SECRET` (solo Production si el webhook es solo para prod).
+4. En Stripe, escucha al menos `checkout.session.completed`.
+5. Recomendado: configura un endpoint de webhook separado para Preview si harás pruebas en ramas.
+
+---
+
+## 8. Monitoreo y verificación post-deploy
+
+Después de cada deploy a Production:
+
+1. Health checks:
+   - `GET /api/health` debe responder `200` con `{ ok: true }`.
+   - `GET /api/health/ready` debe responder `200` y `ready: true`.
+2. Revisa logs de funciones en Vercel (errores 5xx y p95 de latencia).
+3. Ejecuta una prueba de Stripe en modo test y confirma:
+   - el webhook devuelve 2xx
+   - `payments.status` cambia a `succeeded`
+   - `leads.status` cambia a `deposit_paid`.
 
 ---
 
@@ -101,5 +126,6 @@ Cuando tengas el flujo de pago:
 2. **Import** desde GitHub → elegir **smile-transformation-platform-**.
 3. Añadir **Environment Variables** (Supabase y, luego, Stripe).
 4. **Deploy** → listo. Los siguientes pushes a `main` desplegarán solos.
+5. Verifica health/readiness y webhook de Stripe tras el deploy.
 
 Si algo falla en el build, revisa el **Build Logs** en Vercel (pestaña Deployments → clic en el deploy fallido).

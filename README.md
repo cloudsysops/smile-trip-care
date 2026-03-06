@@ -26,10 +26,12 @@ Abrir [http://localhost:3000](http://localhost:3000).
 - `.env.example` y `.env.local.example` listan las variables necesarias.
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
 - Stripe (cuando se use): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, etc.
+- AI (opcional): `OPENAI_API_KEY`, `OPENAI_MODEL`.
 
 ## Documentación
 
 - [Estado de módulos](STATUS.md)
+- [Deployment readiness checklist](docs/DEPLOYMENT_CHECKLIST.md)
 - [Modelo de datos (MVP)](docs/DATA_MODEL.md)
 - [Pasos de prueba](docs/TEST_STEPS.md)
 - **[Usar Cursor desde el móvil (GitHub + Cursor Mobile)](docs/CURSOR_MOBILE.md)**

@@ -8,18 +8,19 @@ import { createLogger } from "@/lib/logger";
 export async function GET() {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
-  const commit =
+  const version =
     process.env.VERCEL_GIT_COMMIT_SHA
     ?? process.env.GITHUB_SHA
-    ?? process.env.COMMIT_SHA;
+    ?? process.env.COMMIT_SHA
+    ?? "unknown";
 
   log.info("Health endpoint checked");
   return NextResponse.json({
     ok: true,
     status: "ok",
-    timestamp: new Date().toISOString(),
-    service: "smile-transformation",
+    version,
+    time: new Date().toISOString(),
     request_id: requestId,
-    ...(commit ? { commit } : {}),
+    service: "smile-transformation",
   });
 }
