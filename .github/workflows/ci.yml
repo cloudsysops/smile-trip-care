@@ -2,9 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - staging
+      - dev
+      - "feature/**"
+      - "hotfix/**"
   pull_request:
-    branches: [main]
+    branches:
+      - main
+      - staging
+      - dev
   workflow_dispatch:
 
 concurrency:
@@ -33,6 +41,21 @@ jobs:
 
       - name: Test
         run: npm run test
+
+      - name: Validate environment variable shape
+        run: ./scripts/env_check.sh
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "anon-placeholder"
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_placeholder"
+          SUPABASE_URL: "https://example.supabase.co"
+          SUPABASE_SERVICE_ROLE_KEY: "service-role-placeholder"
+          STRIPE_SECRET_KEY: "sk_test_placeholder"
+          STRIPE_WEBHOOK_SECRET: "whsec_placeholder"
+          OPENAI_API_KEY: "sk-placeholder"
+          OPENAI_MODEL: "gpt-4.1-mini"
+          AUTOMATION_CRON_SECRET: "automation-secret-placeholder"
+          CRON_SECRET: "automation-secret-placeholder"
 
       - name: Build
         run: npm run build
