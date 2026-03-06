@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import LeadStatusForm from "../LeadStatusForm";
+import LeadFollowUpForm from "../LeadFollowUpForm";
 import DepositButton from "../DepositButton";
 import AiActionsPanel from "./AiActionsPanel";
 import { ItineraryOutputSchema, LeadTriageOutputSchema, SalesResponderOutputSchema } from "@/lib/ai/schemas";
@@ -94,8 +95,26 @@ export default async function AdminLeadDetailPage({ params }: Props) {
             {lead.country && <div><dt className="font-medium text-zinc-500">Country</dt><dd>{lead.country}</dd></div>}
             {lead.package_slug && <div><dt className="font-medium text-zinc-500">Package</dt><dd>{lead.package_slug}</dd></div>}
             <div><dt className="font-medium text-zinc-500">Status</dt><dd>{lead.status}</dd></div>
+            {lead.last_contacted_at && (
+              <div>
+                <dt className="font-medium text-zinc-500">Last contacted</dt>
+                <dd>{new Date(lead.last_contacted_at).toLocaleString()}</dd>
+              </div>
+            )}
+            {lead.next_follow_up_at && (
+              <div>
+                <dt className="font-medium text-zinc-500">Next follow-up</dt>
+                <dd>{new Date(lead.next_follow_up_at).toLocaleString()}</dd>
+              </div>
+            )}
             <div><dt className="font-medium text-zinc-500">Created</dt><dd>{new Date(lead.created_at).toLocaleString()}</dd></div>
             {lead.message && <div><dt className="font-medium text-zinc-500">Message</dt><dd className="whitespace-pre-wrap">{lead.message}</dd></div>}
+            {lead.follow_up_notes && (
+              <div>
+                <dt className="font-medium text-zinc-500">Follow-up notes</dt>
+                <dd className="whitespace-pre-wrap">{lead.follow_up_notes}</dd>
+              </div>
+            )}
             {attributionFields.some((item) => item.value) && (
               <div className="space-y-1 pt-2">
                 <dt className="font-medium text-zinc-500">Attribution</dt>
@@ -116,6 +135,13 @@ export default async function AdminLeadDetailPage({ params }: Props) {
           </dl>
         </div>
         <LeadStatusForm leadId={lead.id} currentStatus={lead.status} />
+        <LeadFollowUpForm
+          leadId={lead.id}
+          currentStatus={lead.status}
+          currentLastContactedAt={(lead.last_contacted_at as string | null | undefined) ?? null}
+          currentNextFollowUpAt={(lead.next_follow_up_at as string | null | undefined) ?? null}
+          currentFollowUpNotes={(lead.follow_up_notes as string | null | undefined) ?? null}
+        />
         <div className="rounded-lg border border-zinc-200 bg-white p-6">
           <h2 className="font-semibold">Stripe deposit</h2>
           <p className="mt-1 text-sm text-zinc-600">Create a checkout session for the deposit.</p>

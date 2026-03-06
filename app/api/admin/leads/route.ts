@@ -15,7 +15,7 @@ export async function GET() {
     const supabase = getServerSupabase();
     const { data, error } = await supabase
       .from("leads")
-      .select("id, first_name, last_name, email, status, created_at")
+      .select("id, first_name, last_name, email, status, created_at, last_contacted_at, next_follow_up_at")
       .order("created_at", { ascending: false });
     if (error) {
       log.error("Failed to list leads", { error: error.message });

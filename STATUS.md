@@ -25,6 +25,7 @@
 | **M9** AI agents (admin connected) | ✅ Done | `/api/ai/{triage,respond,itinerary}`, Zod-validated strict JSON, persisted + visible in `/admin/leads/[id]` |
 | **M9.1** AI lead responder (selling mode) | ✅ Done | “Generate Reply” returns WhatsApp + email drafts, copy-ready UI, persisted in `lead_ai.messages_json` |
 | **M10** Conversion attribution | ✅ Done | Package CTA keeps intent (`?package=`), lead capture stores UTM/referrer/landing path, admin lead detail shows attribution |
+| **M11** Sales follow-up queue | ✅ Done | Leads include next follow-up/last contacted/notes, admin queue prioritizes overdue leads, detail page includes follow-up planner |
 
 ## Run after migration
 ```bash
@@ -33,7 +34,8 @@
 # 2. supabase/migrations/0002_assets_extended_unified.sql
 # 3. supabase/migrations/0003_m9_ai_admin_connected.sql
 # 4. supabase/migrations/0004_leads_attribution.sql
-# 5. scripts/seed_packages.sql
+# 5. supabase/migrations/0005_leads_follow_up_queue.sql
+# 6. scripts/seed_packages.sql
 ```
 
 ## Env

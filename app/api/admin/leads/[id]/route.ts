@@ -6,8 +6,18 @@ import { z } from "zod";
 import { RouteIdParamSchema } from "@/lib/validation/common";
 
 const UpdateLeadSchema = z.object({
-  status: z.enum(["new", "contacted", "qualified", "deposit_paid", "completed", "cancelled"]),
-});
+  status: z.enum(["new", "contacted", "qualified", "deposit_paid", "completed", "cancelled"]).optional(),
+  last_contacted_at: z.string().datetime().optional(),
+  next_follow_up_at: z.string().datetime().nullable().optional(),
+  follow_up_notes: z.string().trim().max(2000).nullable().optional(),
+}).refine(
+  (value) =>
+    value.status !== undefined
+    || value.last_contacted_at !== undefined
+    || value.next_follow_up_at !== undefined
+    || value.follow_up_notes !== undefined,
+  { message: "At least one field is required" },
+);
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -30,12 +40,27 @@ export async function PATCH(request: Request, { params }: Props) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid body" }, { status: 400 });
     }
+    const updates: Record<string, string | null> = {
+      updated_at: new Date().toISOString(),
+    };
+    if (parsed.data.status !== undefined) {
+      updates.status = parsed.data.status;
+    }
+    if (parsed.data.last_contacted_at !== undefined) {
+      updates.last_contacted_at = parsed.data.last_contacted_at;
+    }
+    if (parsed.data.next_follow_up_at !== undefined) {
+      updates.next_follow_up_at = parsed.data.next_follow_up_at;
+    }
+    if (parsed.data.follow_up_notes !== undefined) {
+      updates.follow_up_notes = parsed.data.follow_up_notes;
+    }
     const supabase = getServerSupabase();
     const { data, error } = await supabase
       .from("leads")
-      .update({ status: parsed.data.status, updated_at: new Date().toISOString() })
+      .update(updates)
       .eq("id", id)
-      .select("id, status")
+      .select("id, status, last_contacted_at, next_follow_up_at, follow_up_notes")
       .single();
     if (error) {
       log.error("Failed to update lead", { id, error: error.message });
