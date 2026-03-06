@@ -20,17 +20,17 @@ export async function POST(request: Request) {
   try {
     await requireAdmin();
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden", request_id: requestId }, { status: 403 });
   }
   try {
     const config = getServerConfig();
     if (!config.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+      return NextResponse.json({ error: "Stripe not configured", request_id: requestId }, { status: 500 });
     }
     const body = await request.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid body", request_id: requestId }, { status: 400 });
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
 
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: session.url, request_id: requestId });
   } catch (err) {
     log.error("Stripe checkout endpoint failed", { err: String(err) });
     return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });

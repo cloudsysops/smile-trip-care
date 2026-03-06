@@ -7,6 +7,7 @@ import LeadStatusForm from "../LeadStatusForm";
 import DepositButton from "../DepositButton";
 import AiActionsPanel from "./AiActionsPanel";
 import { ItineraryOutputSchema, LeadTriageOutputSchema, SalesResponderOutputSchema } from "@/lib/ai/schemas";
+import AdminShell from "../../_components/AdminShell";
 
 type Props = { params: Promise<{ id: string }> };
 const StoredMessageSchema = SalesResponderOutputSchema.extend({
@@ -65,14 +66,18 @@ export default async function AdminLeadDetailPage({ params }: Props) {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <Link href="/admin/leads" className="text-sm text-zinc-600 hover:underline">← Leads</Link>
-          <h1 className="text-xl font-semibold">Lead: {lead.first_name} {lead.last_name}</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-2xl px-6 py-8 space-y-6">
+    <AdminShell
+      title={`Lead: ${lead.first_name} ${lead.last_name}`}
+      currentSection="leads"
+      headerLeading={
+        <Link href="/admin/leads" className="text-sm text-zinc-600 hover:underline">
+          ← Leads
+        </Link>
+      }
+      headerContainerClassName="max-w-4xl"
+      mainContainerClassName="max-w-2xl"
+    >
+      <div className="space-y-6">
         <div className="rounded-lg border border-zinc-200 bg-white p-6">
           <dl className="grid gap-3 text-sm">
             <div><dt className="font-medium text-zinc-500">Email</dt><dd>{lead.email}</dd></div>
@@ -96,7 +101,7 @@ export default async function AdminLeadDetailPage({ params }: Props) {
           initialMessage={messagesMaybe.success ? messagesMaybe.data : null}
           initialItineraries={parsedItineraries}
         />
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }
