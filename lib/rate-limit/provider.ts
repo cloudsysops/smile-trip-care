@@ -57,44 +57,58 @@ class InMemoryRateLimitProvider implements RateLimitProvider {
 
 class UpstashRateLimitProvider implements RateLimitProvider {
   constructor(
-    private readonly restUrl: string,
-    private readonly restToken: string,
+    private readonly url: string,
+    private readonly token: string,
+    private readonly prefix: string,
     private readonly fallback: RateLimitProvider,
   ) {}
 
-  async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
-    const redisKey = `ratelimit:${key}`;
-    try {
-      const response = await fetch(`${this.restUrl}/pipeline`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.restToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify([
-          ["INCR", redisKey],
-          ["PEXPIRE", redisKey, options.windowMs, "NX"],
-          ["PTTL", redisKey],
-        ]),
-      });
+  private async command(parts: string[]): Promise<unknown> {
+    const path = parts.map((p) => encodeURIComponent(p)).join("/");
+    const response = await fetch(`${this.url.replace(/\/$/, "")}/${path}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+      },
+      cache: "no-store",
+    });
+    const json = await response.json().catch(() => ({}));
+    if (!response.ok || !("result" in (json as Record<string, unknown>))) {
+      throw new Error(`Upstash command failed (${response.status})`);
+    }
+    return (json as { result: unknown }).result;
+  }
 
-      if (!response.ok) {
-        throw new Error(`Upstash pipeline failed (${response.status})`);
+  private async commandNumber(parts: string[]): Promise<number> {
+    const result = await this.command(parts);
+    const numeric = Number(result);
+    if (!Number.isFinite(numeric)) {
+      throw new Error("Upstash command returned non-numeric result");
+    }
+    return numeric;
+  }
+
+  async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
+    const now = Date.now();
+    const redisKey = `${this.prefix}:${key}`;
+
+    try {
+      const count = await this.commandNumber(["incr", redisKey]);
+      if (count === 1) {
+        await this.commandNumber(["pexpire", redisKey, String(options.windowMs)]);
       }
 
-      const out = await response.json() as Array<{ result?: unknown }>;
-      const count = Number(out?.[0]?.result ?? 0);
-      const ttlMs = Number(out?.[2]?.result ?? options.windowMs);
-      const resetIn = ttlMs > 0 ? ttlMs : options.windowMs;
+      let ttlMs = await this.commandNumber(["pttl", redisKey]);
+      if (ttlMs < 0) ttlMs = options.windowMs;
 
       return {
         allowed: count <= options.maxRequests,
         limit: options.maxRequests,
         remaining: Math.max(0, options.maxRequests - count),
-        resetAt: Date.now() + resetIn,
+        resetAt: now + ttlMs,
       };
-    } catch {
-      // Fail safe: keep lead capture available and apply per-instance throttling.
+    } catch (err) {
+      console.warn("[rate-limit] Upstash provider failed; falling back to memory", String(err));
       return this.fallback.check(key, options);
     }
   }
@@ -104,7 +118,7 @@ let provider: RateLimitProvider | null = null;
 
 /**
  * Abstraction layer for rate limiting providers.
- * Default is in-memory for local/dev; production can switch to Redis later.
+ * Default is in-memory for local/dev; production can switch to Upstash.
  */
 export function getRateLimitProvider(): RateLimitProvider {
   if (provider) return provider;
@@ -114,17 +128,21 @@ export function getRateLimitProvider(): RateLimitProvider {
   const selected = process.env.RATE_LIMIT_PROVIDER ?? (upstashUrl && upstashToken ? "upstash" : "memory");
 
   switch (selected) {
-    case "upstash":
+    case "upstash": {
+      const prefix = process.env.RATE_LIMIT_UPSTASH_PREFIX ?? "smile:ratelimit";
       if (upstashUrl && upstashToken) {
         provider = new UpstashRateLimitProvider(
           upstashUrl,
           upstashToken,
+          prefix,
           new InMemoryRateLimitProvider(),
         );
         return provider;
       }
+      console.warn("[rate-limit] RATE_LIMIT_PROVIDER=upstash but Upstash env is missing; falling back to memory");
       provider = new InMemoryRateLimitProvider();
       return provider;
+    }
     case "memory":
     default:
       provider = new InMemoryRateLimitProvider();
