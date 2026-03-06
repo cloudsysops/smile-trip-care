@@ -14,6 +14,12 @@ const CheckoutSessionMetadataSchema = z.object({
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
 export const runtime = "nodejs";
 
+function isUniqueViolation(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: string; message?: string };
+  return candidate.code === "23505" || candidate.message?.includes("duplicate key value violates unique constraint") === true;
+}
+
 /** Stripe webhook: MUST use raw body for signature verification. */
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -56,6 +62,20 @@ export async function POST(request: Request) {
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
+  if (session.mode !== "payment") {
+    log.info("Ignoring checkout session with unsupported mode", {
+      session_id: session.id,
+      mode: session.mode,
+    });
+    return NextResponse.json({ received: true, ignored: "unsupported_mode" });
+  }
+  if (session.payment_status !== "paid") {
+    log.info("Ignoring checkout session with non-paid status", {
+      session_id: session.id,
+      payment_status: session.payment_status,
+    });
+    return NextResponse.json({ received: true, ignored: "payment_not_paid" });
+  }
   const sessionId = session.id;
   const metadataParsed = CheckoutSessionMetadataSchema.safeParse(session.metadata ?? {});
   if (!metadataParsed.success) {
@@ -106,14 +126,37 @@ export async function POST(request: Request) {
       .select("id, lead_id")
       .single();
     if (createPaymentError || !createdPayment) {
-      log.error("Failed to create payment from webhook", {
-        error: String(createPaymentError),
-        session_id: sessionId,
-      });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      if (isUniqueViolation(createPaymentError)) {
+        const { data: raceRows, error: raceLookupError } = await supabase
+          .from("payments")
+          .select("id, lead_id, status")
+          .eq("stripe_checkout_session_id", sessionId)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (raceLookupError || !raceRows?.[0]) {
+          log.error("Failed to recover payment after duplicate insert race", {
+            error: String(raceLookupError ?? createPaymentError),
+            session_id: sessionId,
+          });
+          return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+        }
+        const recovered = raceRows[0];
+        paymentId = recovered.id as string;
+        if (typeof recovered.lead_id === "string" && recovered.lead_id.length > 0) {
+          leadIdToUpdate = recovered.lead_id;
+        }
+        idempotentReplay = recovered.status === "succeeded";
+      } else {
+        log.error("Failed to create payment from webhook", {
+          error: String(createPaymentError),
+          session_id: sessionId,
+        });
+        return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      }
+    } else {
+      paymentId = createdPayment.id as string;
+      leadIdToUpdate = createdPayment.lead_id as string;
     }
-    paymentId = createdPayment.id as string;
-    leadIdToUpdate = createdPayment.lead_id as string;
   } else {
     if (paymentRows.length > 1) {
       log.warn("Multiple payments found for Stripe session; using latest row", {

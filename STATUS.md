@@ -32,6 +32,7 @@
 | **M16** Assisted outbound conversion engine | ✅ Done | Admin queue for outbound drafts (AI/manual), approval/send/reply tracking, and lead contact logging via `outbound_messages` |
 | **M17** Outbound command center | ✅ Done | Admin outbound dashboard with actionable queue and SLA-risk metrics to prioritize follow-up actions |
 | **M18** Outbound dispatch worker | ✅ Done | Secret-protected outbound worker sends queued messages via providers, retries with backoff, and marks permanent failures |
+| **M19** Launch reliability guardrails | ✅ Done | Stripe paid-state validation, payments idempotency constraints, stale AI lock recovery, and automation status visibility |
 
 ## Run after migration
 ```bash
@@ -44,7 +45,8 @@
 # 6. supabase/migrations/0006_ai_automation_foundation.sql
 # 7. supabase/migrations/0007_ai_automation_jobs.sql
 # 8. supabase/migrations/0008_outbound_messages.sql
-# 9. scripts/seed_packages.sql
+# 9. supabase/migrations/0009_payments_idempotency.sql
+# 10. scripts/seed_packages.sql
 ```
 
 ## Env

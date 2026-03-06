@@ -51,6 +51,8 @@ type EnqueueInput = {
   runAfter?: string;
 };
 
+const PROCESSING_LOCK_TIMEOUT_MS = 15 * 60 * 1000;
+
 function dedupeJobTypes(jobTypes: AutomationJobType[]): AutomationJobType[] {
   const out: AutomationJobType[] = [];
   const seen = new Set<AutomationJobType>();
@@ -64,6 +66,33 @@ function dedupeJobTypes(jobTypes: AutomationJobType[]): AutomationJobType[] {
 
 function truncateError(errorMessage: string): string {
   return errorMessage.length > 800 ? errorMessage.slice(0, 800) : errorMessage;
+}
+
+export async function recoverStuckAutomationJobs(
+  lockTimeoutMs: number = PROCESSING_LOCK_TIMEOUT_MS,
+): Promise<number> {
+  const supabase = getServerSupabase();
+  const nowIso = new Date().toISOString();
+  const staleBeforeIso = new Date(Date.now() - lockTimeoutMs).toISOString();
+
+  const { data, error } = await supabase
+    .from("ai_automation_jobs")
+    .update({
+      status: "retry_scheduled",
+      run_after: nowIso,
+      locked_at: null,
+      locked_by: null,
+      updated_at: nowIso,
+      error_message: "Recovered stale processing lock",
+    })
+    .eq("status", "processing")
+    .not("locked_at", "is", null)
+    .lt("locked_at", staleBeforeIso)
+    .select("id");
+  if (error) {
+    throw new Error(`Failed to recover stuck automation jobs: ${error.message}`);
+  }
+  return (data ?? []).length;
 }
 
 export async function enqueueAutomationJobs(input: EnqueueInput): Promise<AutomationJobRecord[]> {

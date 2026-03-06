@@ -52,6 +52,19 @@
   - keep permanent failure state when attempts are exhausted
 - Added provider abstraction and dispatch queue helpers to decouple transport from workflow.
 
+## 0.4) M19 addendum — Launch reliability guardrails (2026-03-06)
+
+- Stripe webhook hardening now requires:
+  - `event.type === checkout.session.completed`
+  - `session.mode === payment`
+  - `session.payment_status === paid`
+- Added payments idempotency migration (`0009_payments_idempotency.sql`) with unique constraints on Stripe session and payment intent IDs.
+- Added stale automation lock recovery:
+  - stuck `processing` jobs older than lock timeout are moved back to `retry_scheduled`.
+- Added operational visibility endpoint:
+  - `GET /api/admin/status/automation` with queue and outbound failure metrics.
+- Updated admin status UI to surface automation reliability summary.
+
 ---
 
 ## 1) Executive summary

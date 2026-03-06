@@ -39,4 +39,5 @@
 - `supabase/migrations/0006_ai_automation_foundation.sql`: extends `lead_ai` with automation outputs and status flags for trigger-based AI execution.
 - `supabase/migrations/0007_ai_automation_jobs.sql`: creates durable trigger queue table with idempotency and retry/dead-letter lifecycle fields.
 - `supabase/migrations/0008_outbound_messages.sql`: creates assisted outbound queue table for draft/approval/send/reply lifecycle tracking.
+- `supabase/migrations/0009_payments_idempotency.sql`: enforces unique Stripe checkout session/payment intent IDs for payment idempotency.
 - `scripts/seed_packages.sql`: inserts `smile-medellin` and `smile-manizales` as published packages.

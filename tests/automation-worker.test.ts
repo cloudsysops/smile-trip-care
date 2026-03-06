@@ -4,6 +4,7 @@ const claimDueAutomationJobsMock = vi.fn();
 const markAutomationJobCompletedMock = vi.fn();
 const scheduleAutomationJobRetryMock = vi.fn();
 const markAutomationJobDeadLetterMock = vi.fn();
+const recoverStuckAutomationJobsMock = vi.fn();
 const retryBackoffMsMock = vi.fn();
 const executeAutomationJobMock = vi.fn();
 
@@ -15,6 +16,7 @@ vi.mock("@/lib/config/server", () => ({
 }));
 
 vi.mock("@/lib/automation/queue", () => ({
+  recoverStuckAutomationJobs: recoverStuckAutomationJobsMock,
   claimDueAutomationJobs: claimDueAutomationJobsMock,
   markAutomationJobCompleted: markAutomationJobCompletedMock,
   scheduleAutomationJobRetry: scheduleAutomationJobRetryMock,
@@ -28,12 +30,14 @@ vi.mock("@/lib/ai/automation", () => ({
 
 describe("POST /api/automation/worker", () => {
   beforeEach(() => {
+    recoverStuckAutomationJobsMock.mockReset();
     claimDueAutomationJobsMock.mockReset();
     markAutomationJobCompletedMock.mockReset();
     scheduleAutomationJobRetryMock.mockReset();
     markAutomationJobDeadLetterMock.mockReset();
     retryBackoffMsMock.mockReset();
     executeAutomationJobMock.mockReset();
+    recoverStuckAutomationJobsMock.mockResolvedValue(0);
     retryBackoffMsMock.mockReturnValue(60_000);
   });
 
@@ -59,6 +63,7 @@ describe("POST /api/automation/worker", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
       ok: true,
+      recovered: 0,
       claimed: 1,
       completed: 1,
       retried: 0,
@@ -91,6 +96,7 @@ describe("POST /api/automation/worker", () => {
     const payload = await response.json();
     expect(payload).toMatchObject({
       ok: true,
+      recovered: 0,
       claimed: 1,
       completed: 0,
       retried: 1,
@@ -123,6 +129,7 @@ describe("POST /api/automation/worker", () => {
     const payload = await response.json();
     expect(payload).toMatchObject({
       ok: true,
+      recovered: 0,
       claimed: 1,
       completed: 0,
       retried: 0,
@@ -130,5 +137,26 @@ describe("POST /api/automation/worker", () => {
     });
     expect(markAutomationJobDeadLetterMock).toHaveBeenCalledWith("job-3", "permanent failure");
     expect(scheduleAutomationJobRetryMock).not.toHaveBeenCalled();
+  });
+
+  it("includes recovered stale-lock count in worker result", async () => {
+    recoverStuckAutomationJobsMock.mockResolvedValue(2);
+    claimDueAutomationJobsMock.mockResolvedValue([]);
+
+    const { POST } = await import("@/app/api/automation/worker/route");
+    const response = await POST(new Request("http://localhost/api/automation/worker", {
+      method: "POST",
+      headers: { "x-automation-secret": "automation-secret-12345" },
+    }));
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      recovered: 2,
+      claimed: 0,
+      completed: 0,
+      retried: 0,
+      dead_letter: 0,
+    });
   });
 });

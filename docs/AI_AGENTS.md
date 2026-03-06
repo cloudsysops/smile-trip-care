@@ -55,6 +55,7 @@ Statuses in `ai_automation_jobs`:
 Worker behavior:
 
 1. Claim due jobs (`pending` / `retry_scheduled` with `run_after <= now`)
+   - Recover stale `processing` jobs by moving them back to `retry_scheduled`
 2. Lock and execute
 3. On success → `completed`
 4. On failure:
