@@ -16,7 +16,7 @@
 - API routes: thin; delegate to `lib/`.
 - Validate inputs with Zod. Honeypot + rate limit on lead submission.
 - Logging: structured JSON; include `request_id` when available.
-- Admin: middleware protects `/admin/*`; server-side check `profiles.role = 'admin'`.
+- Admin: `proxy.ts` protects `/admin/*`; server-side check `profiles.role = 'admin'`.
 
 ## Verify
 ```bash

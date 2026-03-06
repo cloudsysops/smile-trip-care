@@ -12,7 +12,7 @@
 - Webhook: verify signature with `stripe.webhooks.constructEvent(payload, signature, webhookSecret)`. Payload must be raw body (`request.text()`), not parsed JSON.
 
 ## Admin
-- `/admin/*` protected by middleware (session required). All admin pages and `/api/admin/*` must verify `profiles.role = 'admin'` server-side.
+- `/admin/*` protected by `proxy.ts` (session required). All admin pages and `/api/admin/*` must verify `profiles.role = 'admin'` server-side.
 - AI generation routes (`/api/ai/*`) must call `requireAdmin()` and run only on server.
 
 ## AI policy (M9)

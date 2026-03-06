@@ -90,7 +90,7 @@ No hace falta hacer nada más; cada push dispara un nuevo deploy.
 Cuando tengas el flujo de pago:
 
 1. En Stripe Dashboard → Developers → Webhooks, crea un endpoint.
-2. URL en producción: `https://tu-dominio.vercel.app/api/webhooks/stripe` (o la ruta que uses).
+2. URL en producción: `https://tu-dominio.vercel.app/api/stripe/webhook`.
 3. Copia el **Signing secret** y ponlo en Vercel como `STRIPE_WEBHOOK_SECRET` (solo Production si el webhook es solo para prod).
 
 ---

@@ -32,6 +32,9 @@ Abrir [http://localhost:3000](http://localhost:3000).
 - [Estado de módulos](STATUS.md)
 - [Modelo de datos (MVP)](docs/DATA_MODEL.md)
 - [Pasos de prueba](docs/TEST_STEPS.md)
+- [Checklist de producción](docs/PRODUCTION_CHECKLIST.md)
+- [Runbook de rollback](docs/ROLLBACK.md)
+- [Stripe webhooks](docs/STRIPE_WEBHOOKS.md)
 - **[Usar Cursor desde el móvil (GitHub + Cursor Mobile)](docs/CURSOR_MOBILE.md)**
 - **[Conectar GitHub con Vercel y desplegar](docs/VERCEL_DEPLOY.md)**
 
