@@ -10,6 +10,8 @@ const CheckoutSessionMetadataSchema = z.object({
   lead_id: UuidSchema,
 });
 
+export const runtime = "nodejs";
+
 /** Stripe webhook: MUST use raw body for signature verification. */
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -17,19 +19,19 @@ export async function POST(request: Request) {
   const config = getServerConfig();
   if (!config.STRIPE_WEBHOOK_SECRET) {
     log.error("Stripe webhook env missing");
-    return NextResponse.json({ error: "Not configured" }, { status: 500 });
+    return NextResponse.json({ error: "Not configured", request_id: requestId }, { status: 500 });
   }
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
     log.warn("Webhook missing stripe-signature");
-    return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+    return NextResponse.json({ error: "Missing signature", request_id: requestId }, { status: 400 });
   }
   let payload: string;
   try {
     payload = await request.text();
   } catch {
     log.error("Failed to read raw body");
-    return NextResponse.json({ error: "Bad body" }, { status: 400 });
+    return NextResponse.json({ error: "Bad body", request_id: requestId }, { status: 400 });
   }
   let event: Stripe.Event;
   try {
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
     );
   } catch (err) {
     log.warn("Webhook signature verification failed", { err: String(err) });
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid signature", request_id: requestId }, { status: 400 });
   }
   if (event.type !== "checkout.session.completed") {
     return NextResponse.json({ received: true });

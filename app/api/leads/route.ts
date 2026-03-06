@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
       ?? request.headers.get("x-real-ip")
       ?? "unknown";
-    if (!checkRateLimit(ip)) {
+    if (!(await checkRateLimit(ip))) {
       log.warn("Rate limit exceeded", { ip });
       return NextResponse.json(
         { error: "Too many requests", request_id: requestId },

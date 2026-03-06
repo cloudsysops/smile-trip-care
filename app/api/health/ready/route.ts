@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { getServerConfigSafe } from "@/lib/config/server";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { createLogger } from "@/lib/logger";
 
 /**
  * Readiness probe: app can serve traffic (DB reachable, required config present).
  * Returns 200 if ready, 503 otherwise. Use for Kubernetes / load balancer ready checks.
  */
 export async function GET() {
+  const requestId = crypto.randomUUID();
+  const log = createLogger(requestId);
   const checks: Record<string, "ok" | "missing" | "error"> = {};
   let ready = true;
 
@@ -35,8 +38,10 @@ export async function GET() {
   const body = {
     ready,
     timestamp: new Date().toISOString(),
+    request_id: requestId,
     checks,
   };
 
+  log.info("Readiness endpoint checked", { ready, checks });
   return NextResponse.json(body, { status: ready ? 200 : 503 });
 }
