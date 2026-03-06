@@ -93,3 +93,12 @@ AI responders still generate drafts into `lead_ai.messages_json`, and admin now 
 This keeps execution human-supervised while enabling measurable conversion tracking per lead.
 
 M17 adds an admin outbound command center (`/admin/outbound`) and API metrics endpoints so sales operators can prioritize queue actions and SLA-risk leads from AI-generated drafts.
+
+M18 adds `POST /api/automation/outbound-worker`:
+
+- Claims due outbound messages (`approved`, `queued`, `failed` with due schedule)
+- Dispatches through configured providers (`resend` for email, HTTP provider for WhatsApp)
+- Marks `sent` on success
+- On failure:
+  - schedules retry with backoff while attempts remain
+  - keeps failed-permanent state once max attempts is reached

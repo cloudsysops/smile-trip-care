@@ -13,6 +13,7 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
 - [ ] Proyecto conectado al repo correcto.
 - [ ] Auto-deploy habilitado (Production: `main`, Preview: PRs/branches).
 - [ ] Variables de entorno configuradas por entorno (Production/Preview).
+- [ ] Variables outbound opcionales configuradas si aplica (`RESEND_API_KEY`, `OUTBOUND_EMAIL_FROM`, `OUTBOUND_WHATSAPP_API_*`).
 - [ ] Deploy más reciente en estado `Ready`.
 
 ### Supabase
@@ -41,6 +42,8 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
   - Se permite versionar solo `.env.example` y `.env.local.example`.
 - `.env.example` y `.env.local.example`
   - Plantillas versionadas con variables de Supabase, Stripe, OpenAI y rate limit.
+- `vercel.json`
+  - Cron jobs definidos para `followups`, `automation worker` y `outbound worker`.
 - `docs/VERCEL_DEPLOY.md`
   - Ruta de webhook corregida a `/api/stripe/webhook`.
   - Guía extendida con variables opcionales de AI y verificación post-deploy.
@@ -72,3 +75,5 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
 6. **Outbound command center**
    - Confirmar acceso admin a `/admin/outbound`.
    - Confirmar `GET /api/admin/outbound/metrics` y `/api/admin/outbound/queue` con sesión admin.
+7. **Outbound worker cron**
+   - Confirmar invocación de `/api/automation/outbound-worker` con secret válido y ejecución sin 5xx.

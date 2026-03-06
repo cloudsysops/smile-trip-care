@@ -25,6 +25,11 @@ Operational checklist to launch safely on Vercel + Supabase + Stripe.
 | `OPENAI_API_KEY` | Server secret | AI endpoints (`/api/ai/*`) |
 | `OPENAI_MODEL` | Server | AI model override |
 | `AUTOMATION_CRON_SECRET` | Server secret | Protects internal AI automation cron endpoint |
+| `CRON_SECRET` | Server secret | Optional fallback for Vercel cron bearer auth |
+| `RESEND_API_KEY` | Server secret | Optional provider key for outbound email sends |
+| `OUTBOUND_EMAIL_FROM` | Server | Sender identity for outbound email provider |
+| `OUTBOUND_WHATSAPP_API_URL` | Server | Optional provider endpoint for outbound WhatsApp sends |
+| `OUTBOUND_WHATSAPP_API_TOKEN` | Server secret | Optional bearer token for outbound WhatsApp provider |
 | `COMMIT_SHA` | Server | Version fallback for `/api/health` |
 | `RATE_LIMIT_PROVIDER` | Server | `memory` or `upstash` |
 | `UPSTASH_REDIS_REST_URL` | Server secret | Multi-instance rate limit backend |
@@ -138,6 +143,8 @@ where email = 'admin@your-domain.com';
 11. Validate outbound command center APIs (admin session)
    - `GET /api/admin/outbound/metrics` returns KPI + SLA risk payload
    - `GET /api/admin/outbound/queue` returns approved/queued/failed action queue
+12. Trigger outbound worker with secret
+   Expect: `POST /api/automation/outbound-worker` sends due queue messages, retries failures, and logs permanent failures.
 
 ---
 

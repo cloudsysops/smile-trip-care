@@ -31,6 +31,7 @@
 | **M14** Durable automation queue | ✅ Done | Trigger events enqueue jobs in `ai_automation_jobs`; worker endpoint executes jobs with locks, retries, and dead-letter handling |
 | **M16** Assisted outbound conversion engine | ✅ Done | Admin queue for outbound drafts (AI/manual), approval/send/reply tracking, and lead contact logging via `outbound_messages` |
 | **M17** Outbound command center | ✅ Done | Admin outbound dashboard with actionable queue and SLA-risk metrics to prioritize follow-up actions |
+| **M18** Outbound dispatch worker | ✅ Done | Secret-protected outbound worker sends queued messages via providers, retries with backoff, and marks permanent failures |
 
 ## Run after migration
 ```bash

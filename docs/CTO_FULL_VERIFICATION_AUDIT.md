@@ -41,6 +41,17 @@
 - Added KPI view for outbound lifecycle and SLA-risk leads to prioritize follow-up.
 - Added quick action queue controls linked to outbound status transitions.
 
+## 0.3) M18 addendum — Outbound dispatcher worker (2026-03-06)
+
+- Added endpoint: `POST /api/automation/outbound-worker` (secret-protected).
+- Worker responsibilities:
+  - claim due outbound rows
+  - dispatch via configured providers (email/WhatsApp)
+  - mark `sent` on success
+  - retry failed sends with exponential backoff
+  - keep permanent failure state when attempts are exhausted
+- Added provider abstraction and dispatch queue helpers to decouple transport from workflow.
+
 ---
 
 ## 1) Executive summary
