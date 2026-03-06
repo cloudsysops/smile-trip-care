@@ -3,6 +3,7 @@ import { LeadCreateSchema } from "@/lib/validation/lead";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { jsonBadRequest, jsonError, jsonInternalServerError } from "@/lib/http/response";
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -11,18 +12,12 @@ export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object" || Array.isArray(body)) {
-      return NextResponse.json(
-        { error: "Invalid input", request_id: requestId },
-        { status: 400 }
-      );
+      return jsonBadRequest("Invalid input", requestId);
     }
     const parsed = LeadCreateSchema.safeParse(body);
     if (!parsed.success) {
       log.warn("Lead validation failed", { errors: parsed.error.flatten() });
-      return NextResponse.json(
-        { error: "Invalid input", request_id: requestId },
-        { status: 400 }
-      );
+      return jsonBadRequest("Invalid input", requestId);
     }
     const data = parsed.data;
 
@@ -36,10 +31,7 @@ export async function POST(request: Request) {
       ?? "unknown";
     if (!checkRateLimit(ip)) {
       log.warn("Rate limit exceeded", { ip });
-      return NextResponse.json(
-        { error: "Too many requests", request_id: requestId },
-        { status: 429 }
-      );
+      return jsonError(429, "Too many requests", requestId);
     }
 
     const supabase = getServerSupabase();
@@ -60,10 +52,7 @@ export async function POST(request: Request) {
 
     if (error) {
       log.error("Lead insert failed", { error: error.message });
-      return NextResponse.json(
-        { error: "Failed to save", request_id: requestId },
-        { status: 500 }
-      );
+      return jsonInternalServerError(requestId);
     }
 
     log.info("Lead created", { lead_id: lead.id });
@@ -73,9 +62,6 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     log.error("Leads API error", { err: String(err) });
-    return NextResponse.json(
-      { error: "Server error", request_id: requestId },
-      { status: 500 }
-    );
+    return jsonInternalServerError(requestId);
   }
 }

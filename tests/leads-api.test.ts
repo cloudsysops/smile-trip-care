@@ -12,12 +12,13 @@ describe("POST /api/leads", () => {
     expect(response.status).toBe(400);
     const payload = await response.json();
     expect(payload).toEqual({
+      ok: false,
       error: "Invalid input",
       request_id: expect.any(String),
     });
   });
 
-  it("returns safe 500 response for malformed JSON", async () => {
+  it("returns safe 400 response for malformed JSON", async () => {
     const response = await POST(new Request("http://localhost/api/leads", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -27,6 +28,7 @@ describe("POST /api/leads", () => {
     expect(response.status).toBe(400);
     const payload = await response.json();
     expect(payload).toEqual({
+      ok: false,
       error: "Invalid input",
       request_id: expect.any(String),
     });

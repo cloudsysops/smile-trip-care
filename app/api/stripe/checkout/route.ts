@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 import { UuidSchema } from "@/lib/validation/common";
+import { jsonBadRequest, jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
 
 const BodySchema = z.object({
   lead_id: UuidSchema,
@@ -14,27 +15,33 @@ const BodySchema = z.object({
   cancel_url: z.string().url().optional(),
 });
 
+const DEFAULT_STRIPE_API_VERSION = "2026-02-25.clover" as Stripe.LatestApiVersion;
+
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   }
   try {
     const config = getServerConfig();
     if (!config.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
     const body = await request.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+      return jsonBadRequest("Invalid body", requestId);
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
 
-    const stripe = new Stripe(config.STRIPE_SECRET_KEY);
+    const apiVersion = (config.STRIPE_API_VERSION as Stripe.LatestApiVersion | undefined)
+      ?? DEFAULT_STRIPE_API_VERSION;
+    const stripe = new Stripe(config.STRIPE_SECRET_KEY, { apiVersion });
     const origin = new URL(request.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -62,12 +69,19 @@ export async function POST(request: Request) {
     });
     if (error) {
       log.error("Failed to persist checkout session", { error: error.message, lead_id });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
 
-    return NextResponse.json({ url: session.url });
+    log.info("Stripe checkout created", {
+      admin_user_id: adminUserId,
+      lead_id,
+      amount_cents,
+      stripe_session_id: session.id,
+      stripe_api_version: apiVersion,
+    });
+    return NextResponse.json({ url: session.url, request_id: requestId });
   } catch (err) {
     log.error("Stripe checkout endpoint failed", { err: String(err) });
-    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }

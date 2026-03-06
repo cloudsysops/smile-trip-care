@@ -7,6 +7,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
  * Returns 200 if ready, 503 otherwise. Use for Kubernetes / load balancer ready checks.
  */
 export async function GET() {
+  const requestId = crypto.randomUUID();
   const checks: Record<string, "ok" | "missing" | "error"> = {};
   let ready = true;
 
@@ -33,9 +34,11 @@ export async function GET() {
   }
 
   const body = {
+    ok: ready,
     ready,
     timestamp: new Date().toISOString(),
     checks,
+    request_id: requestId,
   };
 
   return NextResponse.json(body, { status: ready ? 200 : 503 });

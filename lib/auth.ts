@@ -16,7 +16,7 @@ export async function getAuthClient() {
         return cookieStore.getAll();
       },
       setAll() {
-        // Route handlers don't need to set cookies; middleware already refreshed.
+        // Route handlers don't need to set cookies; proxy already refreshed.
       },
     },
   });

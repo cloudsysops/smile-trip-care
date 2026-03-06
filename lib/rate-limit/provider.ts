@@ -14,6 +14,8 @@ export interface RateLimitProvider {
   check(key: string, options: RateLimitOptions): RateLimitResult;
 }
 
+type RateLimitProviderFactory = () => RateLimitProvider;
+
 type MemoryEntry = {
   count: number;
   resetAt: number;
@@ -56,23 +58,42 @@ class InMemoryRateLimitProvider implements RateLimitProvider {
 }
 
 let provider: RateLimitProvider | null = null;
+const providerFactories = new Map<string, RateLimitProviderFactory>();
+
+function createMemoryProvider() {
+  return new InMemoryRateLimitProvider();
+}
+
+providerFactories.set("memory", createMemoryProvider);
 
 /**
  * Abstraction layer for rate limiting providers.
- * Default is in-memory for local/dev; production can switch to Redis later.
+ * Default is in-memory for local/dev.
+ * A production provider (e.g. Upstash Redis) can be plugged via registerRateLimitProvider.
  */
 export function getRateLimitProvider(): RateLimitProvider {
   if (provider) return provider;
 
-  const selected = process.env.RATE_LIMIT_PROVIDER ?? "memory";
-  switch (selected) {
-    case "memory":
-    default:
-      provider = new InMemoryRateLimitProvider();
-      return provider;
+  const selected = process.env.RATE_LIMIT_PROVIDER?.trim().toLowerCase() || "memory";
+  const factory = providerFactories.get(selected);
+  if (factory) {
+    provider = factory();
+    return provider;
   }
+
+  provider = createMemoryProvider();
+  return provider;
 }
 
 export function setRateLimitProviderForTests(next: RateLimitProvider | null) {
   provider = next;
+}
+
+export function registerRateLimitProvider(name: string, factory: RateLimitProviderFactory) {
+  const key = name.trim().toLowerCase();
+  if (!key) {
+    throw new Error("Rate limit provider name is required");
+  }
+  providerFactories.set(key, factory);
+  provider = null;
 }

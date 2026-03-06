@@ -5,6 +5,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { callSalesResponder } from "@/lib/ai/openai";
 import { LeadTriageOutputSchema } from "@/lib/ai/schemas";
+import { jsonBadRequest, jsonError, jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
 
 const BodySchema = z.object({
   lead_id: z.string().uuid(),
@@ -14,25 +15,24 @@ const BodySchema = z.object({
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
 
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden", request_id: requestId }, { status: 403 });
+    return jsonForbidden(requestId);
   }
 
   if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json(
-      { error: "AI service not configured", request_id: requestId },
-      { status: 500 },
-    );
+    return jsonInternalServerError(requestId);
   }
 
   try {
     const body = await request.json().catch(() => ({}));
     const parsedBody = BodySchema.safeParse(body);
     if (!parsedBody.success) {
-      return NextResponse.json({ error: "Invalid body", request_id: requestId }, { status: 400 });
+      return jsonBadRequest("Invalid body", requestId);
     }
 
     const supabase = getServerSupabase();
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       .single();
 
     if (leadError || !lead) {
-      return NextResponse.json({ error: "Lead not found", request_id: requestId }, { status: 404 });
+      return jsonError(404, "Lead not found", requestId);
     }
 
     const { data: aiRows, error: aiError } = await supabase
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       .limit(1);
     if (aiError) {
       log.error("Failed to load lead_ai row", { error: aiError.message });
-      return NextResponse.json({ error: "Failed to generate reply", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
     const aiRow = aiRows?.[0];
     const triageMaybe = LeadTriageOutputSchema.safeParse(aiRow?.triage_json);
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         .eq("id", existingId);
       if (updateError) {
         log.error("Failed to update messages_json", { error: updateError.message });
-        return NextResponse.json({ error: "Failed to save reply", request_id: requestId }, { status: 500 });
+        return jsonInternalServerError(requestId);
       }
     } else {
       const { error: insertError } = await supabase
@@ -103,14 +103,14 @@ export async function POST(request: Request) {
         .insert({ lead_id: parsedBody.data.lead_id, messages_json: messagePayload, updated_at: now });
       if (insertError) {
         log.error("Failed to insert messages_json", { error: insertError.message });
-        return NextResponse.json({ error: "Failed to save reply", request_id: requestId }, { status: 500 });
+        return jsonInternalServerError(requestId);
       }
     }
 
-    log.info("Lead response generated", { lead_id: parsedBody.data.lead_id });
+    log.info("Lead response generated", { lead_id: parsedBody.data.lead_id, admin_user_id: adminUserId });
     return NextResponse.json({ reply: messagePayload, request_id: requestId });
   } catch (err) {
     log.error("Respond route error", { err: String(err) });
-    return NextResponse.json({ error: "Server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }
