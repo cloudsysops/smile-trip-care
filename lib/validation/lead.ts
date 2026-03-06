@@ -8,8 +8,8 @@ export const LeadCreateSchema = z.object({
   country: z.string().max(100).optional(),
   package_slug: z.string().max(100).optional(),
   message: z.string().max(2000).optional(),
-  /** Honeypot: if filled, treat as bot. */
-  company_website: z.string().max(0).optional(),
+  /** Honeypot: allow values and silently drop bot-like submissions in handler. */
+  company_website: z.string().max(500).optional(),
 });
 
 export type LeadCreate = z.infer<typeof LeadCreateSchema>;

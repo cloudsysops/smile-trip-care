@@ -5,12 +5,13 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { z } from "zod";
+import { UuidSchema } from "@/lib/validation/common";
 
 const BodySchema = z.object({
-  lead_id: z.string().uuid(),
-  amount_cents: z.number().int().positive(),
-  success_url: z.string().url(),
-  cancel_url: z.string().url(),
+  lead_id: UuidSchema,
+  amount_cents: z.number().int().positive().max(10_000_000),
+  success_url: z.string().url().optional(),
+  cancel_url: z.string().url().optional(),
 });
 
 export async function POST(request: Request) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
 
-    const stripe = new Stripe(config.STRIPE_SECRET_KEY, { apiVersion: "2026-02-25.clover" });
+    const stripe = new Stripe(config.STRIPE_SECRET_KEY);
     const origin = new URL(request.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

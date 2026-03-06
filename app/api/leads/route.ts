@@ -9,7 +9,13 @@ export async function POST(request: Request) {
   const log = createLogger(requestId);
 
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json(
+        { error: "Invalid input", request_id: requestId },
+        { status: 400 }
+      );
+    }
     const parsed = LeadCreateSchema.safeParse(body);
     if (!parsed.success) {
       log.warn("Lead validation failed", { errors: parsed.error.flatten() });
@@ -20,7 +26,7 @@ export async function POST(request: Request) {
     }
     const data = parsed.data;
 
-    if (data.company_website && data.company_website.length > 0) {
+    if ((data.company_website ?? "").trim().length > 0) {
       log.info("Honeypot filled; returning 200 without inserting");
       return NextResponse.json({ ok: true, request_id: requestId });
     }

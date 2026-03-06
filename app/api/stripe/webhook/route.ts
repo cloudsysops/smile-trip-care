@@ -3,6 +3,12 @@ import Stripe from "stripe";
 import { getServerConfig } from "@/lib/config/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
+import { z } from "zod";
+import { UuidSchema } from "@/lib/validation/common";
+
+const CheckoutSessionMetadataSchema = z.object({
+  lead_id: UuidSchema,
+});
 
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
 
@@ -44,11 +50,11 @@ export async function POST(request: Request) {
   }
   const session = event.data.object as Stripe.Checkout.Session;
   const sessionId = session.id;
-  const leadId = session.metadata?.lead_id as string | undefined;
-  if (!leadId) {
-    log.warn("checkout.session.completed without lead_id in metadata");
+  const metadataParsed = CheckoutSessionMetadataSchema.safeParse(session.metadata ?? {});
+  if (!metadataParsed.success) {
+    log.warn("checkout.session.completed with invalid lead_id metadata");
   }
-  const now = new Date().toISOString();
+  const leadId = metadataParsed.success ? metadataParsed.data.lead_id : undefined;
   const supabase = getServerSupabase();
   const { data: existingPayment, error: paymentLookupError } = await supabase
     .from("payments")
@@ -70,6 +76,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ received: true, idempotent: true });
   }
+  const now = new Date().toISOString();
   const { data: payment, error: updatePayError } = await supabase
     .from("payments")
     .update({ status: "succeeded", updated_at: now })

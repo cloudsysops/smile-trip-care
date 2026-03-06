@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AssetUpdateSchema } from "@/lib/validation/asset";
+import { RouteIdParamSchema } from "@/lib/validation/common";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -15,7 +16,11 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   try {
-    const { id } = await params;
+    const parsedParams = RouteIdParamSchema.safeParse(await params);
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: "Invalid asset id" }, { status: 400 });
+    }
+    const { id } = parsedParams.data;
     const json = await request.json().catch(() => ({}));
     const parsed = AssetUpdateSchema.safeParse(json);
     if (!parsed.success) {
@@ -74,7 +79,11 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   try {
-    const { id } = await params;
+    const parsedParams = RouteIdParamSchema.safeParse(await params);
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: "Invalid asset id" }, { status: 400 });
+    }
+    const { id } = parsedParams.data;
     const supabase = getServerSupabase();
     const { data: asset, error } = await supabase
       .from("assets")

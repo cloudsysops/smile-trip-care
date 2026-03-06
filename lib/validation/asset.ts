@@ -6,6 +6,21 @@ export const ASSET_LOCATIONS = ["Medellín", "Manizales", "Other"] as const;
 export const AssetCategorySchema = z.enum(ASSET_CATEGORIES);
 export const AssetLocationSchema = z.enum(ASSET_LOCATIONS);
 
+const OptionalBooleanQuerySchema = z.preprocess((value) => {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    const normalized = value.toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
+  }
+  return value;
+}, z.boolean().optional());
+
 const AssetTagSchema = z.string().trim().min(1).max(100);
 const AssetTagsSchema = z.array(AssetTagSchema).max(20);
 const AssetAltTextSchema = z.string().trim().min(1).max(500);
@@ -23,8 +38,8 @@ export const AssetMetadataSchema = z.object({
 export const AssetFilterSchema = z.object({
   category: AssetCategorySchema.optional(),
   location: AssetLocationSchema.optional(),
-  approved: z.boolean().optional(),
-  published: z.boolean().optional(),
+  approved: OptionalBooleanQuerySchema,
+  published: OptionalBooleanQuerySchema,
   q: z.string().max(200).optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(100).default(20),
