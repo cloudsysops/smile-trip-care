@@ -110,7 +110,7 @@ Cuando tengas el flujo de pago:
 Después de cada deploy a Production:
 
 1. Health checks:
-   - `GET /api/health` debe responder `200` con `{ ok: true }`.
+   - `GET /api/health` debe responder `200` con `{ status: "ok", version, time, request_id }`.
    - `GET /api/health/ready` debe responder `200` y `ready: true`.
 2. Revisa logs de funciones en Vercel (errores 5xx y p95 de latencia).
 3. Ejecuta una prueba de Stripe en modo test y confirma:

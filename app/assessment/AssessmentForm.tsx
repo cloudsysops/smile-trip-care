@@ -15,6 +15,12 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
     e.preventDefault();
     const form = e.currentTarget;
     const fd = new FormData(form);
+    const currentUrl = new URL(window.location.href);
+    const utm = (key: string) => {
+      const value = currentUrl.searchParams.get(key)?.trim();
+      return value ? value : undefined;
+    };
+    const referrer = document.referrer.trim();
     const body = {
       first_name: fd.get("first_name") ?? "",
       last_name: fd.get("last_name") ?? "",
@@ -23,6 +29,13 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
       country: (fd.get("country") as string) || undefined,
       package_slug: (fd.get("package_slug") as string) || undefined,
       message: (fd.get("message") as string) || undefined,
+      utm_source: utm("utm_source"),
+      utm_medium: utm("utm_medium"),
+      utm_campaign: utm("utm_campaign"),
+      utm_term: utm("utm_term"),
+      utm_content: utm("utm_content"),
+      landing_path: `${currentUrl.pathname}${currentUrl.search}`,
+      referrer_url: referrer.length > 0 ? referrer : undefined,
       company_website: (fd.get("company_website") as string) || undefined,
     };
 

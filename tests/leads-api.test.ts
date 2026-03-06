@@ -51,4 +51,24 @@ describe("POST /api/leads", () => {
       request_id: expect.any(String),
     });
   });
+
+  it("returns 400 when referrer_url is not a valid URL", async () => {
+    const response = await POST(new Request("http://localhost/api/leads", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        first_name: "Ana",
+        last_name: "Buyer",
+        email: "ana@example.com",
+        referrer_url: "not-a-url",
+      }),
+    }));
+
+    expect(response.status).toBe(400);
+    const payload = await response.json();
+    expect(payload).toEqual({
+      error: "Invalid input",
+      request_id: expect.any(String),
+    });
+  });
 });

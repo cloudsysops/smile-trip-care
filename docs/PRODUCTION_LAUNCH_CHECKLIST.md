@@ -39,6 +39,7 @@ Operational checklist to launch safely on Vercel + Supabase + Stripe.
    - `supabase/migrations/0001_init.sql`
    - `supabase/migrations/0002_assets_extended_unified.sql`
    - `supabase/migrations/0003_m9_ai_admin_connected.sql`
+   - `supabase/migrations/0004_leads_attribution.sql`
 2. Validate RLS is enabled for:
    - `profiles`, `packages`, `leads`, `payments`, `assets`, `itineraries`, `lead_ai`
 3. Validate policy behavior:
@@ -148,6 +149,6 @@ Sentry is optional and not required for launch. If enabled later:
 
 ## Final go/no-go gate
 
-- CI (`npm ci`, `npm run lint`, `npm run build`) is green.
+- CI (`npm ci`, `npm run lint`, `npm run test`, `npm run build`) is green.
 - Required env vars pass `./scripts/env_check.sh`.
 - Health endpoints and payment webhook flow validated in Production.

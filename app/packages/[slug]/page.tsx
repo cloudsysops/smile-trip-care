@@ -3,12 +3,37 @@ import { notFound } from "next/navigation";
 import { getPublishedPackageBySlug } from "@/lib/packages";
 import { getPublishedAssets } from "@/lib/assets";
 
-type Props = { params: Promise<{ slug: string }> };
+type SearchValue = string | string[] | undefined;
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, SearchValue>>;
+};
 
-export default async function PackagePage({ params }: Props) {
+function getFirstQueryValue(value: SearchValue): string | undefined {
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    const first = value.find((item) => item.trim().length > 0);
+    return first;
+  }
+  return undefined;
+}
+
+export default async function PackagePage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const query = await searchParams;
   const pkg = await getPublishedPackageBySlug(slug);
   if (!pkg) notFound();
+
+  const assessmentQuery = new URLSearchParams({ package: slug });
+  for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]) {
+    const value = getFirstQueryValue(query[key]);
+    if (value) {
+      assessmentQuery.set(key, value);
+    }
+  }
+  const assessmentHref = `/assessment?${assessmentQuery.toString()}`;
 
   const locationFilter =
     pkg.location === "Medellín"
@@ -119,7 +144,7 @@ export default async function PackagePage({ params }: Props) {
             Complete the assessment and we&apos;ll coordinate next steps.
           </p>
           <Link
-            href="/assessment"
+            href={assessmentHref}
             className="mt-4 inline-flex h-12 items-center justify-center rounded-full bg-emerald-600 px-8 font-medium text-white transition-colors hover:bg-emerald-700"
           >
             Go to assessment

@@ -53,6 +53,13 @@ export async function POST(request: Request) {
         country: data.country ?? null,
         package_slug: data.package_slug ?? null,
         message: data.message ?? null,
+        utm_source: data.utm_source ?? null,
+        utm_medium: data.utm_medium ?? null,
+        utm_campaign: data.utm_campaign ?? null,
+        utm_term: data.utm_term ?? null,
+        utm_content: data.utm_content ?? null,
+        landing_path: data.landing_path ?? null,
+        referrer_url: data.referrer_url ?? null,
         status: "new",
       })
       .select("id")
