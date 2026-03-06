@@ -1,12 +1,13 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-export type AgentName = "lead-triage" | "sales-responder" | "itinerary-generator";
+export type AgentName = "lead-triage" | "sales-responder" | "itinerary-generator" | "ops-coordinator";
 
 const promptFiles: Record<AgentName, string> = {
   "lead-triage": "lead-triage.md",
   "sales-responder": "sales-responder.md",
   "itinerary-generator": "itinerary-generator.md",
+  "ops-coordinator": "ops-coordinator.md",
 };
 
 const cache = new Map<AgentName, string>();

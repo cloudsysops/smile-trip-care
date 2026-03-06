@@ -27,6 +27,7 @@
 | **M10** Conversion attribution | ✅ Done | Package CTA keeps intent (`?package=`), lead capture stores UTM/referrer/landing path, admin lead detail shows attribution |
 | **M11** Sales follow-up queue | ✅ Done | Leads include next follow-up/last contacted/notes, admin queue prioritizes overdue leads, detail page includes follow-up planner |
 | **M12** Deposit pricing governance | ✅ Done | Stripe checkout amount is resolved server-side from package pricing, client amount ignored, admin deposit CTA reflects effective amount |
+| **M13** Agent automation foundation | ✅ Done | Internal server-side triggers run triage/respond after lead creation, itinerary/ops after deposit_paid, plus cron-safe 24h/48h follow-up drafts |
 
 ## Run after migration
 ```bash
@@ -36,7 +37,8 @@
 # 3. supabase/migrations/0003_m9_ai_admin_connected.sql
 # 4. supabase/migrations/0004_leads_attribution.sql
 # 5. supabase/migrations/0005_leads_follow_up_queue.sql
-# 6. scripts/seed_packages.sql
+# 6. supabase/migrations/0006_ai_automation_foundation.sql
+# 7. scripts/seed_packages.sql
 ```
 
 ## Env

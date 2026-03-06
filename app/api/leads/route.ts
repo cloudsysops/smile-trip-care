@@ -3,6 +3,7 @@ import { LeadCreateSchema } from "@/lib/validation/lead";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { triggerLeadCreatedAutomation } from "@/lib/ai/automation";
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -74,6 +75,16 @@ export async function POST(request: Request) {
     }
 
     log.info("Lead created", { lead_id: lead.id });
+    const ctaUrl = `${new URL(request.url).origin}/assessment`;
+    void triggerLeadCreatedAutomation(lead.id as string, {
+      requestId,
+      ctaUrl,
+    }).catch((err) => {
+      log.error("Lead-created automation kickoff failed", {
+        lead_id: lead.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    });
     return NextResponse.json({
       lead_id: lead.id,
       request_id: requestId,

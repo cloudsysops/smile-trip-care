@@ -14,6 +14,7 @@
 ## Admin
 - `/admin/*` protected by middleware (session required). All admin pages and `/api/admin/*` must verify `profiles.role = 'admin'` server-side.
 - AI generation routes (`/api/ai/*`) must call `requireAdmin()` and run only on server.
+- Internal automation cron endpoint (`/api/automation/followups`) must be protected with `AUTOMATION_CRON_SECRET`; never expose this secret to clients.
 
 ## AI policy (M9)
 - No medical advice, diagnosis, or treatment guarantees in generated content.

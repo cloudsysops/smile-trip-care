@@ -18,7 +18,7 @@
 - **leads**: `first_name`, `last_name`, `email`, `phone`, `country`, `package_slug`, `message`, `status` (new → deposit_paid → …), attribution fields `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `landing_path`, `referrer_url`, and sales-ops follow-up fields `last_contacted_at`, `next_follow_up_at`, `follow_up_notes`.
 - **payments**: `lead_id`, `stripe_checkout_session_id`, `stripe_payment_intent_id`, `amount_cents`, `status`.
 - **assets**: `storage_path`, `title`, `category` (clinic\|finca\|lodging\|tour\|team\|other), `location` (Medellín\|Manizales\|Other), `tags` (text[]), `alt_text`, `approved`, `published`, `deleted_at`.
-- **lead_ai**: `lead_id`, `triage_json` (jsonb), `messages_json` (jsonb), `notes`.
+- **lead_ai**: `lead_id`, `triage_json` (jsonb), `messages_json` (jsonb), `ops_json` (jsonb), `followup_24h_json` (jsonb), `followup_48h_json` (jsonb), `triage_completed`, `response_generated`, `itinerary_generated`, `ops_generated`, `notes`.
 - **itineraries**: optional `package_id`, optional `lead_id`, `city`, `content_json` (jsonb), legacy `day_index/title/description`.
 
 ## Admin helper
@@ -32,4 +32,5 @@
 - `supabase/migrations/0003_m9_ai_admin_connected.sql`: extends `lead_ai` and `itineraries` for admin AI workflows.
 - `supabase/migrations/0004_leads_attribution.sql`: adds lead attribution fields (UTM, landing path, referrer) for conversion analytics.
 - `supabase/migrations/0005_leads_follow_up_queue.sql`: adds sales follow-up queue fields and index (`next_follow_up_at`) on leads.
+- `supabase/migrations/0006_ai_automation_foundation.sql`: extends `lead_ai` with automation outputs and status flags for trigger-based AI execution.
 - `scripts/seed_packages.sql`: inserts `smile-medellin` and `smile-manizales` as published packages.

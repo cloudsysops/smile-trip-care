@@ -5,6 +5,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 import { UuidSchema } from "@/lib/validation/common";
+import { triggerDepositPaidAutomation } from "@/lib/ai/automation";
 
 const CheckoutSessionMetadataSchema = z.object({
   lead_id: UuidSchema,
@@ -167,6 +168,12 @@ export async function POST(request: Request) {
       log.error("Failed to update lead status", { error: leadError.message });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
+    void triggerDepositPaidAutomation(leadIdToUpdate, { requestId }).catch((err) => {
+      log.error("Deposit-paid automation kickoff failed", {
+        lead_id: leadIdToUpdate,
+        error: err instanceof Error ? err.message : String(err),
+      });
+    });
   } else {
     log.warn("No lead id available for succeeded payment", {
       payment_id: paymentId,

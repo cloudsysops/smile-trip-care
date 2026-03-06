@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     if (existingId) {
       const { error: updateError } = await supabase
         .from("lead_ai")
-        .update({ triage_json: triage, updated_at: now })
+        .update({ triage_json: triage, triage_completed: true, updated_at: now })
         .eq("id", existingId);
       if (updateError) {
         log.error("Failed to update triage", { error: updateError.message });
@@ -102,7 +102,12 @@ export async function POST(request: Request) {
     } else {
       const { error: insertError } = await supabase
         .from("lead_ai")
-        .insert({ lead_id: parsedBody.data.lead_id, triage_json: triage, updated_at: now });
+        .insert({
+          lead_id: parsedBody.data.lead_id,
+          triage_json: triage,
+          triage_completed: true,
+          updated_at: now,
+        });
       if (insertError) {
         log.error("Failed to insert triage", { error: insertError.message });
         return NextResponse.json({ error: "Failed to save triage", request_id: requestId }, { status: 500 });

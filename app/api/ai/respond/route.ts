@@ -91,7 +91,7 @@ export async function POST(request: Request) {
     if (existingId) {
       const { error: updateError } = await supabase
         .from("lead_ai")
-        .update({ messages_json: messagePayload, updated_at: now })
+        .update({ messages_json: messagePayload, response_generated: true, updated_at: now })
         .eq("id", existingId);
       if (updateError) {
         log.error("Failed to update messages_json", { error: updateError.message });
@@ -100,7 +100,12 @@ export async function POST(request: Request) {
     } else {
       const { error: insertError } = await supabase
         .from("lead_ai")
-        .insert({ lead_id: parsedBody.data.lead_id, messages_json: messagePayload, updated_at: now });
+        .insert({
+          lead_id: parsedBody.data.lead_id,
+          messages_json: messagePayload,
+          response_generated: true,
+          updated_at: now,
+        });
       if (insertError) {
         log.error("Failed to insert messages_json", { error: insertError.message });
         return NextResponse.json({ error: "Failed to save reply", request_id: requestId }, { status: 500 });
