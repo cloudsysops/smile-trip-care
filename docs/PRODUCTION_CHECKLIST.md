@@ -16,7 +16,7 @@ Use this checklist before promoting a release to production.
 
 ## 2) Database & storage
 
-- [ ] Supabase migrations applied (`0001`, `0002`, `0003`)
+- [ ] Supabase migrations applied (`0001` ... `0009`)
 - [ ] `packages` seed executed (if required for environment)
 - [ ] `assets` storage bucket exists
 - [ ] Storage permissions reviewed for signed URL workflow
@@ -27,6 +27,7 @@ Use this checklist before promoting a release to production.
 - [ ] Admin APIs enforce `requireAdmin` server-side
 - [ ] All write operations use server service-role client only
 - [ ] Stripe webhook verifies signature with raw body
+- [ ] Stripe webhook idempotency ledger (`stripe_webhook_events`) is active
 - [ ] Security headers are active in `next.config.ts`
 - [ ] Rate limiting configured:
   - [ ] `RATE_LIMIT_PROVIDER=memory` (dev/single instance) or
@@ -41,6 +42,7 @@ Use this checklist before promoting a release to production.
 - [ ] Admin login works and non-admin access is rejected
 - [ ] Stripe checkout session can be created from admin lead detail
 - [ ] Stripe webhook updates payment and lead status on completion
+- [ ] Payments reconcile endpoint (`/api/automation/payments-reconcile`) is reachable with cron secret
 
 ## 5) Quality gates
 
