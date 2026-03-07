@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 type HealthRes = { status: string; timestamp: string; service?: string };
 type ReadyRes = { ready: boolean; timestamp: string; checks: Record<string, string> };
+type PaymentsMetricsRes = { metrics: Record<string, number>; request_id: string };
 type AutomationRes = {
   pending_jobs: number;
   processing_jobs: number;
@@ -18,6 +19,8 @@ export default function StatusDashboard() {
   const [liveError, setLiveError] = useState<string | null>(null);
   const [ready, setReady] = useState<ReadyRes | null>(null);
   const [readyError, setReadyError] = useState<string | null>(null);
+  const [payments, setPayments] = useState<PaymentsMetricsRes | null>(null);
+  const [paymentsError, setPaymentsError] = useState<string | null>(null);
   const [automation, setAutomation] = useState<AutomationRes | null>(null);
   const [automationError, setAutomationError] = useState<string | null>(null);
 
@@ -30,6 +33,15 @@ export default function StatusDashboard() {
       .then((r) => r.json())
       .then(setReady)
       .catch(() => setReadyError("Failed to fetch"));
+    fetch("/api/admin/payments/metrics")
+      .then((r) => r.json())
+      .then((payload) => {
+        if (!payload || typeof payload !== "object" || !("metrics" in payload)) {
+          throw new Error("Invalid payload");
+        }
+        setPayments(payload as PaymentsMetricsRes);
+      })
+      .catch(() => setPaymentsError("Failed to fetch"));
     fetch("/api/admin/status/automation")
       .then((r) => r.json())
       .then((payload) => {
@@ -86,6 +98,18 @@ export default function StatusDashboard() {
               <p><span className="font-medium">Failed outbound:</span> {automation.failed_outbound_count}</p>
             </div>
           </div>
+        )}
+      </div>
+      <div className="rounded-lg border border-zinc-200 bg-white p-6">
+        <h2 className="text-lg font-semibold">Payments reliability</h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          GET /api/admin/payments/metrics — pending aging, recoveries, and webhook processing.
+        </p>
+        {paymentsError && <p className="mt-2 text-sm text-red-600">{paymentsError}</p>}
+        {payments && (
+          <pre className="mt-2 overflow-auto rounded bg-zinc-100 p-3 text-xs">
+            {JSON.stringify(payments, null, 2)}
+          </pre>
         )}
       </div>
     </div>

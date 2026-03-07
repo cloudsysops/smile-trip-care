@@ -17,7 +17,7 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
 - [ ] Deploy más reciente en estado `Ready`.
 
 ### Supabase
-- [ ] Migraciones aplicadas (`0001` → `0008` según `STATUS.md`).
+- [ ] Migraciones aplicadas (`0001` → `0009` según `STATUS.md`).
 - [ ] RLS habilitado y policies validadas.
 - [ ] Claves correctas en Vercel (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, públicas `NEXT_PUBLIC_*`).
 
@@ -77,3 +77,6 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
    - Confirmar `GET /api/admin/outbound/metrics` y `/api/admin/outbound/queue` con sesión admin.
 7. **Outbound worker cron**
    - Confirmar invocación de `/api/automation/outbound-worker` con secret válido y ejecución sin 5xx.
+8. **Payments reconcile cron**
+   - Confirmar invocación de `/api/automation/payments-reconcile` con secret válido y ejecución sin 5xx.
+   - Confirmar que pagos `pending` envejecidos pasan a `succeeded`/`failed` cuando Stripe ya resolvió el checkout.
