@@ -1,7 +1,8 @@
 # Safe redeploy checklist — Local → Vercel
 
 **Target URL:** https://smile-transformation-platform-dev.vercel.app/  
-**Deploy branch:** `main` (Vercel suele estar conectado a `main`).
+**Proyecto Vercel:** solo uno (nombre termina en `-dev`). Ver [VERCEL_UN_SOLO_PROYECTO.md](VERCEL_UN_SOLO_PROYECTO.md).  
+**Deploy branch:** `main`.
 
 ---
 
@@ -66,17 +67,19 @@ git add .
 # Commit with a clear message
 git commit -m "feat: landing sales upgrade, auth/roles, admin CRUD, dashboards; ready for dev redeploy"
 
-# Push current branch to origin (production-hardening)
-git push origin production-hardening
+# Push to main (único proyecto Vercel usa main)
+git push origin main
 ```
 
-**Note:** If your Vercel project is linked to `main` (or another branch), after push you may need to either merge `production-hardening` into that branch and push, or point Vercel to `production-hardening` for preview deploys. The URL you gave is the dev deployment; confirm in Vercel which branch it uses.
+**Note:** Hay un solo proyecto en Vercel (URL -dev). Debe estar conectado a la rama `main`.
 
 **Do not run:** `git reset --hard`, `git push --force`, or any command that would overwrite remote history without your explicit intent.
 
 ---
 
 ## 5. Deploy instructions
+
+**Importante:** Solo hay un proyecto en Vercel (nombre que termina en `-dev`). En Settings → Git, **Production Branch** debe ser `main`. Cada push a `main` despliega a https://smile-transformation-platform-dev.vercel.app/
 
 - **If** the Vercel project “smile-transformation-platform-dev” is connected to the repo and to branch **production-hardening**:  
   Pushing `production-hardening` will trigger an **automatic deploy**. The new build will appear at https://smile-transformation-platform-dev.vercel.app/ once the build finishes.
@@ -123,11 +126,11 @@ After the deploy completes:
 
 | Item | Value |
 |------|--------|
-| **Repo status** | Branch `production-hardening`, working tree not clean (many changes) |
-| **Files changed** | 31 modified, 1 deleted, many new (app, api, lib, docs, migrations, scripts) |
+| **Repo status** | Branch `main`; working tree limpio o con cambios commiteados |
+| **Files changed** | Según `git status` |
 | **Build validation** | Lint, test, build all passed |
-| **Git commands** | `git add .` → `git commit -m "..."` → `git push origin production-hardening` |
-| **Deploy** | Automatic if Vercel is linked to this branch; otherwise merge to connected branch or change branch in Vercel |
+| **Git commands** | `git add .` → `git commit -m "..."` → `git push origin main` |
+| **Deploy** | Un solo proyecto Vercel (-dev); Production Branch = `main`. Push a main → deploy automático. |
 | **Verification** | Health, homepage, packages, assessment + `deploy_verify.sh` |
 
 These changes are safe to deploy for dev/testing: no destructive refactors, architecture unchanged, and validation passed. Ensure Supabase migrations (0006–0011) are applied on the Supabase project used by this deployment before relying on new features (e.g. roles, dashboards).

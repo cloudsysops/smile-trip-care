@@ -6,7 +6,7 @@
 |-------|--------|--------------------|
 | **M8** Assets Manager + hardening | ✅ Done | CI green (`lint` + `build`), health endpoints, unified migration, admin assets fixes |
 | **M9** AI Workers (triage/reply/itinerary) | ✅ Done | Endpoints + admin UI connected, outputs persisted and visible in lead detail |
-| **Deploy** (Vercel + Stripe + Supabase) | 🔶 Casi listo | Dev: Vercel + env + webhook configurados; smoke OK. Falta: probar webhook en prod (Send test) + flujo completo una vez. **Sprint Salir a vender:** checklist página profesional ejecutado (2026-03-08); verify + deploy_verify OK. [docs/SPRINT_SALIR_A_VENDER.md](docs/SPRINT_SALIR_A_VENDER.md). **Plan maestro agentes:** [docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md](docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md). **Checklist:** [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md). |
+| **Deploy** (Vercel + Stripe + Supabase) | 🔶 Casi listo | **Un solo proyecto Vercel** (nombre termina en `-dev`), URL: https://smile-transformation-platform-dev.vercel.app. Rama en Vercel: `main`. Env + webhook configurados; smoke OK. [docs/VERCEL_UN_SOLO_PROYECTO.md](docs/VERCEL_UN_SOLO_PROYECTO.md). Checklist: [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md). |
 
 ---
 

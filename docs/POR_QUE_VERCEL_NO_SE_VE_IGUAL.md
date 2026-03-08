@@ -10,7 +10,7 @@
 - Archivos **modificados** (M): p. ej. `app/page.tsx`, `app/components/landing/package-card.tsx`, etc.
 - Archivos **nuevos sin seguimiento** (??): login, dashboards, APIs admin, migraciones, docs, etc.
 
-El deploy actual de Vercel se hizo a partir del commit **f7ec1c4** ("chore: trigger Vercel deploy"), que es anterior a toda esa versión.
+El deploy actual de Vercel se hace desde la rama conectada (p. ej. `main`). Si en local tenías cambios sin push, Vercel mostraba una versión anterior. **Actualizado 2026-03-08:** se hizo push de todo lo local a `main` (commit 2adc9af); Vercel debería desplegar esa versión en unos minutos.
 
 ## Qué hacer para que se vea igual
 

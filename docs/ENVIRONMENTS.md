@@ -2,6 +2,8 @@
 
 This document defines the 3 official runtime environments: `dev`, `staging`, and `production`.
 
+**Nota (2026-03):** En Vercel hay **un solo proyecto** (nombre que termina en `-dev`), URL: https://smile-transformation-platform-dev.vercel.app. No hay actualmente un segundo proyecto "production". Ver [VERCEL_UN_SOLO_PROYECTO.md](VERCEL_UN_SOLO_PROYECTO.md).
+
 ## Environment overview
 
 | Environment | Git branch | Purpose | Stripe mode | Supabase target |
