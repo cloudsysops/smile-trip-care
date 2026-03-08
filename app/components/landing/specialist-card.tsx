@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { SpecialistRow } from "@/lib/specialists";
 
 function getInitials(name: string): string {
@@ -15,10 +16,10 @@ type Props = {
 };
 
 export default function SpecialistCard({ specialist, imageUrl }: Props) {
-  const { name, specialty, city, clinic, description } = specialist;
+  const { name, specialty, city, clinic, description, slug } = specialist;
 
-  return (
-    <li className="flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/80 transition hover:border-zinc-600">
+  const content = (
+    <>
       <div className="relative flex h-40 items-center justify-center bg-zinc-800">
         {imageUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
@@ -52,6 +53,18 @@ export default function SpecialistCard({ specialist, imageUrl }: Props) {
           Free evaluation included in your visit.
         </p>
       </div>
+    </>
+  );
+
+  return (
+    <li className="flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/80 transition hover:border-zinc-600">
+      {slug ? (
+        <Link href={`/specialists/${slug}`} className="flex flex-col flex-1 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset rounded-2xl">
+          {content}
+        </Link>
+      ) : (
+        content
+      )}
     </li>
   );
 }

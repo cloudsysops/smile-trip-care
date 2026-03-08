@@ -89,6 +89,28 @@ export async function getSpecialistById(id: string): Promise<SpecialistRow | nul
   }
 }
 
+/** Fetch one published specialist by slug (for public profile page). Returns null if not found. */
+export async function getSpecialistBySlug(slug: string): Promise<SpecialistRow | null> {
+  const config = getServerConfigSafe();
+  if (!config.success || !config.data.SUPABASE_URL || !config.data.SUPABASE_SERVICE_ROLE_KEY) {
+    return null;
+  }
+  try {
+    const supabase = getServerSupabase();
+    const { data, error } = await supabase
+      .from("specialists")
+      .select(SPECIALIST_SELECT)
+      .eq("slug", slug)
+      .eq("published", true)
+      .eq("approval_status", "approved")
+      .maybeSingle();
+    if (error || !data) return null;
+    return data as SpecialistRow;
+  } catch {
+    return null;
+  }
+}
+
 export type SpecialistInsert = Omit<SpecialistRow, "id" | "created_at" | "updated_at"> & {
   id?: string;
   created_at?: string;
