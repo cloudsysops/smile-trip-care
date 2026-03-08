@@ -299,9 +299,9 @@ export default async function Home() {
           </p>
           <ul className="grid gap-6 sm:grid-cols-3">
             {[
-              { title: "Dental Implants", slug: "dental-implants", desc: "Permanent solutions with verified specialists and significant savings." },
-              { title: "Hollywood Smile", slug: "hollywood-smile", desc: "Complete smile makeovers with veneers and aesthetic design." },
-              { title: "Smile Design", slug: "smile-design", desc: "Personalized treatment plans for your ideal smile." },
+              { title: "Dental Implants", slug: "essential-care-journey", desc: "Permanent solutions with verified specialists and significant savings." },
+              { title: "Hollywood Smile", slug: "comfort-recovery-journey", desc: "Complete smile makeovers with veneers and aesthetic design." },
+              { title: "Smile Design", slug: "premium-transformation-experience", desc: "Personalized treatment plans for your ideal smile." },
             ].map(({ title, slug, desc }) => (
               <li key={slug}>
                 <Link
