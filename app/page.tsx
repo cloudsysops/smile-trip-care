@@ -8,7 +8,6 @@ import { WhatsAppButton } from "./components/WhatsAppButton";
 import PackageCard from "./components/landing/package-card";
 import SpecialistCard from "./components/landing/specialist-card";
 import ExperienceCard from "./components/landing/experience-card";
-import StepFlowSection from "./components/landing/step-flow-section";
 import PartnerInstitutionCard from "./components/landing/partner-institution-card";
 import ImagePlaceholder from "./components/landing/image-placeholder";
 import type { PublicAsset } from "@/lib/assets";
@@ -17,15 +16,6 @@ function getPackageImage(assets: PublicAsset[], location: string): PublicAsset |
   const match = assets.find((a) => a.location === location && a.url);
   return match ?? assets.find((a) => a.url) ?? null;
 }
-
-const HOW_IT_WORKS_STEPS = [
-  { step: 1, title: "Free evaluation", desc: "Share your details and goals. We review your case at no cost." },
-  { step: 2, title: "Treatment plan", desc: "Our team and specialists recommend a personalized plan within 24 hours." },
-  { step: 3, title: "Choose package", desc: "Select a package that fits your treatment and recovery journey." },
-  { step: 4, title: "Travel to Medellín", desc: "We coordinate your arrival, lodging, and first consultations." },
-  { step: 5, title: "Recovery in Manizales", desc: "Recover in the coffee region with optional experiences and support." },
-  { step: 6, title: "Optional experiences", desc: "Customize your stay with coffee tours, wellness, and cultural activities." },
-];
 
 const TRUST_ITEMS = [
   { icon: "clinic", title: "Curated partner network", desc: "We work only with vetted clinics and specialists—no open marketplace." },
@@ -44,6 +34,7 @@ const WHY_COLOMBIA = [
 const TESTIMONIALS = [
   { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient, Medellín package", stars: 5 },
   { quote: "The team made me feel safe and informed. The specialists were excellent and the recovery in Manizales was perfect.", author: "Patient, Comfort Recovery Journey", stars: 5 },
+  { quote: "I saved thousands compared to back home and got a smile I love. The free assessment made it easy to get started.", author: "Patient, dental transformation", stars: 5 },
 ];
 
 /** Trusted partners / institutions (verified public info only; images are placeholders until approved assets). */
@@ -152,7 +143,7 @@ export default async function Home() {
               href="/assessment"
               className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-200 sm:px-5 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
             >
-              Free Smile Evaluation
+              Start Free Assessment
             </Link>
             <Link
               href="/#packages"
@@ -182,17 +173,17 @@ export default async function Home() {
           <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-12">
             <div>
               <h1 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-                Free Medical Evaluation · Treatment in Medellín · Recovery in Manizales
+                Transform Your Smile in Colombia and Save Up to 70%
               </h1>
               <p className="mb-8 max-w-lg text-lg text-zinc-400">
-                Free evaluation with no commitment. Oral health and medical tourism in two cities: treatment in Medellín, recovery in Manizales — one coordinated journey with trusted specialists and vetted institutional partners.
+                Verified clinics in Medellín and Manizales. Travel concierge included.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                 <Link
                   href="/assessment"
                   className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-900 hover:bg-zinc-100 sm:w-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
                 >
-                  Free Smile Evaluation
+                  Start My Free Smile Assessment
                 </Link>
                 <Link
                   href="/#packages"
@@ -251,6 +242,40 @@ export default async function Home() {
           <p className="mt-6 rounded-xl border border-zinc-700 bg-zinc-900/60 px-5 py-4 text-sm text-zinc-400">
             <strong className="text-zinc-300">Legal clarity:</strong> We are a coordination and hospitality platform. We do not provide medical advice, diagnosis, or treatment. Medical services are provided by licensed clinics and specialists in Colombia.
           </p>
+        </section>
+
+        {/* Verified Clinics */}
+        <section id="verified-clinics" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Verified clinics
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Partner clinics we work with in Medellín and Manizales
+          </p>
+          <ul className="grid gap-6 sm:grid-cols-2">
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300">
+                <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                </svg>
+                Verified Clinic
+              </span>
+              <h3 className="mt-4 font-bold text-white">Instituto Inmedent</h3>
+              <p className="mt-1 text-sm font-medium text-zinc-400">Manizales</p>
+              <p className="mt-2 text-sm text-zinc-400">Oral health and dental care in the coffee region. Part of our trusted network for treatment and recovery.</p>
+            </li>
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300">
+                <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                </svg>
+                Verified Clinic
+              </span>
+              <h3 className="mt-4 font-bold text-white">Clínica San Martín</h3>
+              <p className="mt-1 text-sm font-medium text-zinc-400">Medellín</p>
+              <p className="mt-2 text-sm text-zinc-400">Trust anchor in Medellín. Modern facilities and experienced specialists for your smile journey.</p>
+            </li>
+          </ul>
         </section>
 
         {/* Trusted Clinical Network */}
@@ -350,8 +375,40 @@ export default async function Home() {
           </Link>
         </section>
 
-        {/* 4. How It Works */}
-        <StepFlowSection steps={HOW_IT_WORKS_STEPS} title="How it works" className="mb-20 md:mb-28" />
+        {/* 4. How It Works (3 steps) */}
+        <section id="how-it-works" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            How it works
+          </h2>
+          <p className="mb-10 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            From photos to your new smile — simple and guided
+          </p>
+          <ul className="grid gap-6 sm:grid-cols-3">
+            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
+              <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">1</span>
+              <h3 className="font-semibold text-white">Upload your smile photos</h3>
+              <p className="text-sm text-zinc-400">Share a few photos in our free assessment. No commitment — we use them to match you with the right plan.</p>
+            </li>
+            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
+              <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">2</span>
+              <h3 className="font-semibold text-white">Get matched with verified specialists</h3>
+              <p className="text-sm text-zinc-400">Our team reviews your case and connects you with vetted clinics and specialists in Medellín and Manizales.</p>
+            </li>
+            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
+              <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">3</span>
+              <h3 className="font-semibold text-white">Travel and transform your smile</h3>
+              <p className="text-sm text-zinc-400">We coordinate your trip, lodging, and appointments. You focus on your care and enjoy Colombia.</p>
+            </li>
+          </ul>
+          <div className="mt-8 text-center">
+            <Link
+              href="/assessment"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-900 hover:bg-zinc-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
+            >
+              Start My Free Smile Assessment
+            </Link>
+          </div>
+        </section>
 
         {/* Medical Experience Story — full patient journey */}
         <section id="medical-experience-story" className="mb-20 scroll-mt-6 md:mb-28">
@@ -383,19 +440,30 @@ export default async function Home() {
             Two-city journey: treatment in Medellín, recovery in Manizales
           </p>
           {packages.length === 0 ? (
-            <p className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-12 text-center text-zinc-500">
-              No packages available at the moment. Check back soon.
-            </p>
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-12 text-center">
+              <p className="text-zinc-500">No packages available at the moment. Check back soon.</p>
+              <Link href="/packages" className="mt-4 inline-block text-sm font-semibold text-emerald-400 hover:text-emerald-300">View packages page →</Link>
+            </div>
           ) : (
-            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {packages.map((pkg, idx) => {
-                const img = getPackageImage(allAssets, pkg.location);
-                const recommended = pkg.badge === "MOST POPULAR" || (idx === 0 && !packages.some((p) => p.badge === "MOST POPULAR"));
-                return (
-                  <PackageCard key={pkg.id} pkg={pkg} image={img} recommended={!!recommended} />
-                );
-              })}
-            </ul>
+            <>
+              <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {packages.map((pkg, idx) => {
+                  const img = getPackageImage(allAssets, pkg.location);
+                  const recommended = pkg.badge === "MOST POPULAR" || (idx === 0 && !packages.some((p) => p.badge === "MOST POPULAR"));
+                  return (
+                    <PackageCard key={pkg.id} pkg={pkg} image={img} recommended={!!recommended} />
+                  );
+                })}
+              </ul>
+              <div className="mt-8 text-center">
+                <Link
+                  href="/packages"
+                  className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-zinc-600 px-8 py-4 text-base font-semibold text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/80 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                >
+                  View all packages
+                </Link>
+              </div>
+            </>
           )}
         </section>
 
@@ -575,12 +643,43 @@ export default async function Home() {
           </ul>
         </section>
 
+        {/* Before / After gallery */}
+        <section id="before-after" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Smile transformations
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Real results from our partner clinics
+          </p>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:gap-6">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 overflow-hidden">
+              <div className="aspect-[3/4] bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-medium uppercase tracking-wider">Before</div>
+              <p className="p-3 text-center text-sm text-zinc-400">Before</p>
+            </div>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 overflow-hidden">
+              <div className="aspect-[3/4] bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-medium uppercase tracking-wider">After</div>
+              <p className="p-3 text-center text-sm text-zinc-400">After</p>
+            </div>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 overflow-hidden">
+              <div className="aspect-[3/4] bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-medium uppercase tracking-wider">Before</div>
+              <p className="p-3 text-center text-sm text-zinc-400">Before</p>
+            </div>
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 overflow-hidden">
+              <div className="aspect-[3/4] bg-zinc-800 flex items-center justify-center text-zinc-500 text-xs font-medium uppercase tracking-wider">After</div>
+              <p className="p-3 text-center text-sm text-zinc-400">After</p>
+            </div>
+          </div>
+          <p className="mt-4 text-center text-sm text-zinc-500">
+            Results may vary. Approved before/after images can be added when available.
+          </p>
+        </section>
+
         {/* 9. Testimonials */}
         <section id="testimonials" className="mb-20 scroll-mt-6 md:mb-28">
           <h2 className="mb-8 text-sm font-semibold uppercase tracking-wider text-zinc-500">
             What people say
           </h2>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
               <blockquote key={i} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-8">
                 <StarRating stars={t.stars} />
@@ -629,17 +728,17 @@ export default async function Home() {
         <section id="cta" className="mb-20 scroll-mt-6 md:mb-28" aria-labelledby="final-cta-title">
           <div className="rounded-2xl border-2 border-emerald-500/50 bg-zinc-900/80 p-8 text-center md:p-14">
             <h2 id="final-cta-title" className="mb-3 text-2xl font-bold text-white md:text-4xl">
-              Start Your {branding.productName} Journey
+              Ready to Transform Your Smile?
             </h2>
             <p className="mx-auto mb-8 max-w-md text-zinc-400">
-              Get your free evaluation and personalized treatment plan. No commitment.
+              Start your free smile assessment. Get a personalized plan from verified clinics — no commitment.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
               <Link
                 href="/assessment"
                 className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-white px-10 py-4 text-lg font-semibold text-zinc-900 hover:bg-zinc-100 sm:w-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
               >
-                Get Your Free Evaluation
+                Start My Free Smile Assessment
               </Link>
               <WhatsAppButton
                 label="Chat on WhatsApp"
@@ -694,7 +793,7 @@ export default async function Home() {
                 href="/assessment"
                 className="min-h-[44px] inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
               >
-                Get Free Evaluation
+                Start Free Smile Assessment
               </Link>
               <WhatsAppButton label="Chat" variant="inline" className="min-h-[44px] inline-flex items-center justify-center rounded-full border border-zinc-600 bg-transparent px-4 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950" />
             </div>
