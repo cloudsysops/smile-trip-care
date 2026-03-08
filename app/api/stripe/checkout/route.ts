@@ -163,7 +163,7 @@ export async function POST(request: Request) {
           price_data: {
             currency: "usd",
             unit_amount: resolvedAmountCents,
-            product_data: { name: `Deposit — ${packageName ?? "Smile Transformation"}` },
+            product_data: { name: `Deposit — ${packageName ?? "Nebula Smile"}` },
           },
         },
       ],

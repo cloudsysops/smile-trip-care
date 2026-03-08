@@ -1,4 +1,4 @@
-# Auditoría ejecutada — Smile Transformation
+# Auditoría ejecutada — Nebula Smile
 
 **Fecha de ejecución:** 2025-03-07  
 **Alcance:** Verificación automática (CI), revisión de seguridad y estado de deploy.

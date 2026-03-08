@@ -1,6 +1,6 @@
 # Marketplace Foundation (Curated)
 
-Smile Transformation’s “marketplace” is a **curated private network**, not an open directory. This doc summarizes the data and API foundation that supports it.
+Nebula Smile's “marketplace” is a **curated private network**, not an open directory. This doc summarizes the data and API foundation that supports it.
 
 ---
 

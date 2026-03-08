@@ -1,8 +1,8 @@
 # Marketplace Foundation Sprint — Proposal
 
-**Objective:** Prepare the data model and architecture so Smile Transformation can scale from a small MVP into a full medical tourism marketplace, without implementing all features at once.
+**Objective:** Prepare the data model and architecture so Nebula Smile can scale from a small MVP into a full medical tourism marketplace, without implementing all features at once.
 
-> **Curated private network:** Smile Transformation is **not** an open marketplace. It is a **curated private network** of trusted providers and specialists. Only admins create/approve providers and specialists; there is no public signup. See [CURATED_NETWORK_FOUNDATION.md](CURATED_NETWORK_FOUNDATION.md) and [DATA_MODEL.md](DATA_MODEL.md).
+> **Curated private network:** Nebula Smile is **not** an open marketplace. It is a **curated private network** of trusted providers and specialists. Only admins create/approve providers and specialists; there is no public signup. See [CURATED_NETWORK_FOUNDATION.md](CURATED_NETWORK_FOUNDATION.md) and [DATA_MODEL.md](DATA_MODEL.md).
 
 ---
 

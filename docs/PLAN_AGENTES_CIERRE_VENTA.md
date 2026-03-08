@@ -2,7 +2,7 @@
 
 Objetivo: que los agentes mejoren frontend y backend, y que se **cierre una venta completa** (assessment → lead → depósito → Stripe → webhook → DB) para verificar que todos los flujos funcionan.
 
-**Contexto:** Smile Transformation Platform. Next.js 16, Supabase, Stripe, Vercel. Rama de trabajo: la que uses (ej. `production-hardening`). Deploy dev: `https://smile-transformation-platform-dev.vercel.app`.
+**Contexto:** Nebula Smile. Next.js 16, Supabase, Stripe, Vercel. Rama de trabajo: la que uses (ej. `production-hardening`). Deploy dev: `https://smile-transformation-platform-dev.vercel.app`.
 
 ---
 
@@ -95,7 +95,7 @@ Si el deploy y las variables ya están listos, un solo agente puede hacer Fase 3
 ### Agente Frontend
 
 ```
-Eres el Agente Frontend del proyecto Smile Transformation. Objetivo: mejorar UX del flujo de venta (landing → assessment → thank-you) y del admin (leads, depósito).
+Eres el Agente Frontend del proyecto Nebula Smile. Objetivo: mejorar UX del flujo de venta (landing → assessment → thank-you) y del admin (leads, depósito).
 
 Tareas: docs/PLAN_AGENTES_CIERRE_VENTA.md — Fase 1 (F1.1 a F1.6). Criterios de aceptación en la tabla. Al terminar, ejecutar `npm run verify` y asegurar que pasa. No cambiar contratos de APIs (ej. POST /api/leads debe seguir devolviendo lead_id). Stack: Next.js 16, React 19, TypeScript, Tailwind. Reglas: .cursor/rules si existen.
 ```
@@ -103,7 +103,7 @@ Tareas: docs/PLAN_AGENTES_CIERRE_VENTA.md — Fase 1 (F1.1 a F1.6). Criterios de
 ### Agente Backend
 
 ```
-Eres el Agente Backend del proyecto Smile Transformation. Objetivo: revisar y endurecer las APIs del flujo de venta (leads, Stripe checkout, webhook).
+Eres el Agente Backend del proyecto Nebula Smile. Objetivo: revisar y endurecer las APIs del flujo de venta (leads, Stripe checkout, webhook).
 
 Tareas: docs/PLAN_AGENTES_CIERRE_VENTA.md — Fase 2 (B2.1 a B2.5). Criterios de aceptación en la tabla. Al terminar, ejecutar `npm run verify` y `npm run test`; ambos deben pasar. No romper la firma del webhook (raw body + STRIPE_WEBHOOK_SECRET). Stack: Next.js 16 App Router, Supabase, Stripe. Reglas: .cursor/rules si existen.
 ```
@@ -111,7 +111,7 @@ Tareas: docs/PLAN_AGENTES_CIERRE_VENTA.md — Fase 2 (B2.1 a B2.5). Criterios de
 ### Agente QA / Verificación
 
 ```
-Eres el Agente QA del proyecto Smile Transformation. Objetivo: ejecutar una venta completa de prueba y verificar que todos los flujos funcionan.
+Eres el Agente QA del proyecto Nebula Smile. Objetivo: ejecutar una venta completa de prueba y verificar que todos los flujos funcionan.
 
 Tareas: docs/PLAN_AGENTES_CIERRE_VENTA.md — Fase 3 (Q3.1 a Q3.7). Orden: pre-requisitos → health → webhook test → flujo assessment → depósito en admin → Stripe checkout → comprobar DB (payments + leads). Marcar checklists en DEPLOY_CHECKLIST.md y CHECKLIST_PRIMERA_VENTA.md; opcional STATUS.md. URL dev: https://smile-transformation-platform-dev.vercel.app. Stripe modo Test; tarjeta test 4242 4242 4242 4242.
 ```

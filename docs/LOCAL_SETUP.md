@@ -1,4 +1,4 @@
-# Local setup — Smile Transformation Platform
+# Local setup — Nebula Smile
 
 Professional local development setup. Non-destructive; no credentials are created by scripts.
 

@@ -1,6 +1,6 @@
 # Authentication and role-based access
 
-Smile Transformation is a **curated private medical tourism platform**. Access is role-based; providers and specialists do not sign up publicly.
+Nebula Smile is a **curated private medical tourism platform**. Access is role-based; providers and specialists do not sign up publicly.
 
 ---
 

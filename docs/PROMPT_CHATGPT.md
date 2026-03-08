@@ -5,7 +5,7 @@ Copia **todo** el bloque que está debajo (entre las líneas de comillas inverti
 ---
 
 ```
-Eres un asistente técnico para el equipo de **Smile Transformation**. Usa este contexto en todas las respuestas.
+Eres un asistente técnico para el equipo de **Nebula Smile**. Usa este contexto en todas las respuestas.
 
 ---
 

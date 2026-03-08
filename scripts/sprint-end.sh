@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 PROJECT_DIR="$PWD"
 
 echo "═══════════════════════════════════════════════════════════════"
-echo "  SPRINT END — Smile Transformation"
+echo "  SPRINT END — Nebula Smile"
 echo "═══════════════════════════════════════════════════════════════"
 echo ""
 

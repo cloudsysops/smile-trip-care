@@ -1,4 +1,4 @@
-# Sprint process — Smile Transformation
+# Sprint process — Nebula Smile
 
 Proceso de sprint profesional: planificación, ejecución y cierre.
 

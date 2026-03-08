@@ -68,7 +68,7 @@ export default async function PackagePage({ params, searchParams }: Props) {
       <header className="border-b border-zinc-200 bg-white">
         <div className="mx-auto max-w-4xl px-4 py-6">
           <Link href="/" className="text-sm text-zinc-600 hover:underline">
-            ← Smile Transformation
+            ← Nebula Smile
           </Link>
           <h1 className="mt-2 text-xl font-semibold tracking-tight">{pkg.name}</h1>
           <p className="text-sm text-zinc-600">{pkg.location}</p>

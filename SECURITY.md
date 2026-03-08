@@ -1,4 +1,4 @@
-# Política de seguridad — Smile Transformation Platform
+# Política de seguridad — Nebula Smile
 
 ## Reportar vulnerabilidades
 

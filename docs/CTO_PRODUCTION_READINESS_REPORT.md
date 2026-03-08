@@ -1,4 +1,4 @@
-# CTO Production Readiness Report — Smile Transformation Platform
+# CTO Production Readiness Report — Nebula Smile
 
 **Date:** 2026-03-08  
 **Scope:** Technical architecture, security, launch readiness, and engineering plan.  

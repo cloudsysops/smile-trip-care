@@ -1,6 +1,6 @@
 # Engineering handbook
 
-Short reference for Smile Transformation platform development.
+Short reference for Nebula Smile platform development.
 
 ---
 

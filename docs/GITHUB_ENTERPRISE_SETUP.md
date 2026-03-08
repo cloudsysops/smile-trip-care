@@ -1,6 +1,6 @@
 # Configuración GitHub tipo Enterprise para SaaS
 
-Guía para dejar el repositorio **Smile Transformation Platform** organizado y seguro a nivel SaaS/empresa: protección de ramas, CI, plantillas, seguridad y buenas prácticas.
+Guía para dejar el repositorio **Nebula Smile** organizado y seguro a nivel SaaS/empresa: protección de ramas, CI, plantillas, seguridad y buenas prácticas.
 
 ---
 

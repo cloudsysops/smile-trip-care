@@ -21,6 +21,6 @@ export async function GET() {
     version,
     time: new Date().toISOString(),
     request_id: requestId,
-    service: "smile-transformation",
+    service: "nebula-smile",
   });
 }

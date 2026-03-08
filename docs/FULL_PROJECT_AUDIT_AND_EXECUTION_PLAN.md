@@ -1,6 +1,6 @@
 # Full Project Audit + Execution Plan
 
-**Role:** Permanent AI CTO for Smile Transformation Platform  
+**Role:** Permanent AI CTO for Nebula Smile  
 **Date:** 2026-03-08  
 **Purpose:** Engineering and product status report for launch; coordination between Cursor (codebase/infra) and ChatGPT (architecture, UX, product strategy).
 

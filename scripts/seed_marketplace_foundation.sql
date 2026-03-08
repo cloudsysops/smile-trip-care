@@ -32,7 +32,7 @@ values (
   'clinic',
   'Medellín',
   'Colombia',
-  'Trusted medical partner for Smile Transformation journeys in Colombia.',
+  'Trusted medical partner for Nebula Smile journeys in Colombia.',
   'info@clinicasanmartin.com',
   '+57 300 000 0000',
   'https://clinicasanmartin.com',

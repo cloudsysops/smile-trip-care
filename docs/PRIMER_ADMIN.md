@@ -1,6 +1,6 @@
 # Cómo crear el primer usuario admin
 
-Smile Transformation usa **Supabase Auth** para autenticación. Las rutas de administración comprueban que el usuario tenga `profiles.role = 'admin'`. Las tablas relevantes son:
+Nebula Smile usa **Supabase Auth** para autenticación. Las rutas de administración comprueban que el usuario tenga `profiles.role = 'admin'`. Las tablas relevantes son:
 
 - **auth.users** — usuarios de Supabase Auth
 - **public.profiles** — perfil extendido (`id` referencia `auth.users`, `role` es texto: `'user'` o `'admin'`)

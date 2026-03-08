@@ -1,4 +1,4 @@
-# Environments Strategy — Smile Transformation
+# Environments Strategy — Nebula Smile
 
 This document defines the 3 official runtime environments: `dev`, `staging`, and `production`.
 

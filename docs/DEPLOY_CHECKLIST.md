@@ -75,4 +75,4 @@ Checklist oficial para el sprint **Deploy & production verification**. Completar
 
 ---
 
-*Sprint: Deploy & production verification — Smile Transformation Platform*
+*Sprint: Deploy & production verification — Nebula Smile*

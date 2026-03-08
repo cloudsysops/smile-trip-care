@@ -1,6 +1,6 @@
 # Referencia: The Edge Fitness Clubs — qué nos sirve para vender
 
-Análisis de [theedgefitnessclubs.com](https://www.theedgefitnessclubs.com) aplicado a Smile Transformation Platform.
+Análisis de [theedgefitnessclubs.com](https://www.theedgefitnessclubs.com) aplicado a Nebula Smile.
 
 ---
 

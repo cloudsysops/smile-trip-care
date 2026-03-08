@@ -1,4 +1,4 @@
-# Guía paso a paso — Llevar Smile Transformation a producción
+# Guía paso a paso — Llevar Nebula Smile a producción
 
 Guía para hacer todo lo que la IA no puede: Supabase, Vercel, Stripe y pruebas. Sigue los pasos en orden.
 
@@ -131,7 +131,7 @@ Añade **una por una** (Name = nombre exacto, Value = el valor). Marca **Product
 
 ### 2.5 Comprobar que la web carga
 
-Abre esa URL en el navegador. Deberías ver la landing de Smile Transformation. Si ves error, anota el mensaje.
+Abre esa URL en el navegador. Deberías ver la landing de Nebula Smile. Si ves error, anota el mensaje.
 
 ---
 

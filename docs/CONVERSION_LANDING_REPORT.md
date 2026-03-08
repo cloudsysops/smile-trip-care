@@ -63,7 +63,7 @@ Ensure migration `0006_specialists_consultations_experiences.sql` and seed `scri
 7. **Recovery Experiences** — Grid of experiences from DB (coffee tours, hot springs, paragliding, etc.). CTA: Select experiences in assessment.
 8. **Why Colombia** — Four benefits: up to 60–70% cost savings, experienced specialists, modern clinics, beautiful recovery destinations.
 9. **Testimonials** — Two testimonials with ★★★★★ and quote + author.
-10. **Final CTA** — Headline: "Start Your Smile Transformation Journey." Button: "Get Your Free Evaluation." Secondary: WhatsApp.
+10. **Final CTA** — Headline: "Start Your Nebula Smile Journey." Button: "Get Your Free Evaluation." Secondary: WhatsApp.
 
 Additional: announcement bar (free evaluation, 24h), sticky header (Sign in, Start Free Evaluation, Explore Packages, How it works, Specialists), sticky bottom bar (Get Free Evaluation + Chat), footer (Packages, Start, Contact, Legal).
 

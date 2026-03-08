@@ -1,4 +1,4 @@
-# Vercel pre-deploy checklist — Smile Transformation
+# Vercel pre-deploy checklist — Nebula Smile
 
 Use this checklist before and after deploying to Vercel.
 

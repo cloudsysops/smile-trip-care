@@ -1,6 +1,6 @@
 "use client";
 
-const DEFAULT_MESSAGE = "Hi, I'm interested in the Smile Transformation program.";
+const DEFAULT_MESSAGE = "Hi, I'm interested in the Nebula Smile program.";
 const FALLBACK_NUMBER = "573001234567"; // Replace via NEXT_PUBLIC_WHATSAPP_NUMBER
 
 function buildWaLink(text: string): string {

@@ -103,7 +103,7 @@ Cada agente debe buscar en la tabla anterior las tareas con su nombre y ejecutar
 ### Agente Repo/CI
 
 ```
-Eres el Agente Repo/CI de Smile Transformation. Objetivo: dejar el código y la documentación listos para producción.
+Eres el Agente Repo/CI de Nebula Smile. Objetivo: dejar el código y la documentación listos para producción.
 
 Tareas (en orden): docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md — Fase 0 (P0.1), Fase 1 (L1.4, L1.5), Fase 2 (M8).
 Ejecuta npm run verify y corrige cualquier fallo. Actualiza STATUS.md cuando el track Deploy esté cerrado. Documenta la URL de producción en README o en el plan.
@@ -113,7 +113,7 @@ No introduzcas nuevos frameworks. Stack: Next.js 16, TypeScript, Supabase, Strip
 ### Agente Frontend
 
 ```
-Eres el Agente Frontend de Smile Transformation. Objetivo: mejorar UX y conversión sin romper funcionalidad.
+Eres el Agente Frontend de Nebula Smile. Objetivo: mejorar UX y conversión sin romper funcionalidad.
 
 Tareas: docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md — Fase 2 mejoras (M5, M6, etc.). Mantén el diseño dark premium. No cambies contratos de APIs.
 Ejecuta npm run verify al terminar. Referencias: PLAN_AGENTES_CIERRE_VENTA (Fase 1), TEST_FIRST_SALE.
@@ -122,7 +122,7 @@ Ejecuta npm run verify al terminar. Referencias: PLAN_AGENTES_CIERRE_VENTA (Fase
 ### Agente Backend
 
 ```
-Eres el Agente Backend de Smile Transformation. Objetivo: APIs estables, webhook idempotente, observabilidad.
+Eres el Agente Backend de Nebula Smile. Objetivo: APIs estables, webhook idempotente, observabilidad.
 
 Tareas: docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md — Fase 0 (verificar APIs), Fase 2 (M2, M3, M9). Asegura que POST /api/leads devuelve lead_id, que el webhook devuelve 200 en todos los caminos, y que los tests pasan.
 No expongas datos sensibles en logs. Ejecuta npm run test y npm run verify.
@@ -131,7 +131,7 @@ No expongas datos sensibles en logs. Ejecuta npm run test y npm run verify.
 ### Agente QA
 
 ```
-Eres el Agente QA de Smile Transformation. Objetivo: verificar flujo de venta y cerrar checklists.
+Eres el Agente QA de Nebula Smile. Objetivo: verificar flujo de venta y cerrar checklists.
 
 Tareas: docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md — Fase 0 (P0.1 si hace falta), Fase 1 (L1.1–L1.3). Sigue docs/TEST_FIRST_SALE.md para el flujo completo. Marca DEPLOY_CHECKLIST y CHECKLIST_PRIMERA_VENTA. Opcional: L1.4 (STATUS.md).
 URL dev: https://smile-transformation-platform-dev.vercel.app. Stripe test card: 4242 4242 4242 4242.
@@ -140,7 +140,7 @@ URL dev: https://smile-transformation-platform-dev.vercel.app. Stripe test card:
 ### Agente DevOps
 
 ```
-Eres el Agente DevOps de Smile Transformation. Objetivo: Vercel, Supabase, Stripe y env listos para producción.
+Eres el Agente DevOps de Nebula Smile. Objetivo: Vercel, Supabase, Stripe y env listos para producción.
 
 Tareas: docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md — Fase 0 (P0.2, P0.3, P0.4, P0.5), Fase 2 (M1, M4, M10). Verifica variables en Vercel, webhook en Stripe (Send test → 200), migraciones y seed en Supabase, usuario admin. Documenta en el plan o en DEPLOY_CHECKLIST lo que no sea comprobable desde código.
 ```

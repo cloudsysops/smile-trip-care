@@ -1,6 +1,6 @@
 # CTO Full Verification Audit — Production Polish
 
-**Project:** Smile Transformation Platform  
+**Project:** Nebula Smile  
 **Date:** 2026-03-05  
 **Mode:** Production Polish (conversion + hardening + security)
 

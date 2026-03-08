@@ -1,6 +1,6 @@
 # Curated Private Network Foundation
 
-Smile Transformation is **not an open marketplace**. It is a **curated private network** of trusted providers, specialists, and partners.
+Nebula Smile is **not an open marketplace**. It is a **curated private network** of trusted providers, specialists, and partners.
 
 ---
 

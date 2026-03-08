@@ -1,6 +1,6 @@
 # Git and GitHub workflow
 
-Verification and branch workflow for Smile Transformation Platform. **No GitHub settings are changed by this doc** — configure branch protection and rules in the repo Settings when approved.
+Verification and branch workflow for Nebula Smile. **No GitHub settings are changed by this doc** — configure branch protection and rules in the repo Settings when approved.
 
 ---
 

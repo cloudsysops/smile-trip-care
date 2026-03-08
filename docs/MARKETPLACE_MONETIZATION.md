@@ -2,7 +2,7 @@
 
 This document describes the schema and design for marketplace monetization. Implementation of billing and payouts is left for a later phase.
 
-**Context:** Smile Transformation is a **curated private network**, not an open marketplace. Providers and specialists are admin-created and -approved only; there is no public signup. See [CURATED_NETWORK_FOUNDATION.md](CURATED_NETWORK_FOUNDATION.md) and [DATA_MODEL.md](DATA_MODEL.md).
+**Context:** Nebula Smile is a **curated private network**, not an open marketplace. Providers and specialists are admin-created and -approved only; there is no public signup. See [CURATED_NETWORK_FOUNDATION.md](CURATED_NETWORK_FOUNDATION.md) and [DATA_MODEL.md](DATA_MODEL.md).
 
 ## Supported mechanisms
 

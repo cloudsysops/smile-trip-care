@@ -1,4 +1,4 @@
-# Smile Transformation Platform
+# Nebula Smile
 
 Plataforma web para coordinación y hospitalidad de experiencias (USA LLC). Los servicios médicos son facturados por clínicas en Colombia. Stack: **Next.js 16** (App Router), **TypeScript**, **Supabase** (Auth, Postgres, Storage), **Stripe**, **Vercel**.
 

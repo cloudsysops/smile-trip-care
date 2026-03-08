@@ -1,4 +1,4 @@
-# PRODUCTION LAUNCH CHECKLIST — Smile Transformation
+# PRODUCTION LAUNCH CHECKLIST — Nebula Smile
 
 Operational checklist to launch safely on Vercel + Supabase + Stripe.
 

@@ -1,6 +1,6 @@
 # GitHub Enterprise Setup — Audit Report
 
-**Repository:** Smile Transformation Platform  
+**Repository:** Nebula Smile  
 **Owner:** cloudsysops  
 **Audit date:** Generated from repo and gh CLI.  
 **Scope:** Connection, gh CLI, security practices, branch strategy, CI, automation commands. No destructive changes; no fake auth.

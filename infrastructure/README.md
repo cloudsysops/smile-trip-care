@@ -1,4 +1,4 @@
-# Infrastructure — Smile Transformation Platform
+# Infrastructure — Nebula Smile
 
 Terraform and infrastructure-as-code for this project. **No resources are provisioned by default** — this directory provides structure and documentation only.
 

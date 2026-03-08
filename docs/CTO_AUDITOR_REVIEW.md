@@ -1,4 +1,4 @@
-# CTO Auditor Review — Smile Transformation Platform
+# CTO Auditor Review — Nebula Smile
 
 **Role:** CTO Auditor (review only; no code implementation).  
 **Focus:** Architecture, security, auth, payments, RLS, API structure, deployment, maintainability.  

@@ -1,4 +1,4 @@
-# CTO Full Audit — Smile Transformation Platform (March 2026)
+# CTO Full Audit — Nebula Smile (March 2026)
 
 **Scope:** Repository state, production readiness, next revenue module, AI agents, API/security, landing/conversion, deployment.  
 **Deploy target:** Single Vercel project (-dev); branch `main`. [VERCEL_UN_SOLO_PROYECTO.md](VERCEL_UN_SOLO_PROYECTO.md)

@@ -1,4 +1,4 @@
-# Vercel setup — Smile Transformation Platform
+# Vercel setup — Nebula Smile
 
 Deploy and environment configuration. **No credentials are created by scripts.** CLI login is your manual step when needed.
 

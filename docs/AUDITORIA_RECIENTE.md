@@ -1,4 +1,4 @@
-# Auditoría reciente — Smile Transformation Platform
+# Auditoría reciente — Nebula Smile
 
 *Fecha: marzo 2026. Tras configurar Vercel (dev), env (local + Vercel) y webhook Stripe.*
 

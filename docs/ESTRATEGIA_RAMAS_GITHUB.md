@@ -1,4 +1,4 @@
-# Estrategia de ramas en GitHub — Smile Transformation
+# Estrategia de ramas en GitHub — Nebula Smile
 
 Guía para trabajar ordenado: qué ramas usar, cómo nombrarlas y cómo configurar GitHub.
 

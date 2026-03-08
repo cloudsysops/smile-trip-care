@@ -1,4 +1,4 @@
-# Auditoría técnica del proyecto: Smile Transformation
+# Auditoría técnica del proyecto: Nebula Smile
 
 Documento para dar contexto completo a ChatGPT u otra IA para ayudar en tareas de desarrollo, deploy y debugging.
 
@@ -12,7 +12,7 @@ Documento para dar contexto completo a ChatGPT u otra IA para ayudar en tareas d
 
 ## 1. Contexto del proyecto
 
-**Smile Transformation** es una plataforma web de **coordinación de salud + turismo médico**.
+**Nebula Smile** es una plataforma web de **coordinación de salud + turismo médico**.
 
 - Los pacientes solicitan tratamientos a través de un **assessment** y el equipo administra los leads desde un **panel admin**.
 - Luego se cobra un **depósito por Stripe** y se gestiona el itinerario del paciente.
@@ -186,7 +186,7 @@ Riesgos antes de producción:
 3. **Después** escribe tu pregunta.
 
 **Ejemplo:**  
-*"Según la auditoría del proyecto Smile Transformation, necesitamos configurar el webhook de Stripe en Vercel. Dame los pasos exactos."*
+*"Según la auditoría del proyecto Nebula Smile, necesitamos configurar el webhook de Stripe en Vercel. Dame los pasos exactos."*
 
 ---
 
@@ -226,4 +226,4 @@ Una vez hecho eso, el sistema está listo para operar. Estimación: **medio día
 
 ---
 
-*Auditoría para IA — Smile Transformation Platform. Actualizar este documento cuando cambie el estado del proyecto.*
+*Auditoría para IA — Nebula Smile. Actualizar este documento cuando cambie el estado del proyecto.*

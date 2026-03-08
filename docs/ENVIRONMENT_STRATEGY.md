@@ -1,4 +1,4 @@
-# Environment strategy — Smile Transformation Platform
+# Environment strategy — Nebula Smile
 
 How environment variables are organized, required vs optional, and where they are used. No secrets are stored in the repo.
 

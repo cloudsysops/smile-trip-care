@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap local setup for Smile Transformation Platform.
+# Bootstrap local setup for Nebula Smile.
 # Run from repo root: ./scripts/bootstrap.sh
 # Non-destructive: checks and validates; does not overwrite .env.local.
 
@@ -8,7 +8,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-echo "=== Smile Transformation Platform — Bootstrap ==="
+echo "=== Nebula Smile — Bootstrap ==="
 echo ""
 
 # 1. Install checks

@@ -7,7 +7,7 @@ Copia el bloque del agente que vaya a ejecutar sus tareas (en una sesión de Cur
 ## Agente Repo/CI
 
 ```
-Eres el Agente Repo/CI del proyecto Smile Transformation. Tu objetivo es dejar el código listo para deploy.
+Eres el Agente Repo/CI del proyecto Nebula Smile. Tu objetivo es dejar el código listo para deploy.
 
 Tareas asignadas (ver docs/PLAN_TRABAJO_PRODUCCION.md):
 - P0.1: Asegurar que el código está actualizado desde main (o rama de deploy).
@@ -24,7 +24,7 @@ Contexto: Next.js 16, Supabase, Stripe, Vercel. Reglas del proyecto en .cursor/r
 ## Agente Supabase
 
 ```
-Eres el Agente Supabase del proyecto Smile Transformation. Tu objetivo es tener la base de datos de producción lista.
+Eres el Agente Supabase del proyecto Nebula Smile. Tu objetivo es tener la base de datos de producción lista.
 
 Tareas asignadas (ver docs/PLAN_TRABAJO_PRODUCCION.md):
 - S1.1: Crear proyecto Supabase de producción (dashboard).
@@ -41,7 +41,7 @@ Contexto: Migraciones en supabase/migrations/. RLS ya definido en 0001. No expon
 ## Agente Vercel
 
 ```
-Eres el Agente Vercel del proyecto Smile Transformation. Tu objetivo es tener la app desplegada con variables correctas.
+Eres el Agente Vercel del proyecto Nebula Smile. Tu objetivo es tener la app desplegada con variables correctas.
 
 Tareas asignadas (ver docs/PLAN_TRABAJO_PRODUCCION.md):
 - V2.1: Conectar el repo a Vercel (Import from GitHub). Guía: docs/VERCEL_DEPLOY.md.
@@ -59,7 +59,7 @@ Necesitas las credenciales de Supabase (Agente Supabase) antes de V2.2.
 ## Agente Stripe
 
 ```
-Eres el Agente Stripe del proyecto Smile Transformation. Tu objetivo es tener el webhook de pagos funcionando en producción.
+Eres el Agente Stripe del proyecto Nebula Smile. Tu objetivo es tener el webhook de pagos funcionando en producción.
 
 Tareas asignadas (ver docs/PLAN_TRABAJO_PRODUCCION.md):
 - ST3.1: Stripe Dashboard → Webhooks → Add endpoint. URL: https://<dominio-prod>/api/stripe/webhook.
@@ -78,7 +78,7 @@ Necesitas la URL de producción (Agente Vercel) para ST3.1.
 ## Agente QA
 
 ```
-Eres el Agente QA del proyecto Smile Transformation. Tu objetivo es verificar que producción funciona y cerrar el sprint.
+Eres el Agente QA del proyecto Nebula Smile. Tu objetivo es verificar que producción funciona y cerrar el sprint.
 
 Tareas asignadas (ver docs/PLAN_TRABAJO_PRODUCCION.md):
 - Q4.1: GET /api/health → 200.

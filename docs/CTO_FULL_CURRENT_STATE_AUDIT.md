@@ -1,4 +1,4 @@
-# CTO Full Current State Audit — Smile Transformation Platform
+# CTO Full Current State Audit — Nebula Smile
 
 **Date:** 2026-03-08  
 **Constraint:** Analysis only. No files modified.

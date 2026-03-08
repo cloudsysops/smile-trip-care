@@ -1,6 +1,6 @@
 # Production Deployment and Launch Readiness
 
-**Project:** Smile Transformation Platform  
+**Project:** Nebula Smile  
 **Owner:** Founder / CTO  
 **Stack:** Next.js 16, React 19, TypeScript, Supabase (Postgres, Auth, RLS), Stripe, Vercel, Vitest, Zod  
 **Purpose:** Prepare for production deploy and allow the founder to test the full user journey in a live environment.  

@@ -1,4 +1,4 @@
-# Agentes — Smile Transformation Platform
+# Agentes — Nebula Smile
 
 **Si eres un agente (IA o humano) trabajando en este repo, lee esto primero.**
 

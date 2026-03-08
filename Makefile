@@ -1,10 +1,10 @@
-# Smile Transformation Platform — Makefile for local and CI
+# Nebula Smile — Makefile for local and CI
 # Use from repo root: make <target>
 
 .PHONY: help install verify bootstrap check-env dev dev-up dev-down down lint test build clean
 
 help:
-	@echo "Smile Transformation Platform — targets:"
+	@echo "Nebula Smile — targets:"
 	@echo "  make install      - npm ci"
 	@echo "  make bootstrap    - run scripts/bootstrap.sh"
 	@echo "  make check-env    - run scripts/check_env.sh"

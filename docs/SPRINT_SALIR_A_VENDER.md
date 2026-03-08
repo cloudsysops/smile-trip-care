@@ -40,7 +40,7 @@
 Copia y pega esto al abrir una sesión con un agente:
 
 ```
-Eres un agente del proyecto Smile Transformation Platform. Objetivo: ejecutar el sprint "Salir a vender" para dejar la página profesional y lista para vender.
+Eres un agente del proyecto Nebula Smile. Objetivo: ejecutar el sprint "Salir a vender" para dejar la página profesional y lista para vender.
 
 1. Lee AGENTS.md y docs/SPRINT_SALIR_A_VENDER.md.
 2. Ejecuta las tareas del sprint en orden (S1 → S10). Marca cada tarea en docs/NEXT_TASKS.md (sección "Sprint: Salir a vender") cuando la completes.

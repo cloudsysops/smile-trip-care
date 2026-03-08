@@ -52,7 +52,7 @@ function LoginForm() {
       <header className="border-b border-zinc-800">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link href="/" className="text-lg font-semibold text-white">
-            Smile Transformation
+            Nebula Smile
           </Link>
           <Link href="/" className="text-sm text-zinc-400 hover:text-white">
             ← Back to home

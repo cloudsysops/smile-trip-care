@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { branding } from "@/lib/branding";
 import { getPublishedPackages } from "@/lib/packages";
 import { getPublishedAssets } from "@/lib/assets";
 import { getPublishedSpecialists } from "@/lib/specialists";
@@ -142,7 +143,7 @@ export default async function Home() {
 
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:py-5">
-          <span className="text-lg font-semibold text-white">Smile Transformation</span>
+          <span className="text-lg font-semibold text-white">{branding.productName}</span>
           <nav className="flex items-center gap-2 sm:gap-3">
             <Link href="/signin" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Sign in
@@ -213,7 +214,7 @@ export default async function Home() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={heroImage.url}
-                    alt={heroImage.alt_text ?? heroImage.title ?? "Smile Transformation - Medellín and Manizales"}
+                    alt={heroImage.alt_text ?? heroImage.title ?? `${branding.productName} — Medellín and Manizales`}
                     className="h-full w-full object-cover"
                     fetchPriority="high"
                   />
@@ -261,7 +262,7 @@ export default async function Home() {
             Curated partners and institutions in Medellín and Manizales
           </p>
           <p className="mb-10 max-w-2xl text-zinc-400">
-            Smile Transformation works with a curated network of clinical institutions, specialists, and partner clinics—not an open marketplace. Every partner is vetted for quality, professionalism, and patient experience.
+            {branding.productName} works with a curated network of clinical institutions, specialists, and partner clinics—not an open marketplace. Every partner is vetted for quality, professionalism, and patient experience.
           </p>
           <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {TRUSTED_CLINICAL_NETWORK_CARDS.map((card, idx) => (
@@ -628,7 +629,7 @@ export default async function Home() {
         <section id="cta" className="mb-20 scroll-mt-6 md:mb-28" aria-labelledby="final-cta-title">
           <div className="rounded-2xl border-2 border-emerald-500/50 bg-zinc-900/80 p-8 text-center md:p-14">
             <h2 id="final-cta-title" className="mb-3 text-2xl font-bold text-white md:text-4xl">
-              Start Your Smile Transformation Journey
+              Start Your {branding.productName} Journey
             </h2>
             <p className="mx-auto mb-8 max-w-md text-zinc-400">
               Get your free evaluation and personalized treatment plan. No commitment.
@@ -678,7 +679,7 @@ export default async function Home() {
             </div>
           </div>
           <p className="mt-10 text-center text-sm text-zinc-500">
-            USA LLC — International coordination &amp; hospitality. Medical services billed by clinics in Colombia.
+            {branding.productName} — A {branding.companyName} company. International coordination &amp; hospitality. Medical services billed by clinics in Colombia.
           </p>
         </footer>
 

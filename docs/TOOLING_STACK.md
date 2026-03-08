@@ -1,4 +1,4 @@
-# Tooling stack — Smile Transformation Platform
+# Tooling stack — Nebula Smile
 
 Professional foundation stack for development, testing, deployment, and future scaling. Classified by support level; no credentials are stored in the repo.
 

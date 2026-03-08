@@ -1,4 +1,4 @@
-# Mejoras priorizadas — Smile Transformation
+# Mejoras priorizadas — Nebula Smile
 
 Documento vivo: qué hacer antes de lanzar, qué después, y mejoras técnicas ya aplicadas.
 

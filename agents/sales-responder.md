@@ -33,7 +33,7 @@ Generate WhatsApp and Email draft messages for admins to send to leads. Use only
 ```json
 {
   "whatsapp_message": "Hi [Name], thanks for your interest. We'd love to help you plan your trip. Next step: complete our short form here: [cta_url]",
-  "email_subject": "Next step – Smile Transformation",
+  "email_subject": "Next step – Nebula Smile",
   "email_body": "Dear [Name], ...",
   "followup_in_hours": 24,
   "tone": "premium"

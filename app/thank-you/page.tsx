@@ -1,11 +1,14 @@
 import Link from "next/link";
-import { getPublishedPackageBySlug } from "@/lib/packages";
+import { getPublishedPackageBySlug, getPackageById } from "@/lib/packages";
+import { getLeadByIdForMatching } from "@/lib/leads";
+import { getRecommendedSpecialist } from "@/lib/specialists";
 import { WhatsAppButton } from "../components/WhatsAppButton";
+import RecommendedDoctorCard from "../components/booking/RecommendedDoctorCard";
 
 const RECOMMENDATION_DISCLAIMER =
   "This recommendation is based on the information provided and serves as an orientation only. Final treatment planning belongs to the specialist.";
 
-type Props = { searchParams: Promise<{ lead_id?: string; recommended_package_slug?: string }> };
+type Props = Readonly<{ searchParams: Promise<{ lead_id?: string; recommended_package_slug?: string }> }>;
 
 export default async function ThankYouPage({ searchParams }: Props) {
   const { lead_id, recommended_package_slug } = await searchParams;
@@ -14,12 +17,32 @@ export default async function ThankYouPage({ searchParams }: Props) {
       await getPublishedPackageBySlug(recommended_package_slug.trim())
     : null;
 
+  let cityPreference = recommendedPackage?.location?.trim() ?? "";
+  let treatmentTypes: string[] = [];
+  if (lead_id?.trim()) {
+    const leadContext = await getLeadByIdForMatching(lead_id.trim());
+    if (leadContext) {
+      treatmentTypes = leadContext.selected_specialties ?? [];
+      if (!cityPreference) {
+        const pkgId = leadContext.recommended_package_id ?? leadContext.package_id;
+        if (pkgId) {
+          const pkg = await getPackageById(pkgId);
+          cityPreference = pkg?.location?.trim() ?? "";
+        }
+      }
+    }
+  }
+  const recommendedSpecialist =
+    cityPreference
+      ? await getRecommendedSpecialist({ cityPreference, treatmentTypes })
+      : null;
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="border-b border-zinc-800">
         <div className="mx-auto max-w-4xl px-4 py-6">
           <Link href="/" className="text-sm text-zinc-400 hover:text-white">
-            ← Smile Transformation
+            ← Nebula Smile
           </Link>
         </div>
       </header>
@@ -27,7 +50,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
       <main className="mx-auto max-w-2xl px-4 py-12 text-center sm:py-16">
         <h1 className="text-2xl font-semibold">Your request has been received</h1>
         <p className="mt-4 text-zinc-400">
-          Thank you for your interest in Smile Transformation. Our team will review your details and
+          Thank you for your interest in Nebula Smile. Our team will review your details and
           get in touch within 24 hours.
         </p>
 
@@ -47,6 +70,24 @@ export default async function ThankYouPage({ searchParams }: Props) {
             >
               View package details →
             </Link>
+          </div>
+        )}
+
+        {recommendedSpecialist && (
+          <div className="mt-6 text-left">
+            <h2 className="text-sm font-semibold text-white">Recommended specialist</h2>
+            <p className="mt-1 text-xs text-zinc-500 italic">{RECOMMENDATION_DISCLAIMER}</p>
+            <div className="mt-3">
+              <RecommendedDoctorCard
+                name={recommendedSpecialist.name}
+                clinic={recommendedSpecialist.clinic_name ?? recommendedSpecialist.clinic}
+                city={recommendedSpecialist.city}
+                specialty={recommendedSpecialist.specialty}
+                yearsOfExperience={null}
+                photoUrl={null}
+                slug={recommendedSpecialist.slug}
+              />
+            </div>
           </div>
         )}
 

@@ -1,4 +1,4 @@
-# Cómo contribuir — Smile Transformation Platform
+# Cómo contribuir — Nebula Smile
 
 Gracias por contribuir. Sigue estas pautas para mantener el flujo claro y el código alineado con el resto del equipo.
 

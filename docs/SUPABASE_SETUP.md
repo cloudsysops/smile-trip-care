@@ -1,4 +1,4 @@
-# Supabase setup — Smile Transformation Platform
+# Supabase setup — Nebula Smile
 
 Database, Auth, and local/remote Supabase usage. **No credentials are created by scripts.** Login and project linking require your manual action.
 
