@@ -9,10 +9,31 @@ import { UuidSchema } from "@/lib/validation/common";
 
 const BodySchema = z.object({
   lead_id: UuidSchema,
-  amount_cents: z.number().int().positive().max(10_000_000),
-  success_url: z.string().url().optional(),
-  cancel_url: z.string().url().optional(),
+  amount_cents: z.number().int().positive().max(10_000_000).optional(),
+  success_url: z.string().max(2000).optional(),
+  cancel_url: z.string().max(2000).optional(),
 });
+
+const FALLBACK_DEPOSIT_CENTS = 50_000;
+
+function resolveInternalReturnUrl(
+  rawUrl: string | undefined,
+  origin: string,
+  fallbackPath: string,
+): string | null {
+  if (!rawUrl) {
+    return `${origin}${fallbackPath}`;
+  }
+  try {
+    const url = new URL(rawUrl, origin);
+    if (url.origin !== origin) {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -20,12 +41,12 @@ export async function POST(request: Request) {
   try {
     await requireAdmin();
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden", request_id: requestId }, { status: 403 });
   }
   try {
     const config = getServerConfig();
     if (!config.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+      return NextResponse.json({ error: "Stripe not configured", request_id: requestId }, { status: 500 });
     }
     const body = await request.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
@@ -36,8 +57,74 @@ export async function POST(request: Request) {
       );
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
+    const origin = new URL(request.url).origin;
+    const successUrl = resolveInternalReturnUrl(
+      success_url,
+      origin,
+      `/admin/leads/${lead_id}?paid=1`,
+    );
+    const cancelUrl = resolveInternalReturnUrl(
+      cancel_url,
+      origin,
+      `/admin/leads/${lead_id}`,
+    );
+    if (!successUrl || !cancelUrl) {
+      return NextResponse.json({ error: "Invalid return URLs" }, { status: 400 });
+    }
 
     const supabase = getServerSupabase();
+    const { data: leadRow, error: leadError } = await supabase
+      .from("leads")
+      .select("id, package_slug")
+      .eq("id", lead_id)
+      .maybeSingle();
+    if (leadError) {
+      log.error("Failed to validate lead before checkout", { error: leadError.message, lead_id });
+      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    }
+    if (!leadRow) {
+      return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+    }
+
+    let packageName: string | null = null;
+    let resolvedAmountCents = FALLBACK_DEPOSIT_CENTS;
+    const packageSlug = (leadRow.package_slug as string | null | undefined) ?? null;
+    if (packageSlug) {
+      const { data: packageRow, error: packageError } = await supabase
+        .from("packages")
+        .select("name, deposit_cents")
+        .eq("slug", packageSlug)
+        .maybeSingle();
+      if (packageError) {
+        log.error("Failed to load package pricing", {
+          error: packageError.message,
+          package_slug: packageSlug,
+        });
+        return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      }
+      if (packageRow?.name) {
+        packageName = packageRow.name as string;
+      }
+      const packageDepositRaw = packageRow?.deposit_cents;
+      const packageDeposit =
+        typeof packageDepositRaw === "number"
+          ? packageDepositRaw
+          : typeof packageDepositRaw === "string"
+            ? Number(packageDepositRaw)
+            : NaN;
+      if (Number.isInteger(packageDeposit) && packageDeposit > 0) {
+        resolvedAmountCents = packageDeposit;
+      }
+    }
+
+    if (amount_cents !== undefined && amount_cents !== resolvedAmountCents) {
+      log.warn("Ignoring client-provided amount_cents; server pricing enforced", {
+        lead_id,
+        client_amount_cents: amount_cents,
+        resolved_amount_cents: resolvedAmountCents,
+      });
+    }
+
     const { data: lead, error: leadErr } = await supabase
       .from("leads")
       .select("id, status")
@@ -64,7 +151,6 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(config.STRIPE_SECRET_KEY);
-    const origin = new URL(request.url).origin;
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [
@@ -72,20 +158,20 @@ export async function POST(request: Request) {
           quantity: 1,
           price_data: {
             currency: "usd",
-            unit_amount: amount_cents,
-            product_data: { name: "Deposit — Smile Transformation" },
+            unit_amount: resolvedAmountCents,
+            product_data: { name: `Deposit — ${packageName ?? "Smile Transformation"}` },
           },
         },
       ],
-      success_url: success_url || `${origin}/admin/leads/${lead_id}?paid=1`,
-      cancel_url: cancel_url || `${origin}/admin/leads/${lead_id}`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: { lead_id },
     });
 
     const { error } = await supabase.from("payments").insert({
       lead_id,
       stripe_checkout_session_id: session.id,
-      amount_cents,
+      amount_cents: resolvedAmountCents,
       status: "pending",
     });
     if (error) {
@@ -93,7 +179,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: session.url, amount_cents: resolvedAmountCents, request_id: requestId });
   } catch (err) {
     log.error("Stripe checkout endpoint failed", { err: String(err) });
     return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });

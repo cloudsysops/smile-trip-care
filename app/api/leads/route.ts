@@ -5,6 +5,7 @@ import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getPublishedPackageBySlug } from "@/lib/packages";
+import { enqueueLeadCreatedAutomationJobs } from "@/lib/ai/automation";
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
       ?? request.headers.get("x-real-ip")
       ?? "unknown";
-    if (!checkRateLimit(ip)) {
+    if (!(await checkRateLimit(ip))) {
       log.warn("Rate limit exceeded", { ip });
       return NextResponse.json(
         { error: "Too many requests. Please try again later.", request_id: requestId },
@@ -70,6 +71,10 @@ export async function POST(request: Request) {
         utm_source: data.utm_source?.trim() || null,
         utm_medium: data.utm_medium?.trim() || null,
         utm_campaign: data.utm_campaign?.trim() || null,
+        utm_term: data.utm_term ?? null,
+        utm_content: data.utm_content ?? null,
+        landing_path: data.landing_path ?? null,
+        referrer_url: data.referrer_url ?? null,
         status: "new",
       })
       .select("id")
@@ -97,10 +102,19 @@ export async function POST(request: Request) {
     }
 
     log.info("Lead created", { lead_id: lead.id });
-    return NextResponse.json(
-      { lead_id: lead.id, request_id: requestId },
-      { status: 201 }
-    );
+    const ctaUrl = `${new URL(request.url).origin}/assessment`;
+    void enqueueLeadCreatedAutomationJobs(lead.id as string, { requestId, ctaUrl })
+      .then((jobs) => {
+        log.info("Automation jobs enqueued", { lead_id: lead.id, trigger_type: "lead_created", job_count: jobs.length });
+      })
+      .catch((err) => {
+        log.error("Lead-created automation enqueue failed", {
+          lead_id: lead.id,
+          trigger_type: "lead_created",
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
+    return NextResponse.json({ lead_id: lead.id, request_id: requestId }, { status: 201 });
   } catch (err) {
     log.error("Leads API error", { err: String(err) });
     return NextResponse.json(

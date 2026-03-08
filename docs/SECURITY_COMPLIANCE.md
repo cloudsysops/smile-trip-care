@@ -1,52 +1,27 @@
-# Security and compliance (reference)
+# Security & Compliance
 
-Smile Transformation is a curated private medical tourism platform. This document summarizes access control and security-related practices.
+## Secrets
+- **Server-only**: `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`. Used only in server code (API routes, server components, server actions). Never in client bundles or `NEXT_PUBLIC_*`.
+- **Server-only AI secret**: `OPENAI_API_KEY`. Never expose in client code or `NEXT_PUBLIC_*`.
+- **Public**: Only `NEXT_PUBLIC_*` vars. No secrets there.
 
----
+## Supabase
+- RLS enabled on all tables. Service role bypasses RLS; use only on server for writes. Client uses anon key; RLS enforces packages (published), assets (approved+published), leads/payments/admin-only.
 
-## Curated private access model
+## Stripe
+- Webhook: verify signature with `stripe.webhooks.constructEvent(payload, signature, webhookSecret)`. Payload must be raw body (`request.text()`), not parsed JSON.
 
-- **No public signup** for providers, specialists, or coordinators. Only admins create or invite these users and set their role and optional `provider_id` / `specialist_id`.
-- **Patient-facing experience** remains simple: assessment form (public), optional patient account to view own submissions (matched by email).
-- **All privileged actions** (create/edit providers, specialists, experiences, packages, consultations, bookings) go through admin-only or role-scoped APIs and pages.
+## Admin
+- `/admin/*` protected by middleware (session required). All admin pages and `/api/admin/*` must verify `profiles.role = 'admin'` server-side.
+- AI generation routes (`/api/ai/*`) must call `requireAdmin()` and run only on server.
+- Internal automation cron endpoint (`/api/automation/followups`) must be protected with `AUTOMATION_CRON_SECRET`; never expose this secret to clients.
 
----
+## AI policy (M9)
+- No medical advice, diagnosis, or treatment guarantees in generated content.
+- Sales messaging must frame Smile Transformation as coordination/hospitality support (clinic coordination, lodging, transport), not direct medical provider claims.
+- Agent outputs must be strict JSON and validated with Zod before saving.
+- Keep human-in-the-loop: generate drafts for review; do not auto-send outbound messages yet.
+- Avoid logging raw lead notes in error logs if they can contain sensitive personal details.
 
-## Who can sign in
-
-- **Admin** — Full access; created via Supabase Dashboard or by another admin.
-- **Coordinator** — Access to coordinator dashboard (leads, bookings, consultations).
-- **Provider manager** — Access only to own provider’s data (dashboard scoped by `provider_id`).
-- **Specialist** — Access only to own specialist’s consultations (scoped by `specialist_id`).
-- **Patient** — Optional account; sees only own leads/bookings/payments (matched by email).
-
-See [AUTH_AND_ROLES.md](AUTH_AND_ROLES.md).
-
----
-
-## Server-side enforcement
-
-- **Role guards** are used on every protected route (Server Components and API routes): `requireAdmin()`, `requireCoordinator()`, `requireProviderManager()`, `requireSpecialist()`, `requirePatient()`.
-- **Do not rely only on client-side** route protection or hiding UI; server must reject unauthorized access with 401/403.
-- **Data access layer** (`lib/dashboard-data.ts`) returns only role-appropriate data (e.g. provider sees only rows for `provider_id`).
-
----
-
-## Secrets and env
-
-- **Service role key** and **STRIPE_SECRET_KEY** are server-only; never exposed to the client.
-- **NEXT_PUBLIC_*** variables are safe for client (e.g. Supabase URL, anon key, Stripe publishable key).
-- See [ENV_Y_STRIPE.md](ENV_Y_STRIPE.md).
-
----
-
-## RLS and database
-
-- Row Level Security is enabled on relevant tables; `is_admin()` and role helpers support policies where needed.
-- Application layer additionally filters by `provider_id` / `specialist_id` / email so each role sees only intended rows.
-
----
-
-## Rollout
-
-- Auth + role dashboards (migration 0011, guards, login, dashboards) are additive; existing MVP flows (leads, Stripe, health, admin) are unchanged and remain protected by `requireAdmin()` where applicable.
+## Headers
+- Security headers set in `next.config.ts`: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy.

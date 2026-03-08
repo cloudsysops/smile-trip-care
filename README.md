@@ -78,6 +78,7 @@ Equivale a `lint` → `test` → `build`. Si todo pasa, el código está listo p
 
 - `.env.example` y `.env.local.example` listan las variables necesarias.
 - **Obligatorias:** Supabase (URL, service_role, anon) + Stripe (secret, webhook secret, publishable). Ver **[Variables y Stripe](docs/ENV_Y_STRIPE.md)**.
+- AI (opcional): `OPENAI_API_KEY`, `OPENAI_MODEL`.
 
 ## Branding
 
@@ -92,7 +93,7 @@ Equivale a `lint` → `test` → `build`. Si todo pasa, el código está listo p
 
 - **[Conectar Supabase y Vercel](docs/CONECTAR_SUPABASE_VERCEL.md)** — Guía rápida para enlazar la app con Supabase y Vercel.
 - **[Variables de entorno y Stripe](docs/ENV_Y_STRIPE.md)** — Lista de variables (obligatorias/opcionales) y checklist Stripe (API keys + webhook).
-- [Estado de módulos](STATUS.md) — Módulos, migraciones 0006–0009 (marketplace, red curada), rutas.
+- [Estado de módulos](STATUS.md) — Módulos, migraciones, rutas.
 - **[Modelo de datos y red curada](docs/DATA_MODEL.md)** — Entidades, aprobaciones, flujo. [CURATED_NETWORK_FOUNDATION](docs/CURATED_NETWORK_FOUNDATION.md).
 - **[Dashboards por rol](docs/DASHBOARDS_POR_ROL.md)** — Admin, Especialista, Paciente, Proveedor (diseño y roadmap).
 - **[Organización y mejora continua](docs/ORGANIZACION_Y_MEJORA_CONTINUA.md)** — Lista maestra, cadencia, reglas de limpieza.

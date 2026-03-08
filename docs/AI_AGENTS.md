@@ -1,89 +1,105 @@
-# AI Agents System
+# AI Agents Runtime Overview
 
-Production-ready fixed agents for lead triage, sales replies, itineraries, and ops tasks. All agents run **server-side only**; `OPENAI_API_KEY` is never exposed to the client.
+## Active agents
 
-## Agents
+- `lead-triage`
+- `sales-responder`
+- `itinerary-generator`
+- `ops-coordinator`
 
-| Agent | Purpose | Persisted to |
-|-------|---------|--------------|
-| **lead-triage** | Classify lead priority, recommended city/package, next step, questions to ask | `lead_ai.triage_json` |
-| **sales-responder** | Draft WhatsApp + Email messages for admins | `lead_ai.messages_json` |
-| **itinerary-generator** | Day-by-day logistics itinerary (city, days, tour) | `itineraries.content_json` |
-| **ops-coordinator** | Operational task list (before arrival, day 1, etc.) | `lead_ai.ops_json` |
-| **marketing-content** | (Future) Non-medical marketing copy | Admin-only, not yet wired |
+> `marketing-content` is planned and not yet implemented.
 
-## Safety rules (all agents)
+## Safety and output rules
 
-- **No medical advice**, diagnosis, treatment instructions, or outcome promises.
-- Use **only provided input** and known constants (e.g. cities: Medellín, Manizales). If something is missing, ask questions in the output.
-- Output must be **strict JSON**; validated with Zod before persistence. Invalid output is rejected (502).
+- All prompts include global safety instructions:
+  - strict JSON only
+  - no medical advice / diagnosis / treatment instructions / guarantees
+- All outputs are validated with Zod before persistence.
+- Failed validation is treated as execution failure and does not expose stack traces to clients.
 
-## How to run locally
+## Trigger-driven automation (M14)
 
-1. Copy `.env.local.example` to `.env.local` and set `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default `gpt-4.1-mini`).
-2. Start the app: `npm run dev`.
-3. Log in as admin and open a lead: `/admin/leads/[id]`.
-4. Use the **AI Actions** card: **Run Triage**, **Generate Reply**, **Generate Itinerary**, **Generate Ops Tasks**.
+AI execution is queued via `ai_automation_jobs` and executed by `/api/automation/worker`.
 
-## API endpoints (admin-only)
+### Trigger: lead created
 
-All require admin session (`requireAdmin()`) and are rate-limited per admin user.
+- Source: `POST /api/leads`
+- Enqueued jobs:
+  - `lead-triage`
+  - `sales-responder`
 
-- `POST /api/admin/ai/triage` — Body: `{ "lead_id": "uuid" }` → triage output, saved to `lead_ai.triage_json`.
-- `POST /api/admin/ai/respond` — Body: `{ "lead_id": "uuid", "cta_url": "optional" }` → reply draft, saved to `lead_ai.messages_json`.
-- `POST /api/admin/ai/itinerary` — Body: `{ "lead_id": "uuid", "city?", "start_date?", "days?", "includes_tour?" }` → itinerary, saved to `itineraries`.
-- `POST /api/admin/ai/ops` — Body: `{ "lead_id": "uuid" }` → ops tasks, saved to `lead_ai.ops_json`.
+### Trigger: lead marked `deposit_paid`
 
-## Example inputs / outputs
+- Source: `POST /api/stripe/webhook` (`checkout.session.completed`)
+- Enqueued jobs:
+  - `itinerary-generator`
+  - `ops-coordinator`
 
-### Triage input (from lead record)
+### Trigger: inactive lead 24h/48h
 
-```json
-{
-  "name": "Jane Doe",
-  "email": "jane@example.com",
-  "phone": "+1234567890",
-  "preferred_city": "Medellín",
-  "desired_dates": null,
-  "notes": "Interested in full package",
-  "package_slug": "smile-medellin"
-}
-```
+- Source: `POST /api/automation/followups` (secret-protected cron endpoint)
+- Enqueued jobs:
+  - `sales-responder` for `lead_inactive_24h`
+  - `sales-responder` for `lead_inactive_48h`
 
-### Triage output (strict schema)
+## Queue lifecycle
 
-```json
-{
-  "priority": "medium",
-  "recommended_city": "Medellín",
-  "recommended_package_slug": "smile-medellin",
-  "confidence": 0.8,
-  "questions_to_ask": ["Preferred travel dates?"],
-  "risk_flags": ["missing_dates"],
-  "next_step": "request_more_info"
-}
-```
+Statuses in `ai_automation_jobs`:
 
-### Ops output (strict schema)
+- `pending`
+- `processing`
+- `completed`
+- `retry_scheduled`
+- `dead_letter`
 
-```json
-{
-  "tasks": [
-    {"title": "Confirm arrival date", "due_relative": "before_arrival", "assignee": "coordinator", "notes": "Email or WhatsApp"}
-  ],
-  "summary": "One pre-arrival task."
-}
-```
+Worker behavior:
 
-## Architecture
+1. Claim due jobs (`pending` / `retry_scheduled` with `run_after <= now`)
+   - Recover stale `processing` jobs by moving them back to `retry_scheduled`
+2. Lock and execute
+3. On success → `completed`
+4. On failure:
+   - retry with backoff if attempts remain
+   - `dead_letter` when attempts exhausted
 
-- **Prompts**: Stored in `/agents/*.md`; loaded at runtime and cached in memory (`lib/ai/agent-loader.ts`).
-- **Runner**: `lib/ai/run-agent.ts` — validates input, loads prompt, calls `runChatJson` (OpenAI), validates output with Zod, returns result.
-- **OpenAI**: `lib/ai/openai.ts` — `runChatJson({ systemPrompt, userJson })` requests JSON-only response, retries once if parse fails.
-- **Persistence**: `lib/ai/persist.ts` — `saveLeadAI(leadId, kind, payload)`, `saveItinerary(leadId, payload)` using service-role Supabase.
-- **Logging**: Every agent run logs `request_id` via `createLogger(requestId)`.
+## Idempotency
 
-## Tests
+- Unique key on `(lead_id, trigger_type, job_type)` prevents duplicate jobs for the same trigger scope.
+- Enqueue uses upsert with `ignoreDuplicates`.
 
-- `tests/ai-schemas.test.ts` — Validates sample outputs against Zod schemas.
-- Run: `npm run test`
+## Operational endpoints
+
+- `POST /api/automation/followups`
+- `POST /api/automation/worker`
+
+Both require `AUTOMATION_CRON_SECRET` via `x-automation-secret` or Bearer token.
+
+## Assisted outbound conversion (M16)
+
+AI responders still generate drafts into `lead_ai.messages_json`, and admin now has an outbound lifecycle queue:
+
+- Data model: `outbound_messages`
+- Channels: `whatsapp`, `email`
+- Source: `ai_draft` or `manual`
+- Lifecycle statuses:
+  - `draft`
+  - `approved`
+  - `queued`
+  - `sent`
+  - `delivered`
+  - `failed`
+  - `replied`
+  - `cancelled`
+
+This keeps execution human-supervised while enabling measurable conversion tracking per lead.
+
+M17 adds an admin outbound command center (`/admin/outbound`) and API metrics endpoints so sales operators can prioritize queue actions and SLA-risk leads from AI-generated drafts.
+
+M18 adds `POST /api/automation/outbound-worker`:
+
+- Claims due outbound messages (`approved`, `queued`, `failed` with due schedule)
+- Dispatches through configured providers (`resend` for email, HTTP provider for WhatsApp)
+- Marks `sent` on success
+- On failure:
+  - schedules retry with backoff while attempts remain
+  - keeps failed-permanent state once max attempts is reached

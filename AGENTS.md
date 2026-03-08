@@ -26,7 +26,8 @@ Cada tarea está asignada a un tipo de agente (Repo/CI, Frontend, Backend, QA, D
 ## Reglas
 
 1. Ejecutar desde la **raíz del proyecto** (`smile-transformation-platform/`).
-2. Antes de cerrar: **`npm run verify`** debe pasar.
+2. **Git:** Al conectar, sincronizar con el remoto (`git fetch` / `git pull`). Al terminar trabajo que modifica código o docs, **hacer commit** con mensaje claro y **push** a la rama actual. No dejar cambios sin commitear. Ver [.cursor/rules/git-commit-and-sync.mdc](.cursor/rules/git-commit-and-sync.mdc).
+3. Antes de cerrar: **`npm run verify`** debe pasar (o documentar por qué no y qué falta).
 3. No introducir nuevos frameworks; stack: Next.js 16, TypeScript, Supabase, Stripe, Vercel.
 4. No desplegar a producción sin que esté documentado; sí se puede deploy a dev/preview.
 5. Actualizar checklists y STATUS.md cuando corresponda (ver plan).

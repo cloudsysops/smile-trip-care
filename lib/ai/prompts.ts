@@ -1,9 +1,35 @@
-import { loadAgentPrompt } from "@/lib/ai/agent-loader";
-import type { AgentId } from "@/lib/ai/agent-registry";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
-export type AgentName = "lead-triage" | "sales-responder" | "itinerary-generator";
+export type AgentName = "lead-triage" | "sales-responder" | "itinerary-generator" | "ops-coordinator";
 
-/** Load system prompt for an agent. Uses agent-loader (file-based, cached). */
+const promptFiles: Record<AgentName, string> = {
+  "lead-triage": "lead-triage.md",
+  "sales-responder": "sales-responder.md",
+  "itinerary-generator": "itinerary-generator.md",
+  "ops-coordinator": "ops-coordinator.md",
+};
+
+const cache = new Map<AgentName, string>();
+
+function globalSafetyFooter(): string {
+  return [
+    "",
+    "Global policy (must follow):",
+    "- Return strict JSON only. No markdown, no code fences, no explanations outside JSON.",
+    "- No medical advice, diagnosis, treatment instructions, or guaranteed outcomes.",
+    "- If key info is missing, ask up to 3 targeted questions and still provide best-effort output.",
+  ].join("\n");
+}
+
 export async function getAgentSystemPrompt(agentName: AgentName): Promise<string> {
-  return loadAgentPrompt(agentName as AgentId);
+  const cached = cache.get(agentName);
+  if (cached) return cached;
+
+  const fileName = promptFiles[agentName];
+  const absolute = path.join(process.cwd(), "agents", fileName);
+  const basePrompt = await readFile(absolute, "utf8");
+  const fullPrompt = `${basePrompt.trim()}\n${globalSafetyFooter()}`;
+  cache.set(agentName, fullPrompt);
+  return fullPrompt;
 }

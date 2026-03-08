@@ -131,6 +131,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to save itinerary", request_id: requestId }, { status: 500 });
     }
 
+    const now = new Date().toISOString();
+    const { data: aiStatusRows, error: aiUpdateLookupError } = await supabase
+      .from("lead_ai")
+      .select("id")
+      .eq("lead_id", lead_id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (aiUpdateLookupError) {
+      log.error("Failed to lookup lead_ai for itinerary status update", { error: aiUpdateLookupError.message });
+    } else {
+      const existingAiId = aiStatusRows?.[0]?.id as string | undefined;
+      if (existingAiId) {
+        const { error: aiUpdateError } = await supabase
+          .from("lead_ai")
+          .update({ itinerary_generated: true, updated_at: now })
+          .eq("id", existingAiId);
+        if (aiUpdateError) {
+          log.error("Failed to update itinerary_generated status", { error: aiUpdateError.message });
+        }
+      } else {
+        const { error: aiInsertError } = await supabase
+          .from("lead_ai")
+          .insert({ lead_id, itinerary_generated: true, updated_at: now });
+        if (aiInsertError) {
+          log.error("Failed to insert lead_ai itinerary_generated status", { error: aiInsertError.message });
+        }
+      }
+    }
+
     log.info("Itinerary generated", { lead_id });
     return NextResponse.json({ itinerary: created?.content_json ?? itinerary, request_id: requestId });
   } catch (err) {
