@@ -151,6 +151,13 @@ describe("POST /api/stripe/webhook", () => {
           }),
         };
       }
+      if (table === "bookings") {
+        return {
+          update: () => ({
+            eq: () => ({ error: null }),
+          }),
+        };
+      }
       return {};
     });
 

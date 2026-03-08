@@ -1,18 +1,12 @@
 import Link from "next/link";
 import { getPublishedPackages } from "@/lib/packages";
-import { getPublishedSpecialists } from "@/lib/specialists";
-import { getPublishedExperiences } from "@/lib/experiences";
 import AssessmentForm from "./AssessmentForm";
 
 type Props = { searchParams: Promise<{ package?: string }> };
 
 export default async function AssessmentPage({ searchParams }: Props) {
   const params = await searchParams;
-  const [packages, specialists, experiences] = await Promise.all([
-    getPublishedPackages(),
-    getPublishedSpecialists(),
-    getPublishedExperiences(),
-  ]);
+  const packages = await getPublishedPackages();
   const prefillPackageSlug = params.package ?? "";
 
   return (
@@ -36,8 +30,6 @@ export default async function AssessmentPage({ searchParams }: Props) {
         </p>
         <AssessmentForm
           packages={packages}
-          specialists={specialists}
-          experiences={experiences}
           prefillPackageSlug={prefillPackageSlug}
         />
       </main>

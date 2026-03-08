@@ -8,6 +8,8 @@ import PackageCard from "./components/landing/package-card";
 import SpecialistCard from "./components/landing/specialist-card";
 import ExperienceCard from "./components/landing/experience-card";
 import StepFlowSection from "./components/landing/step-flow-section";
+import PartnerInstitutionCard from "./components/landing/partner-institution-card";
+import ImagePlaceholder from "./components/landing/image-placeholder";
 import type { PublicAsset } from "@/lib/assets";
 
 function getPackageImage(assets: PublicAsset[], location: string): PublicAsset | null {
@@ -27,7 +29,7 @@ const HOW_IT_WORKS_STEPS = [
 const TRUST_ITEMS = [
   { icon: "clinic", title: "Curated partner network", desc: "We work only with vetted clinics and specialists—no open marketplace." },
   { icon: "people", title: "Qualified specialists", desc: "Dental, dermatology, plastic surgery, wellness, and more. All recommendation-based." },
-  { icon: "place", title: "Treatment in Medellín · Recovery in Manizales", desc: "Two-city journey with coordinated care and recovery in the coffee region." },
+  { icon: "place", title: "Treatment in Medellín · Recovery in Manizales", desc: "Oral health and medical tourism: treatment in Medellín, recovery in Manizales. Two valid paths, one coordinated journey in the coffee region." },
   { icon: "transport", title: "Full coordination", desc: "Lodging, transport between cities, and recovery support included." },
 ];
 
@@ -41,6 +43,35 @@ const WHY_COLOMBIA = [
 const TESTIMONIALS = [
   { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient, Medellín package", stars: 5 },
   { quote: "The team made me feel safe and informed. The specialists were excellent and the recovery in Manizales was perfect.", author: "Patient, Comfort Recovery Journey", stars: 5 },
+];
+
+/** Trusted partners / institutions (verified public info only; images are placeholders until approved assets). */
+const TRUSTED_PARTNERS = [
+  {
+    name: "Instituto INMEDENT S.A.S.",
+    city: "Manizales",
+    tagline: "Oral health & dental care",
+    description: "Institutional presence and trust in Manizales. Professional, quality-oriented care with physical facilities and a clear focus on patient experience. Part of our trusted network for treatment and recovery in the coffee region.",
+    imageUrl: null as string | null,
+    websiteUrl: null as string | null,
+  },
+];
+
+/** Placeholder cards for Trusted Clinical Network (institutions, specialists, partner clinics). Replace with real data when available. */
+const TRUSTED_CLINICAL_NETWORK_CARDS = [
+  { type: "institution" as const, name: "Clinical institution", city: "Manizales", specialty: "Oral health & dental", description: "Curated clinical institution in our network. Professional facilities and patient-centered care. Approved partner media can be added here.", image: null as string | null, website: null as string | null },
+  { type: "specialist" as const, name: "Specialist practice", city: "Medellín", specialty: "Dental & oral surgery", description: "Trusted specialist within our referral network. Quality over quantity—we work with vetted professionals only.", image: null as string | null, website: null as string | null },
+  { type: "clinic" as const, name: "Partner clinic", city: "Manizales", specialty: "Recovery & follow-up care", description: "Partner clinic for recovery and follow-up in the coffee region. Calm environment and coordinated care.", image: null as string | null, website: null as string | null },
+];
+
+/** Patient journey steps for Medical Experience Story. */
+const MEDICAL_EXPERIENCE_JOURNEY = [
+  { step: 1, title: "Free evaluation", body: "Share your details and goals. Our team and specialists review your case at no cost and recommend a personalized plan." },
+  { step: 2, title: "Treatment recommendation", body: "Receive your treatment plan, package options, and next steps—no obligation." },
+  { step: 3, title: "Travel coordination", body: "We coordinate lodging, transport between Medellín and Manizales, and your program so you focus on your care." },
+  { step: 4, title: "Treatment in Medellín or Manizales", body: "Treatment in modern clinics with experienced specialists. Both cities are valid paths depending on your plan." },
+  { step: 5, title: "Recovery experience", body: "Recover in a calm, supported environment. Optional experiences: coffee tours, wellness, nature." },
+  { step: 6, title: "Optional tours", body: "Customize your stay with cultural activities, hot springs, or city tours—all optional." },
 ];
 
 function TrustIcon({ icon }: { icon: string }) {
@@ -134,6 +165,12 @@ export default async function Home() {
             <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Specialists
             </Link>
+            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+              Clinical network
+            </Link>
+            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+              Partners
+            </Link>
           </nav>
         </div>
       </header>
@@ -147,7 +184,7 @@ export default async function Home() {
                 Free Medical Evaluation · Treatment in Medellín · Recovery in Manizales
               </h1>
               <p className="mb-8 max-w-lg text-lg text-zinc-400">
-                Free evaluation with no commitment. Treatment in Medellín, recovery in Manizales — one coordinated journey with trusted specialists and family-approved partners.
+                Free evaluation with no commitment. Oral health and medical tourism in two cities: treatment in Medellín, recovery in Manizales — one coordinated journey with trusted specialists and vetted institutional partners.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                 <Link
@@ -212,6 +249,64 @@ export default async function Home() {
           </p>
         </section>
 
+        {/* Trusted Clinical Network */}
+        <section id="trusted-clinical-network" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Trusted Clinical Network
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Curated partners and institutions in Medellín and Manizales
+          </p>
+          <p className="mb-10 max-w-2xl text-zinc-400">
+            Smile Transformation works with a curated network of clinical institutions, specialists, and partner clinics—not an open marketplace. Every partner is vetted for quality, professionalism, and patient experience.
+          </p>
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {TRUSTED_CLINICAL_NETWORK_CARDS.map((card, idx) => (
+              <li key={idx}>
+                <PartnerInstitutionCard
+                  name={card.name}
+                  city={card.city}
+                  description={card.description}
+                  image={card.image}
+                  website={card.website}
+                  specialty={card.specialty}
+                />
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 rounded-xl border border-zinc-700 bg-zinc-900/60 px-5 py-4 text-sm text-zinc-500">
+            Placeholder cards. Real institution data and approved images (e.g. clinic, specialist, facility) can be wired in when available.
+          </p>
+        </section>
+
+        {/* Trust signals */}
+        <section id="trust-signals" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Why we&apos;re different
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Curated specialists, trusted partners, private network
+          </p>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Curated specialists</h3>
+              <p className="text-sm text-zinc-400">We work with vetted professionals by referral—no open directory. Quality and fit matter more than volume.</p>
+            </li>
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Trusted partners</h3>
+              <p className="text-sm text-zinc-400">Clinical institutions and partner clinics are selected for standards, facilities, and patient experience.</p>
+            </li>
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Private referral network</h3>
+              <p className="text-sm text-zinc-400">Our network is invitation-based. Patients get a coordinated path, not a list of options.</p>
+            </li>
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Quality over quantity</h3>
+              <p className="text-sm text-zinc-400">We focus on the right match and full journey—evaluation, treatment, recovery, and optional experiences.</p>
+            </li>
+          </ul>
+        </section>
+
         {/* 3. Free Medical Evaluation */}
         <section id="evaluation" className="mb-20 scroll-mt-6 md:mb-28">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
@@ -253,6 +348,27 @@ export default async function Home() {
 
         {/* 4. How It Works */}
         <StepFlowSection steps={HOW_IT_WORKS_STEPS} title="How it works" className="mb-20 md:mb-28" />
+
+        {/* Medical Experience Story — full patient journey */}
+        <section id="medical-experience-story" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Your medical experience
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            From free evaluation to recovery—one coordinated journey
+          </p>
+          <ol className="space-y-6">
+            {MEDICAL_EXPERIENCE_JOURNEY.map(({ step, title, body }) => (
+              <li key={step} className="flex gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-lg font-bold text-white">{step}</span>
+                <div>
+                  <h3 className="font-bold text-white">{title}</h3>
+                  <p className="mt-1 text-sm text-zinc-400">{body}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
         {/* 5. Travel Packages */}
         <section id="packages" className="mb-20 scroll-mt-6 md:mb-28">
@@ -347,7 +463,99 @@ export default async function Home() {
               <p className="text-sm text-zinc-400">Recover in a calm, welcoming environment. Optional experiences: coffee tours, hot springs, nature. Family-run hospitality and support.</p>
             </div>
           </div>
-          <h2 className="mb-2 mt-12 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          <p className="text-sm text-zinc-400">
+            Both Medellín and Manizales are valid paths for oral health and medical tourism: treatment in modern clinics, then recovery in a safe, welcoming city with institutional partners you can trust.
+          </p>
+          {/* TODO: Approved media — treatment room, doctor consultation, Medellín skyline. Add URLs when available. */}
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <ImagePlaceholder label="Treatment room / clinic" aspectRatio="4/3" />
+            <ImagePlaceholder label="Doctor consultation" aspectRatio="4/3" />
+            <ImagePlaceholder label="Medellín skyline" aspectRatio="4/3" />
+          </div>
+        </section>
+
+        {/* Trusted Network in Manizales */}
+        <section id="trusted-network-manizales" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Trusted network in Manizales
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Vetted institutions and clinics in the coffee region
+          </p>
+          <p className="mb-10 max-w-2xl text-zinc-400">
+            We work with a curated network of partners in Manizales: established institutions with physical facilities, professional standards, and a focus on quality and patient experience. Contact and city references are part of how we select and maintain our trusted network.
+          </p>
+          <Link
+            href="/#trusted-partners"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border-2 border-zinc-600 px-6 py-3 text-sm font-semibold text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/80 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+          >
+            Meet our trusted partners
+          </Link>
+        </section>
+
+        {/* Recover in the calm of Manizales */}
+        <section id="recovery-manizales" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Recover in the calm of Manizales
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Calm environment, mountains and nature, smaller-city pace
+          </p>
+          <p className="mb-10 max-w-2xl text-zinc-400">
+            Manizales is ideal for recovery: a calmer pace, mountains and nature, and professional institutions focused on patient comfort. Our partners there offer a supportive environment so you can heal in a welcoming, local context.
+          </p>
+          <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* TODO: Replace with approved media — clinic environment, treatment rooms, patient care, Manizales landscapes. See image-placeholder.tsx. */}
+            <ImagePlaceholder label="Manizales mountains / nature" aspectRatio="4/3" />
+            <ImagePlaceholder label="Clinic environment" aspectRatio="4/3" />
+            <ImagePlaceholder label="Patient care" aspectRatio="4/3" />
+            <ImagePlaceholder label="Nature / recovery setting" aspectRatio="4/3" />
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Calm environment</h3>
+              <p className="text-sm text-zinc-400">Smaller-city pace and a focus on rest. Manizales offers a safe, welcoming setting for recovery.</p>
+            </div>
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Professional institutions</h3>
+              <p className="text-sm text-zinc-400">Trusted clinics and facilities with clear standards. You know where you are and who is caring for you.</p>
+            </div>
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+              <h3 className="mb-2 font-bold text-white">Patient comfort</h3>
+              <p className="text-sm text-zinc-400">Quality-oriented care and a focus on patient experience. Our partners are selected for outcomes and comfort.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Trusted Partners / Institutions (partner cards) */}
+        <section id="trusted-partners" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            Our trusted partners
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            Institutions and clinics we work with
+          </p>
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {TRUSTED_PARTNERS.map((partner, idx) => (
+              <li key={idx}>
+                <PartnerInstitutionCard
+                  name={partner.name}
+                  city={partner.city}
+                  description={partner.description}
+                  image={partner.imageUrl}
+                  website={partner.websiteUrl}
+                  specialty={partner.tagline}
+                />
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 rounded-xl border border-zinc-700 bg-zinc-900/60 px-5 py-4 text-sm text-zinc-500">
+            Partner images are placeholders. Approved assets (e.g. from Instagram, Facebook, or manual upload) can be added to the platform and will appear here when configured.
+          </p>
+        </section>
+
+        <section id="why-colombia" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
             Why Colombia
           </h2>
           <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
@@ -444,6 +652,9 @@ export default async function Home() {
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Packages</h3>
               <Link href="/#packages" className="block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
                 Explore packages
+              </Link>
+              <Link href="/#trusted-partners" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                Trusted partners
               </Link>
             </div>
             <div>

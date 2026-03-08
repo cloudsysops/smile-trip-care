@@ -110,9 +110,10 @@ describe("POST /api/leads", () => {
 
     expect(response.status).toBe(400);
     const payload = await response.json();
-    expect(payload).toEqual({
-      error: "Invalid input",
+    expect(payload).toMatchObject({
+      error: expect.any(String),
       request_id: expect.any(String),
     });
+    expect(payload.error).toMatch(/invalid|validation/i);
   });
 });

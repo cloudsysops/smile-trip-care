@@ -41,7 +41,7 @@
 | **Auditoría buenas prácticas** | ✅ Hecho (2026-03) | [AUDITORIA_RESULTADO](docs/AUDITORIA_RESULTADO.md). [TAREAS_AUDITORIA](docs/TAREAS_AUDITORIA_BUENAS_PRACTICAS.md). |
 
 ## Run after migration
-Aplicar migraciones en orden. Desde repo (con Supabase enlazado): `npm run db:migrate`. O en SQL Editor: 0001–0011 y luego seeds. Opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`. Si en remoto hay migraciones adicionales (0004 lead_ai_ops, 0005 payments_idempotency, etc.), aplicarlas según corresponda al entorno.
+Aplicar migraciones en orden lexicográfico **0001 → 0018**. Desde repo (con Supabase enlazado): `npm run db:migrate`. Lista completa: [supabase/migrations/MIGRATION_ORDER.md](supabase/migrations/MIGRATION_ORDER.md). Luego opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`.
 
 ## Rutas principales
 - **Público:** `/`, `/assessment`, `/packages`, `/health-packages`, `/tour-experiences`, `/packages/[slug]`, `/thank-you`, `/legal`, `/login`, `/signin`.

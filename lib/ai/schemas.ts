@@ -45,7 +45,21 @@ export const OpsCoordinatorOutputSchema = z.object({
   internal_note: z.string().min(1),
 }).strict();
 
+/** Ops tasks format (tasks array + summary, max 8 tasks). */
+export const OpsTasksOutputSchema = z.object({
+  tasks: z.array(
+    z.object({
+      title: z.string().min(1),
+      due_relative: z.string().min(1),
+      assignee: z.string().min(1),
+      notes: z.string(),
+    }).strict(),
+  ).max(8),
+  summary: z.string().min(1),
+}).strict();
+
 export type LeadTriageOutput = z.infer<typeof LeadTriageOutputSchema>;
 export type SalesResponderOutput = z.infer<typeof SalesResponderOutputSchema>;
 export type ItineraryOutput = z.infer<typeof ItineraryOutputSchema>;
 export type OpsCoordinatorOutput = z.infer<typeof OpsCoordinatorOutputSchema>;
+export type OpsTasksOutput = z.infer<typeof OpsTasksOutputSchema>;

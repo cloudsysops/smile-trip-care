@@ -1,7 +1,7 @@
 # Safe redeploy checklist — Local → Vercel
 
 **Target URL:** https://smile-transformation-platform-dev.vercel.app/  
-**Date:** 2026-03-08
+**Deploy branch:** `main` (Vercel suele estar conectado a `main`).
 
 ---
 
@@ -9,11 +9,11 @@
 
 | Item | Status |
 |------|--------|
-| **Current branch** | `production-hardening` |
-| **Working tree** | **Not clean** — modified and untracked files present |
-| **Uncommitted changes** | 31 modified files, 1 deleted file (`middleware.ts`), many untracked (new) files |
+| **Deploy branch** | `main` |
+| **Working tree** | Debe estar limpio antes de deploy; hacer `git status`. |
+| **Sincronización** | `git pull origin main` antes de deploy; después `git push origin main` si hay commits locales. |
 
-**Summary:** The local version includes landing upgrades, auth/role dashboards, admin pages, new APIs, migrations (untracked), and docs. All changes need to be added and committed before push. No destructive git commands have been run.
+**Summary:** Código unificado (landing, auth/roles, admin CRUD, automation, outbound, migraciones 0001–0018). Ver [STATUS.md](../STATUS.md) y [supabase/migrations/MIGRATION_ORDER.md](../supabase/migrations/MIGRATION_ORDER.md).
 
 ---
 
@@ -34,7 +34,7 @@
 - New app routes: `app/login/`, `app/signin/`, `app/coordinator/`, `app/provider/`, `app/specialist/`, `app/patient/`, `app/admin/overview/`, `app/admin/providers/`, etc.
 - New API routes: `app/api/auth/me/`, `app/api/admin/*` (bookings, consultations, experiences, packages, providers, specialists)
 - New lib: `lib/bookings.ts`, `lib/consultations.ts`, `lib/dashboard-data.ts`, `lib/experiences.ts`, `lib/providers.ts`, `lib/specialists.ts`, validation schemas
-- Migrations: `supabase/migrations/0006` through `0011`
+- Migrations: `supabase/migrations/0001` through `0018` (orden en [MIGRATION_ORDER.md](../supabase/migrations/MIGRATION_ORDER.md))
 - Scripts: `run_migrations.sh`, `run_seed_marketplace.sh`, seed SQL files
 - Docs: multiple new docs (AUTH_AND_ROLES, DASHBOARD_ROLES, sprint reports, etc.)
 - `.cursor/rules/controlled-execution-policy.mdc`, `AGENTS.md`

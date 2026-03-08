@@ -16,7 +16,14 @@ export const LeadCreateSchema = z.object({
   utm_term: OptionalTrackingValueSchema,
   utm_content: OptionalTrackingValueSchema,
   landing_path: z.string().trim().min(1).max(1000).optional(),
-  referrer_url: z.string().url().max(2000).optional(),
+  referrer_url: z.union([z.string().url().max(2000), z.literal("")]).optional(),
+  specialist_ids: z.array(z.string().uuid()).optional().default([]),
+  experience_ids: z.array(z.string().uuid()).optional().default([]),
+  selected_specialties: z.array(z.string().min(1)).optional().default([]),
+  selected_experience_categories: z.array(z.string().min(1)).optional().default([]),
+  selected_experience_ids: z.array(z.string().uuid()).optional().default([]),
+  travel_companions: z.string().max(200).optional(),
+  budget_range: z.string().max(200).optional(),
   /** Honeypot: allow values and silently drop bot-like submissions in handler. */
   company_website: z.string().max(500).optional(),
 });

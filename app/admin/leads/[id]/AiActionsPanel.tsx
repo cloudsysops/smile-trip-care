@@ -27,14 +27,14 @@ type Props = {
   initialTriage: LeadTriageOutput | null;
   initialMessage: StoredMessage | null;
   initialItineraries: StoredItinerary[];
-  initialOps: OpsTasksOutput | null;
+  initialOps?: OpsTasksOutput | null;
 };
 
-export default function AiActionsPanel({ leadId, initialTriage, initialMessage, initialItineraries, initialOps }: Props) {
+export default function AiActionsPanel({ leadId, initialTriage, initialMessage, initialItineraries, initialOps = null }: Props) {
   const [triage, setTriage] = useState<LeadTriageOutput | null>(initialTriage);
   const [message, setMessage] = useState<StoredMessage | null>(initialMessage);
   const [itineraryPreview, setItineraryPreview] = useState<ItineraryOutput | null>(null);
-  const [ops, setOps] = useState<OpsTasksOutput | null>(initialOps);
+  const [ops, setOps] = useState<OpsTasksOutput | null>(initialOps ?? null);
   const [loading, setLoading] = useState<"triage" | "reply" | "itinerary" | "ops" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);

@@ -71,7 +71,7 @@ export async function POST(request: Request) {
   }
   if (session.payment_status !== "paid") {
     log.warn("checkout.session.completed with payment_status not paid");
-    return NextResponse.json({ received: true }, { status: 200 });
+    return NextResponse.json({ received: true, ignored: "payment_not_paid" }, { status: 200 });
   }
   const sessionId = session.id;
   const metadataParsed = CheckoutSessionMetadataSchema.safeParse(session.metadata ?? {});
