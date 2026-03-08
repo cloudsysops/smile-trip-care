@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { branding } from "@/lib/branding";
 import "./globals.css";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 
@@ -14,12 +13,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const metaTitle = "Nebula Smile — AI-Powered Dental Tourism Platform";
+const metaDescription =
+  "Nebula Smile connects international patients with verified dental clinics in Colombia, offering concierge medical tourism and savings up to 70%.";
+
 export const metadata: Metadata = {
-  title: `${branding.productName} | ${branding.tagline}`,
-  description: `Premium coordination for dental transformation and recovery in Medellín and Manizales. A ${branding.companyName} company.`,
+  title: metaTitle,
+  description: metaDescription,
   openGraph: {
-    title: `${branding.productName} | ${branding.tagline}`,
-    description: `Premium coordination for dental transformation and recovery in Medellín and Manizales. A ${branding.companyName} company.`,
+    title: metaTitle,
+    description: metaDescription,
   },
 };
 

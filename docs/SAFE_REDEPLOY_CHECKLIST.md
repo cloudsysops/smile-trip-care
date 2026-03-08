@@ -99,7 +99,7 @@ After the deploy completes:
 
 1. **Health**
    - Open: `https://smile-transformation-platform-dev.vercel.app/api/health`  
-   - Expect: `200` and JSON with `ok: true`, `service: "smile-transformation"`.
+   - Expect: `200` and JSON with `ok: true`, `service: "nebula-smile"`.
 
 2. **Homepage**
    - Open: `https://smile-transformation-platform-dev.vercel.app/`  

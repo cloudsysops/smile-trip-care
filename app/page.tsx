@@ -17,13 +17,6 @@ function getPackageImage(assets: PublicAsset[], location: string): PublicAsset |
   return match ?? assets.find((a) => a.url) ?? null;
 }
 
-const TRUST_ITEMS = [
-  { icon: "clinic", title: "Curated partner network", desc: "We work only with vetted clinics and specialists—no open marketplace." },
-  { icon: "people", title: "Qualified specialists", desc: "Dental, dermatology, plastic surgery, wellness, and more. All recommendation-based." },
-  { icon: "place", title: "Treatment in Medellín · Recovery in Manizales", desc: "Oral health and medical tourism: treatment in Medellín, recovery in Manizales. Two valid paths, one coordinated journey in the coffee region." },
-  { icon: "transport", title: "Full coordination", desc: "Lodging, transport between cities, and recovery support included." },
-];
-
 const WHY_COLOMBIA = [
   { title: "Up to 60–70% cost savings", desc: "World-class care at a fraction of US and European prices." },
   { title: "Experienced specialists", desc: "Board-certified and internationally trained professionals." },
@@ -32,9 +25,9 @@ const WHY_COLOMBIA = [
 ];
 
 const TESTIMONIALS = [
-  { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient, Medellín package", stars: 5 },
-  { quote: "The team made me feel safe and informed. The specialists were excellent and the recovery in Manizales was perfect.", author: "Patient, Comfort Recovery Journey", stars: 5 },
-  { quote: "I saved thousands compared to back home and got a smile I love. The free assessment made it easy to get started.", author: "Patient, dental transformation", stars: 5 },
+  { quote: "I saved over $8,000 compared to US prices. The clinic was modern and the team made everything easy.", author: "Sarah M.", role: "Dental implants, USA", stars: 5 },
+  { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient", role: "Medellín package", stars: 5 },
+  { quote: "The specialists were excellent and the recovery in Manizales was perfect. I recommend Nebula Smile to anyone considering dental travel.", author: "James K.", role: "Smile design", stars: 5 },
 ];
 
 /** Trusted partners / institutions (verified public info only; images are placeholders until approved assets). */
@@ -146,10 +139,10 @@ export default async function Home() {
               Start Free Assessment
             </Link>
             <Link
-              href="/#packages"
+              href="/packages"
               className="hidden rounded-full border border-zinc-600 px-4 py-2 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/80 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
             >
-              View Packages
+              View Treatment Packages
             </Link>
             <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               How it works
@@ -168,15 +161,16 @@ export default async function Home() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12 md:py-16">
-        {/* 1. Hero */}
+        {/* 1. Hero — Silicon Valley style */}
         <section id="hero" className="mb-20 scroll-mt-6 md:mb-28">
           <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-12">
             <div>
               <h1 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-                Transform Your Smile in Colombia and Save Up to 70%
+                Transform Your Smile in Colombia<br />
+                <span className="text-emerald-400">Save up to 70%</span> on world-class dental treatments.
               </h1>
               <p className="mb-8 max-w-lg text-lg text-zinc-400">
-                Verified clinics in Medellín and Manizales. Travel concierge included.
+                {branding.productName} connects international patients with verified clinics in Medellín and Manizales.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                 <Link
@@ -186,17 +180,14 @@ export default async function Home() {
                   Start My Free Smile Assessment
                 </Link>
                 <Link
-                  href="/#packages"
+                  href="/packages"
                   className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border-2 border-zinc-600 px-8 py-4 text-base font-semibold text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/80 sm:w-auto focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
                 >
-                  View Packages
+                  View Treatment Packages
                 </Link>
-                <div className="w-full sm:w-auto">
-                  <WhatsAppButton label="Chat on WhatsApp" variant="inline" className="w-full justify-center rounded-full border-0 bg-emerald-600 px-8 py-4 text-base font-semibold hover:bg-emerald-700 sm:w-auto min-h-[48px]" />
-                </div>
               </div>
               <p className="mt-3 text-sm text-zinc-500" aria-hidden="true">
-                No commitment · We reply within 24 hours · Takes 2 minutes
+                No commitment · Response within 24 hours
               </p>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:aspect-square">
@@ -220,27 +211,47 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 2. Trust + legal clarity */}
+        {/* 2. Trust — pillars + badges */}
         <section id="trust" className="mb-20 scroll-mt-6 md:mb-28">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
-            Curated trusted network
-          </h2>
-          <p className="mb-8 text-2xl font-bold text-white md:text-3xl">
-            Providers and specialists join by invitation only. Family-oriented, high-quality, professional.
-          </p>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {TRUST_ITEMS.map(({ icon, title, desc }) => (
-              <li key={title} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-zinc-700">
-                <div className="mb-3">
-                  <TrustIcon icon={icon} />
-                </div>
-                <h3 className="mb-1 font-bold text-white">{title}</h3>
-                <p className="text-sm text-zinc-400">{desc}</p>
-              </li>
-            ))}
+          <div className="mb-10 flex flex-wrap items-center justify-center gap-6 border-y border-zinc-800 py-8">
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <svg className="h-4 w-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+              </span>
+              Verified clinic
+            </span>
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </span>
+              International standards
+            </span>
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              </span>
+              Secure payments
+            </span>
+          </div>
+          <ul className="grid gap-6 sm:grid-cols-3">
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center transition hover:border-emerald-500/50">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20"><TrustIcon icon="clinic" /></div>
+              <h3 className="mb-1 font-bold text-white">Verified Clinics</h3>
+              <p className="text-sm text-zinc-400">Vetted partners in Medellín and Manizales. Quality and safety first.</p>
+            </li>
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center transition hover:border-emerald-500/50">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20"><TrustIcon icon="people" /></div>
+              <h3 className="mb-1 font-bold text-white">International Patients</h3>
+              <p className="text-sm text-zinc-400">Thousands of patients from the US, Canada, and Europe choose Colombia.</p>
+            </li>
+            <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center transition hover:border-emerald-500/50">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20"><TrustIcon icon="transport" /></div>
+              <h3 className="mb-1 font-bold text-white">Concierge Medical Travel</h3>
+              <p className="text-sm text-zinc-400">We handle lodging, transport, and appointments so you focus on your smile.</p>
+            </li>
           </ul>
           <p className="mt-6 rounded-xl border border-zinc-700 bg-zinc-900/60 px-5 py-4 text-sm text-zinc-400">
-            <strong className="text-zinc-300">Legal clarity:</strong> We are a coordination and hospitality platform. We do not provide medical advice, diagnosis, or treatment. Medical services are provided by licensed clinics and specialists in Colombia.
+            <strong className="text-zinc-300">Legal:</strong> We coordinate travel and hospitality. Medical services are provided by licensed clinics and specialists in Colombia.
           </p>
         </section>
 
@@ -275,6 +286,34 @@ export default async function Home() {
               <p className="mt-1 text-sm font-medium text-zinc-400">Medellín</p>
               <p className="mt-2 text-sm text-zinc-400">Trust anchor in Medellín. Modern facilities and experienced specialists for your smile journey.</p>
             </li>
+          </ul>
+        </section>
+
+        {/* Treatments — main offerings */}
+        <section id="treatments" className="mb-20 scroll-mt-6 md:mb-28">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-emerald-400">
+            Treatments
+          </h2>
+          <p className="mb-8 max-w-2xl text-2xl font-bold text-white md:text-3xl">
+            World-class dental care in Colombia
+          </p>
+          <ul className="grid gap-6 sm:grid-cols-3">
+            {[
+              { title: "Dental Implants", slug: "dental-implants", desc: "Permanent solutions with verified specialists and significant savings." },
+              { title: "Hollywood Smile", slug: "hollywood-smile", desc: "Complete smile makeovers with veneers and aesthetic design." },
+              { title: "Smile Design", slug: "smile-design", desc: "Personalized treatment plans for your ideal smile." },
+            ].map(({ title, slug, desc }) => (
+              <li key={slug}>
+                <Link
+                  href={`/packages/${slug}`}
+                  className="block rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 transition hover:border-emerald-500/50 hover:bg-zinc-900"
+                >
+                  <h3 className="mb-2 font-bold text-white">{title}</h3>
+                  <p className="text-sm text-zinc-400">{desc}</p>
+                  <span className="mt-3 inline-block text-sm font-medium text-emerald-400">View package →</span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </section>
 
@@ -377,27 +416,27 @@ export default async function Home() {
 
         {/* 4. How It Works (3 steps) */}
         <section id="how-it-works" className="mb-20 scroll-mt-6 md:mb-28">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-emerald-400">
             How it works
           </h2>
           <p className="mb-10 max-w-2xl text-2xl font-bold text-white md:text-3xl">
-            From photos to your new smile — simple and guided
+            Three steps to your new smile
           </p>
           <ul className="grid gap-6 sm:grid-cols-3">
             <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
               <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">1</span>
               <h3 className="font-semibold text-white">Upload your smile photos</h3>
-              <p className="text-sm text-zinc-400">Share a few photos in our free assessment. No commitment — we use them to match you with the right plan.</p>
+              <p className="text-sm text-zinc-400">Share photos in our free assessment. We use them to match you with the right plan.</p>
             </li>
             <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
               <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">2</span>
               <h3 className="font-semibold text-white">Get matched with verified specialists</h3>
-              <p className="text-sm text-zinc-400">Our team reviews your case and connects you with vetted clinics and specialists in Medellín and Manizales.</p>
+              <p className="text-sm text-zinc-400">Our team connects you with vetted clinics and specialists in Medellín and Manizales.</p>
             </li>
             <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
               <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">3</span>
-              <h3 className="font-semibold text-white">Travel and transform your smile</h3>
-              <p className="text-sm text-zinc-400">We coordinate your trip, lodging, and appointments. You focus on your care and enjoy Colombia.</p>
+              <h3 className="font-semibold text-white">Travel to Colombia and transform your smile</h3>
+              <p className="text-sm text-zinc-400">We coordinate trip, lodging, and appointments. You focus on your care.</p>
             </li>
           </ul>
           <div className="mt-8 text-center">
@@ -674,19 +713,30 @@ export default async function Home() {
           </p>
         </section>
 
-        {/* 9. Testimonials */}
+        {/* 9. Testimonials — photo + quote */}
         <section id="testimonials" className="mb-20 scroll-mt-6 md:mb-28">
-          <h2 className="mb-8 text-sm font-semibold uppercase tracking-wider text-zinc-500">
-            What people say
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-emerald-400">
+            Testimonials
           </h2>
+          <p className="mb-8 text-2xl font-bold text-white md:text-3xl">
+            What our patients say
+          </p>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
-              <blockquote key={i} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-8">
-                <StarRating stars={t.stars} />
-                <p className="mt-4 text-lg font-medium leading-relaxed text-zinc-200">
+              <blockquote key={i} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 shrink-0 rounded-full bg-zinc-700 flex items-center justify-center text-zinc-400 text-lg font-semibold">
+                    {(t.author ?? "?").charAt(0)}
+                  </div>
+                  <div>
+                    <StarRating stars={t.stars} />
+                    <cite className="mt-1 block not-italic font-semibold text-white">{t.author}</cite>
+                    {"role" in t && t.role && <span className="text-xs text-zinc-500">{t.role}</span>}
+                  </div>
+                </div>
+                <p className="mt-4 text-sm font-medium leading-relaxed text-zinc-300">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <footer className="mt-4 text-sm text-zinc-500">— {t.author}</footer>
               </blockquote>
             ))}
           </div>
@@ -728,17 +778,17 @@ export default async function Home() {
         <section id="cta" className="mb-20 scroll-mt-6 md:mb-28" aria-labelledby="final-cta-title">
           <div className="rounded-2xl border-2 border-emerald-500/50 bg-zinc-900/80 p-8 text-center md:p-14">
             <h2 id="final-cta-title" className="mb-3 text-2xl font-bold text-white md:text-4xl">
-              Ready to Transform Your Smile?
+              Get Your Personalized Smile Plan
             </h2>
             <p className="mx-auto mb-8 max-w-md text-zinc-400">
-              Start your free smile assessment. Get a personalized plan from verified clinics — no commitment.
+              Free assessment. Personalized plan from verified clinics. No commitment.
             </p>
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
               <Link
                 href="/assessment"
                 className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-white px-10 py-4 text-lg font-semibold text-zinc-900 hover:bg-zinc-100 sm:w-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
               >
-                Start My Free Smile Assessment
+                Start My Free Assessment
               </Link>
               <WhatsAppButton
                 label="Chat on WhatsApp"

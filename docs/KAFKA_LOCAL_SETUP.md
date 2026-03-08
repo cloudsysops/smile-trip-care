@@ -32,7 +32,7 @@ If you add Kafka clients to the app, use a grouped env section, e.g.:
 | Variable | Example | Notes |
 |----------|--------|--------|
 | `KAFKA_BOOTSTRAP_SERVERS` | `127.0.0.1:9092` | Local; production would use your managed Kafka URL |
-| `KAFKA_CLIENT_ID` | `smile-transformation` | Optional |
+| `KAFKA_CLIENT_ID` | `nebula-smile` | Optional |
 | `KAFKA_TOPIC_*` | Per-topic names | Define as you add features |
 
 None of these are in `.env.example` by default because Kafka is not required for current app startup.

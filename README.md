@@ -1,26 +1,38 @@
 # Nebula Smile
 
-Plataforma web para coordinación y hospitalidad de experiencias (USA LLC). Los servicios médicos son facturados por clínicas en Colombia. Stack: **Next.js 16** (App Router), **TypeScript**, **Supabase** (Auth, Postgres, Storage), **Stripe**, **Vercel**.
+**AI-Powered Medical Tourism Platform**
 
 ---
 
-**🤖 Agentes (IA):** Ejecutar primero el **Sprint Salir a vender** ([docs/SPRINT_SALIR_A_VENDER.md](docs/SPRINT_SALIR_A_VENDER.md)) para dejar la página profesional; tareas en [docs/NEXT_TASKS.md](docs/NEXT_TASKS.md). Luego [AGENTS.md](AGENTS.md) y [docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md](docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md). Objetivo: producción lista para vender y mejoras continuas.
+## Overview
+
+Nebula Smile is a coordination and hospitality platform (USA LLC) connecting international patients with verified dental clinics in Colombia. Medical services are billed by clinics in Colombia. The platform offers free smile assessments, curated packages, concierge travel coordination, and savings up to 70% for dental transformation in Medellín and Manizales.
+
+**🤖 Agentes (IA):** Run the **Sprint Salir a vender** ([docs/SPRINT_SALIR_A_VENDER.md](docs/SPRINT_SALIR_A_VENDER.md)) first; then [AGENTS.md](AGENTS.md) and [docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md](docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md). Goal: production ready to sell and continuous improvements.
 
 ---
 
-## Importante: ejecutar desde la raíz del proyecto
+## Tech stack
 
-Todos los comandos (`npm run ...`, `./scripts/...`) deben ejecutarse desde la carpeta del proyecto. Si clonaste el repo y el código está en `smile-transformation-platform/`:
+- **App:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS
+- **Data & Auth:** Supabase (Postgres, Auth, Storage, RLS)
+- **Payments:** Stripe (Checkout, webhooks)
+- **Deploy:** Vercel
+- **CI:** GitHub Actions (lint, test, build)
+
+---
+
+## Development workflow
+
+**Run all commands from the project root.** If you cloned the repo and the code is in `smile-transformation-platform/`:
 
 ```bash
 cd smile-transformation-platform
 ```
 
-Luego ya puedes usar `npm run dev`, `./scripts/deploy_verify.sh ...`, etc.
+**Conectar Supabase y Vercel:** [docs/CONECTAR_SUPABASE_VERCEL.md](docs/CONECTAR_SUPABASE_VERCEL.md) — create Supabase project, migrations, env vars, and Vercel deploy.
 
-**Conectar Supabase y Vercel:** [docs/CONECTAR_SUPABASE_VERCEL.md](docs/CONECTAR_SUPABASE_VERCEL.md) — pasos para crear proyecto Supabase, migraciones, variables y deploy en Vercel.
-
-### Migraciones con Supabase CLI (desde la raíz del repo)
+### Migraciones con Supabase CLI
 
 Ejecuta todo **desde la raíz del proyecto** (no hagas `cd smile-transformation-platform` si ya estás dentro):
 
@@ -34,7 +46,7 @@ Si aparece *"Access token not provided"*, el primer paso (`npx supabase login`) 
 
 Si la base remota ya tenía el esquema aplicado a mano y `db push` falla (p. ej. "policy already exists"), puedes marcar migraciones como aplicadas y luego empujar solo las nuevas: `npx supabase migration repair 0001 --status applied` (y 0002… hasta la última que ya esté en remoto), luego `npm run db:migrate`.
 
-## Arrancar en local
+### Arrancar en local
 
 ```bash
 cd smile-transformation-platform   # si no estás ya en la raíz del proyecto
@@ -45,7 +57,7 @@ npm run dev
 
 Abrir [http://localhost:3000](http://localhost:3000).
 
-## Scripts
+### Scripts
 
 | Comando | Descripción |
 |--------|-------------|
@@ -64,7 +76,7 @@ Abrir [http://localhost:3000](http://localhost:3000).
 | `./scripts/sprint-end.sh` | Cierre de sprint (verify + checklist PR/deploy) |
 | `./scripts/dev-local.sh` | DEV con Supabase en Docker |
 
-## Verificación pre-deploy
+### Verificación pre-deploy
 
 Antes de desplegar o hacer merge a `main`, ejecutar:
 
@@ -74,7 +86,7 @@ npm run verify
 
 Equivale a `lint` → `test` → `build`. Si todo pasa, el código está listo para deploy. Checklist completo de producción: [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md).
 
-## Variables de entorno
+### Variables de entorno
 
 - `.env.example` y `.env.local.example` listan las variables necesarias.
 - **Obligatorias:** Supabase (URL, service_role, anon) + Stripe (secret, webhook secret, publishable). Ver **[Variables y Stripe](docs/ENV_Y_STRIPE.md)**.
@@ -130,10 +142,12 @@ Equivale a `lint` → `test` → `build`. Si todo pasa, el código está listo p
 - Reglas del proyecto para la IA: `.cursor/rules.md`.
 - Para **abrir este proyecto en Cursor Mobile** (iPhone/Android) o en **Cursor Agents** (web): sigue la guía [docs/CURSOR_MOBILE.md](docs/CURSOR_MOBILE.md) (crear repo en GitHub, conectar remoto, push, abrir desde la app o la web).
 
-## Deploy
+---
 
-Compatible con Vercel. Configurar env en el dashboard y desplegar desde la rama `main`.
+## Deployment
 
+- **Platform:** Vercel. Connect the Git repo, set environment variables in the Vercel dashboard, and deploy from the `main` branch.
+- **Checklists:** [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md), [docs/VERCEL_PRE_DEPLOY_CHECKLIST.md](docs/VERCEL_PRE_DEPLOY_CHECKLIST.md), [docs/VERCEL_DEPLOY.md](docs/VERCEL_DEPLOY.md).
 - **Plan de trabajo para agentes (producción y mejoras continuas):** [docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md](docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md)
 
 ## Cómo vender
