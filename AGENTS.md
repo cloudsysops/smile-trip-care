@@ -42,6 +42,7 @@ Cada tarea está asignada a un tipo de agente (Repo/CI, Frontend, Backend, QA, D
 
 ## Referencias rápidas
 
+- [ESTRATEGIA_RAMAS_GITHUB](docs/ESTRATEGIA_RAMAS_GITHUB.md) — Ramas: main, feature/*, hotfix/*; flujo ordenado y protección en GitHub.
 - [DEPLOY_CHECKLIST](docs/DEPLOY_CHECKLIST.md)
 - [TEST_FIRST_SALE](docs/TEST_FIRST_SALE.md)
 - [ENV_Y_STRIPE](docs/ENV_Y_STRIPE.md)

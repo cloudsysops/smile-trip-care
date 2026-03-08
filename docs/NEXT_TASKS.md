@@ -6,6 +6,14 @@
 
 ---
 
+## Plan de mejoras para producción (por sprint, asignable a agentes)
+
+**Documento:** [PLAN_MEJORAS_PRODUCCION_POR_SPRINT.md](PLAN_MEJORAS_PRODUCCION_POR_SPRINT.md)
+
+Sprints: **1** (cierre lanzamiento + SECURITY.md + regla docs), **2** (rate limit signup/login + middleware por rol), **3** (persistir webhook events + doc email), **4** (Sentry, E2E opcional, doc RLS), **5** (forgot password, dominio, staging). Cada tarea tiene agente sugerido y columna Hecho [ ]. Ejecutar en orden S1 → S2 → S3 → S4 → S5.
+
+---
+
 ## Dashboards por rol
 
 **Documento:** [DASHBOARDS_POR_ROL.md](DASHBOARDS_POR_ROL.md) — Diseño de dashboards para **Admin**, **Especialista**, **Paciente/Cliente** y **Proveedor** (sidebar, overview, métricas, acciones). Incluye qué más considerar (notificaciones, reportes, mensajería, auditoría) y orden de implementación.

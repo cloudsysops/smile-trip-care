@@ -2,6 +2,8 @@
 
 Guía para proteger ramas en GitHub. **Guía maestra:** [GITHUB_ENTERPRISE_SETUP.md](GITHUB_ENTERPRISE_SETUP.md).
 
+**Estrategia de ramas (resumen en español):** [ESTRATEGIA_RAMAS_GITHUB.md](ESTRATEGIA_RAMAS_GITHUB.md).
+
 ## Modo simple (solo `main`) — recomendado para SaaS con un solo deploy
 
 Si solo usas la rama `main` y un proyecto Vercel:
