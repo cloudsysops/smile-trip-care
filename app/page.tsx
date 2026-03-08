@@ -127,9 +127,9 @@ export default async function Home() {
 
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:py-5">
-          <span className="text-lg font-semibold text-white">{branding.productName}</span>
+          <Link href="/" className="text-lg font-semibold text-white hover:text-zinc-200">{branding.productName}</Link>
           <nav className="flex items-center gap-2 sm:gap-3">
-            <Link href="/signin" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+            <Link href="/login" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Sign in
             </Link>
             <Link
@@ -231,6 +231,12 @@ export default async function Home() {
                 <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
               </span>
               Secure payments
+            </span>
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              </span>
+              Concierge support
             </span>
           </div>
           <ul className="grid gap-6 sm:grid-cols-3">
@@ -414,7 +420,7 @@ export default async function Home() {
           </Link>
         </section>
 
-        {/* 4. How It Works (3 steps) */}
+        {/* How it works — 3 steps */}
         <section id="how-it-works" className="mb-20 scroll-mt-6 md:mb-28">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-emerald-400">
             How it works
@@ -423,20 +429,20 @@ export default async function Home() {
             Three steps to your new smile
           </p>
           <ul className="grid gap-6 sm:grid-cols-3">
-            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
+            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center shadow-lg shadow-black/20">
               <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">1</span>
-              <h3 className="font-semibold text-white">Upload your smile photos</h3>
-              <p className="text-sm text-zinc-400">Share photos in our free assessment. We use them to match you with the right plan.</p>
+              <h3 className="font-semibold text-white">Share your smile</h3>
+              <p className="text-sm text-zinc-400">Complete our free assessment and share your goals. Optional photos help us personalize your plan.</p>
             </li>
-            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
+            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center shadow-lg shadow-black/20">
               <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">2</span>
-              <h3 className="font-semibold text-white">Get matched with verified specialists</h3>
-              <p className="text-sm text-zinc-400">Our team connects you with vetted clinics and specialists in Medellín and Manizales.</p>
+              <h3 className="font-semibold text-white">Get matched with a specialist</h3>
+              <p className="text-sm text-zinc-400">Our team connects you with a vetted specialist and clinic in Medellín or Manizales.</p>
             </li>
-            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center">
+            <li className="flex flex-col gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center shadow-lg shadow-black/20">
               <span className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xl font-bold text-white">3</span>
-              <h3 className="font-semibold text-white">Travel to Colombia and transform your smile</h3>
-              <p className="text-sm text-zinc-400">We coordinate trip, lodging, and appointments. You focus on your care.</p>
+              <h3 className="font-semibold text-white">Travel and transform your smile</h3>
+              <p className="text-sm text-zinc-400">We coordinate travel, lodging, and appointments. You focus on your care and recovery.</p>
             </li>
           </ul>
           <div className="mt-8 text-center">
@@ -828,7 +834,7 @@ export default async function Home() {
             </div>
           </div>
           <p className="mt-10 text-center text-sm text-zinc-500">
-            {branding.productName} — A {branding.companyName} company. International coordination &amp; hospitality. Medical services billed by clinics in Colombia.
+            {branding.productName} — A {branding.companyName} company.<br className="sm:hidden" /> International coordination &amp; hospitality. Medical services billed by clinics in Colombia.
           </p>
         </footer>
 

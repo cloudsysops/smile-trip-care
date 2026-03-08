@@ -24,9 +24,9 @@ function getStepPlaceholder(stepId: string): string {
 
 export default function TreatmentTimelineSection({ steps }: Props) {
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-6">
-      <h3 className="text-lg font-semibold text-zinc-900">Treatment timeline</h3>
-      <p className="mt-1 text-sm text-zinc-500">Your journey from consultation to follow-up</p>
+    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Treatment timeline</h3>
+      <p className="mt-1 text-sm text-zinc-600">Your journey from consultation to follow-up</p>
       <ol className="mt-6 space-y-0" role="list">
         {steps.map((step, index) => {
           const isLast = index === steps.length - 1;

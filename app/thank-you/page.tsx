@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { branding } from "@/lib/branding";
 import { getPublishedPackageBySlug, getPackageById } from "@/lib/packages";
 import { getLeadByIdForMatching } from "@/lib/leads";
 import { getRecommendedSpecialist } from "@/lib/specialists";
@@ -39,25 +40,36 @@ export default async function ThankYouPage({ searchParams }: Props) {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <header className="border-b border-zinc-800">
-        <div className="mx-auto max-w-4xl px-4 py-6">
-          <Link href="/" className="text-sm text-zinc-400 hover:text-white">
-            ← Nebula Smile
+      <header className="border-b border-zinc-800 bg-zinc-950/95">
+        <div className="mx-auto max-w-2xl px-4 py-6">
+          <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
+            ← {branding.productName}
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-12 text-center sm:py-16">
-        <h1 className="text-2xl font-semibold">Your request has been received</h1>
-        <p className="mt-4 text-zinc-400">
-          Thank you for your interest in Nebula Smile. Our team will review your details and
-          get in touch within 24 hours.
-        </p>
+      <main className="mx-auto max-w-2xl px-4 py-10 sm:py-16">
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-8 text-center sm:p-10">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20">
+            <svg className="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">
+            Request received
+          </h1>
+          <p className="mt-3 text-zinc-300">
+            Thank you for your interest in {branding.productName}. A coordinator or specialist team will review your details and get in touch within 24 hours.
+          </p>
+          <p className="mt-2 text-sm text-zinc-500">
+            No commitment. We&apos;re here to help you plan your smile journey.
+          </p>
+        </div>
 
         {recommendedPackage && (
-          <div className="mt-6 rounded-xl border border-zinc-700 bg-zinc-900/80 p-6 text-left">
-            <h2 className="text-sm font-semibold text-white">Recommended package (orientation)</h2>
-            <p className="mt-1 font-medium text-zinc-200">{recommendedPackage.name}</p>
+          <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-left">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Recommended package</h2>
+            <p className="mt-2 font-semibold text-white">{recommendedPackage.name}</p>
             {recommendedPackage.deposit_cents != null && recommendedPackage.deposit_cents > 0 && (
               <p className="mt-1 text-sm text-zinc-400">
                 Deposit: ${(recommendedPackage.deposit_cents / 100).toFixed(2)} USD
@@ -66,7 +78,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
             <p className="mt-3 text-xs text-zinc-500 italic">{RECOMMENDATION_DISCLAIMER}</p>
             <Link
               href={`/packages/${recommendedPackage.slug}`}
-              className="mt-3 inline-block text-sm font-medium text-emerald-400 hover:text-emerald-300"
+              className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-emerald-400 hover:text-emerald-300"
             >
               View package details →
             </Link>
@@ -74,10 +86,10 @@ export default async function ThankYouPage({ searchParams }: Props) {
         )}
 
         {recommendedSpecialist && (
-          <div className="mt-6 text-left">
-            <h2 className="text-sm font-semibold text-white">Recommended specialist</h2>
+          <div className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-left">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Recommended specialist</h2>
             <p className="mt-1 text-xs text-zinc-500 italic">{RECOMMENDATION_DISCLAIMER}</p>
-            <div className="mt-3">
+            <div className="mt-4">
               <RecommendedDoctorCard
                 name={recommendedSpecialist.name}
                 clinic={recommendedSpecialist.clinic_name ?? recommendedSpecialist.clinic}
@@ -91,45 +103,51 @@ export default async function ThankYouPage({ searchParams }: Props) {
           </div>
         )}
 
-        <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 text-left">
-          <h2 className="text-sm font-semibold text-white">Next steps</h2>
-          <ul className="mt-3 list-inside list-disc space-y-1 text-sm text-zinc-400">
-            <li>Review by our team</li>
-            <li>Contact within 24 hours</li>
-            <li>You can also message us on WhatsApp anytime</li>
+        <div className="mt-8 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">What happens next</h2>
+          <ul className="mt-4 space-y-3 text-sm text-zinc-300">
+            <li className="flex gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-400">1</span>
+              Our team reviews your submission and matches you with the best option.
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-400">2</span>
+              We&apos;ll contact you within 24 hours by email (or phone if you shared it).
+            </li>
+            <li className="flex gap-3">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-400">3</span>
+              You can message us on WhatsApp anytime with questions.
+            </li>
           </ul>
         </div>
 
         {lead_id && (
-          <p className="mt-4 text-sm text-zinc-500">
+          <p className="mt-6 text-center text-sm text-zinc-500">
             Reference: <span className="font-mono text-zinc-400">{lead_id}</span>
           </p>
         )}
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <WhatsAppButton
             label="Message us on WhatsApp"
             variant="inline"
-            className="inline-flex justify-center rounded-full border-0 bg-emerald-600 hover:bg-emerald-700"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full border-0 bg-emerald-600 px-6 font-semibold hover:bg-emerald-700"
           />
           <Link
             href="/"
-            className="inline-block rounded-full border border-zinc-600 px-8 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-zinc-600 px-6 font-medium text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/80"
           >
             Back to home
           </Link>
-          <Link href="/#packages" className="text-sm font-medium text-zinc-400 underline hover:text-white">
+          <Link href="/packages" className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-zinc-600 px-6 font-medium text-zinc-400 hover:text-white">
             View packages
           </Link>
-          <Link href="/signup" className="text-sm font-medium text-zinc-400 underline hover:text-white">
-            Create account
-          </Link>
-          <Link href="/login?next=/patient" className="text-sm font-medium text-zinc-400 underline hover:text-white">
-            Log in to your dashboard
-          </Link>
         </div>
-        <p className="mt-4 text-center text-sm text-zinc-500">
-          Create an account with the same email to see your journey and pay the deposit online.
+        <p className="mt-6 text-center text-sm text-zinc-500">
+          <Link href="/signup" className="text-zinc-400 underline hover:text-white">Create an account</Link>
+          {" or "}
+          <Link href="/login?next=/patient" className="text-zinc-400 underline hover:text-white">log in</Link>
+          {" with the same email to see your journey and pay the deposit online."}
         </p>
       </main>
     </div>

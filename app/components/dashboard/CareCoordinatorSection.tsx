@@ -9,9 +9,9 @@ const COORDINATOR_PLACEHOLDER =
 
 export default function CareCoordinatorSection({ coordinatorName }: Props) {
   return (
-    <section className="rounded-xl border border-zinc-200 bg-white p-6">
-      <h3 className="text-lg font-semibold text-zinc-900">Care coordinator</h3>
-      <p className="mt-1 text-sm text-zinc-500">Your dedicated point of contact</p>
+    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Care coordinator</h3>
+      <p className="mt-1 text-sm text-zinc-600">Your dedicated point of contact</p>
       <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Assigned coordinator</p>

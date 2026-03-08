@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requirePatient } from "@/lib/auth";
+import { branding } from "@/lib/branding";
 import { getPatientDashboardData } from "@/lib/dashboard-data";
 import { getPublishedPackages, getPackageWithRelations } from "@/lib/packages";
 import { getSpecialistById } from "@/lib/specialists";
@@ -88,30 +89,36 @@ export default async function PatientDashboardPage() {
   const hasHotel = /hotel|lodging|accommodation|stay/i.test(includedText);
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/patient" className="text-sm font-medium text-zinc-900 underline">
-              My journey
+    <div className="min-h-screen bg-zinc-100">
+      <header className="border-b border-zinc-200 bg-white shadow-sm">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-5 sm:px-6">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-sm font-medium text-zinc-500 hover:text-zinc-900">
+              {branding.productName}
             </Link>
-            <Link href="/assessment" className="text-sm text-zinc-600 hover:underline">
-              New assessment
-            </Link>
-          </nav>
-          <h1 className="text-xl font-semibold">Patient dashboard</h1>
+            <nav className="flex items-center gap-3">
+              <Link href="/patient" className="text-sm font-semibold text-zinc-900">
+                My journey
+              </Link>
+              <Link href="/assessment" className="text-sm text-zinc-600 hover:text-zinc-900">
+                New assessment
+              </Link>
+            </nav>
+          </div>
+          <h1 className="text-lg font-bold text-zinc-900 sm:text-xl">Patient dashboard</h1>
         </div>
       </header>
-      <main className="mx-auto max-w-4xl px-6 py-8">
-        <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-sm font-medium text-zinc-500">Profile</p>
-          <p className="mt-1 font-medium text-zinc-900">{profile.full_name || profile.email || "—"}</p>
-          <p className="text-sm text-zinc-600">{profile.email}</p>
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        <div className="mb-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Profile</p>
+          <p className="mt-2 font-semibold text-zinc-900">{profile.full_name || profile.email || "—"}</p>
+          <p className="mt-0.5 text-sm text-zinc-600">{profile.email}</p>
         </div>
 
         {showJourneyPortal && pkgForJourney && (
           <>
-            <h2 className="mb-4 text-xl font-semibold text-zinc-900">Your journey</h2>
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">Your journey</h2>
+            <p className="mb-6 text-lg font-semibold text-zinc-900">Treatment plan, travel, and timeline</p>
             <div className="mb-8 grid gap-6 lg:grid-cols-2">
               <TreatmentPlanSection
                 procedureType={pkgForJourney.name}
@@ -137,11 +144,11 @@ export default async function PatientDashboardPage() {
         )}
 
         {travelPackage && (
-          <div className="mb-8 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-6">
-            <h2 className="text-lg font-semibold text-zinc-900">Your recommended journey</h2>
-            <p className="mt-1 font-medium text-emerald-800">{travelPackage.name}</p>
+          <div className="mb-8 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800">Your recommended journey</p>
+            <p className="mt-2 text-lg font-semibold text-zinc-900">{travelPackage.name}</p>
             {travelPackage.deposit_cents != null && travelPackage.deposit_cents > 0 && (
-              <p className="mt-1 text-sm text-zinc-600">
+              <p className="mt-1 text-sm font-medium text-emerald-800">
                 Deposit: ${(travelPackage.deposit_cents / 100).toFixed(2)} USD
               </p>
             )}
@@ -150,51 +157,52 @@ export default async function PatientDashboardPage() {
             </p>
             <Link
               href={`/packages/${travelPackage.slug}`}
-              className="mt-4 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-emerald-600 px-5 text-sm font-semibold text-white hover:bg-emerald-700"
             >
               View full package details
             </Link>
           </div>
         )}
 
-        <h2 className="mb-6 text-2xl font-semibold">Your submissions and status</h2>
+        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">Overview</h2>
+        <p className="mb-6 text-lg font-semibold text-zinc-900">Your submissions and status</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Assessments</p>
-            <p className="mt-1 text-2xl font-semibold">{leads.length}</p>
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Assessments</p>
+            <p className="mt-2 text-2xl font-bold text-zinc-900">{leads.length}</p>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Bookings</p>
-            <p className="mt-1 text-2xl font-semibold">{bookings.length}</p>
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Bookings</p>
+            <p className="mt-2 text-2xl font-bold text-zinc-900">{bookings.length}</p>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Consultations</p>
-            <p className="mt-1 text-2xl font-semibold">{consultations.length}</p>
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Consultations</p>
+            <p className="mt-2 text-2xl font-bold text-zinc-900">{consultations.length}</p>
           </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Payments</p>
-            <p className="mt-1 text-2xl font-semibold">{payments.length}</p>
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">Payments</p>
+            <p className="mt-2 text-2xl font-bold text-zinc-900">{payments.length}</p>
           </div>
         </div>
         <div className="mt-8">
-          <h3 className="mb-2 text-lg font-medium">Your assessments</h3>
-          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Your assessments</h3>
+          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
             {leads.length === 0 ? (
-              <p className="p-6 text-sm text-zinc-500">
-                No submissions yet.{" "}
-                <Link href="/assessment" className="text-emerald-600 hover:underline">
-                  Start free assessment
+              <div className="p-10 text-center">
+                <p className="text-zinc-600">No submissions yet.</p>
+                <Link href="/assessment" className="mt-3 inline-block text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                  Start free assessment →
                 </Link>
-              </p>
+              </div>
             ) : (
               <table className="min-w-full text-left text-sm">
                 <thead className="border-b border-zinc-200 bg-zinc-50">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Name</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Recommended package</th>
-                    <th className="px-4 py-3 font-medium">Submitted</th>
-                    <th className="px-4 py-3 font-medium">Next action</th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Name</th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Status</th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Recommended package</th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Submitted</th>
+                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500">Next action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -234,11 +242,11 @@ export default async function PatientDashboardPage() {
           </div>
         </div>
         {(bookings.length > 0 || payments.length > 0) && (
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
             {bookings.length > 0 && (
               <div>
-                <h3 className="mb-2 text-lg font-medium">Booking status</h3>
-                <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Booking status</h3>
+                <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
                   <table className="min-w-full text-left text-sm">
                     <thead className="border-b border-zinc-200 bg-zinc-50">
                       <tr>
@@ -266,8 +274,8 @@ export default async function PatientDashboardPage() {
             )}
             {payments.length > 0 && (
               <div>
-                <h3 className="mb-2 text-lg font-medium">Payment status</h3>
-                <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Payment status</h3>
+                <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
                   <table className="min-w-full text-left text-sm">
                     <thead className="border-b border-zinc-200 bg-zinc-50">
                       <tr>
