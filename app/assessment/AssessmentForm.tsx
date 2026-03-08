@@ -29,6 +29,8 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
       country: (fd.get("country") as string) || undefined,
       package_slug: (fd.get("package_slug") as string) || undefined,
       message: (fd.get("message") as string) || undefined,
+      travel_companions: (fd.get("travel_companions") as string) || undefined,
+      budget_range: (fd.get("budget_range") as string) || undefined,
       utm_source: utm("utm_source"),
       utm_medium: utm("utm_medium"),
       utm_campaign: utm("utm_campaign"),
@@ -149,6 +151,44 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
             maxLength={100}
             className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100"
           />
+        </div>
+
+        <div>
+          <label htmlFor="travel_companions" className="block text-sm font-medium mb-1">
+            Who are you traveling with?
+          </label>
+          <select
+            id="travel_companions"
+            name="travel_companions"
+            className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100 min-h-[44px]"
+            aria-label="Travel companions"
+          >
+            <option value="">Select (optional)</option>
+            <option value="Solo">Solo</option>
+            <option value="Partner">Partner</option>
+            <option value="Family">Family</option>
+            <option value="Group">Group</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="budget_range" className="block text-sm font-medium mb-1">
+            Budget range (USD)
+          </label>
+          <select
+            id="budget_range"
+            name="budget_range"
+            className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-zinc-900 dark:text-zinc-100 min-h-[44px]"
+            aria-label="Budget range"
+          >
+            <option value="">Select (optional)</option>
+            <option value="Under $3,000">Under $3,000</option>
+            <option value="$3,000 – $5,000">$3,000 – $5,000</option>
+            <option value="$5,000 – $10,000">$5,000 – $10,000</option>
+            <option value="$10,000+">$10,000+</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
         </div>
 
         <div>

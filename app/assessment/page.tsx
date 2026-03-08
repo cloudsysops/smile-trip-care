@@ -20,7 +20,7 @@ export default async function AssessmentPage({ searchParams }: Props) {
             ← Back to home
           </Link>
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-white">Free medical evaluation</h1>
-          <p className="mt-1 text-sm text-zinc-400">Share your details and we&apos;ll get in touch within 24 hours. No commitment.</p>
+          <p className="mt-1 text-sm text-zinc-400">Share your details and we&apos;ll get in touch within 24 hours. No commitment. Optional questions help us personalize your journey.</p>
         </div>
       </header>
 

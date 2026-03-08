@@ -26,6 +26,7 @@ O en Supabase SQL Editor, ejecutar en este orden:
 16. 0016_curated_network_providers_specialists.sql  
 17. 0017_curated_network_enterprise.sql  
 18. 0018_profiles_roles_dashboards.sql  
+19. 0019_leads_qualification_indexes.sql  
 
 Luego opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`.
 

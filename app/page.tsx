@@ -203,6 +203,9 @@ export default async function Home() {
                   <WhatsAppButton label="Chat on WhatsApp" variant="inline" className="w-full justify-center rounded-full border-0 bg-emerald-600 px-8 py-4 text-base font-semibold hover:bg-emerald-700 sm:w-auto min-h-[48px]" />
                 </div>
               </div>
+              <p className="mt-3 text-sm text-zinc-500" aria-hidden="true">
+                No commitment · We reply within 24 hours · Takes 2 minutes
+              </p>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:aspect-square">
               {heroImage?.url ? (
