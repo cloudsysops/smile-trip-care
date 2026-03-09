@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { branding } from "@/lib/branding";
 
 export const metadata: Metadata = {
-  title: "Veneers in Colombia | Hollywood Smile | Nebula Smile",
+  title: "Veneers in Colombia | Hollywood Smile | MedVoyage Smile",
   description:
     "Get a Hollywood smile with veneers in Colombia. Trusted clinics in Medellín and Manizales, concierge coordination, and secure online deposit.",
   openGraph: {
-    title: "Veneers in Colombia — Nebula Smile",
+    title: "Veneers in Colombia — MedVoyage Smile",
     description:
       "Premium veneer makeovers in Colombia with vetted clinics, aesthetic specialists, and full travel coordination.",
   },
@@ -138,7 +138,7 @@ export default function VeneersColombiaPage() {
           </div>
         </section>
 
-        {/* Why Nebula Smile */}
+        {/* Why MedVoyage Smile */}
         <section className="mb-16">
           <h2 className="text-xl font-semibold text-white sm:text-2xl">
             Why {branding.productName} for your veneer journey

@@ -24,7 +24,7 @@ export default function CareCoordinatorSection({ coordinatorName }: Props) {
         </div>
         <div className="shrink-0">
           <WhatsAppButton
-            message="Hi, I have a question about my Nebula Smile journey."
+            message="Hi, I have a question about my MedVoyage Smile journey."
             label="Contact via WhatsApp"
             variant="inline"
             className="inline-flex justify-center rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-700"

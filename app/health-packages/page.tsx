@@ -21,7 +21,7 @@ function parseFilters(params: Record<string, string | undefined>) {
 }
 
 export const metadata = {
-  title: "Health Packages | Nebula Smile",
+  title: "Health Packages | MedVoyage Smile",
   description: "Health treatment packages in Medellín and Manizales.",
 };
 

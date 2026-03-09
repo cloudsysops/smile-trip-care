@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { branding } from "@/lib/branding";
 import { getServerConfig } from "@/lib/config/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth";
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
           price_data: {
             currency: "usd",
             unit_amount: resolvedAmountCents,
-            product_data: { name: `Deposit — ${packageName ?? "Nebula Smile"}` },
+            product_data: { name: `Deposit — ${packageName ?? branding.productName}` },
           },
         },
       ],

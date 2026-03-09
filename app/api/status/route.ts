@@ -7,7 +7,7 @@ export async function GET() {
   const version =
     process.env.APP_VERSION ?? (packageJson as { version?: string }).version ?? "0.1.0";
   return NextResponse.json({
-    app: "nebula-smile",
+    app: "medvoyage-smile",
     status: "ok",
     version,
   });

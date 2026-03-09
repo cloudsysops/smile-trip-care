@@ -27,7 +27,7 @@ const WHY_COLOMBIA = [
 const TESTIMONIALS = [
   { quote: "I saved over $8,000 compared to US prices. The clinic was modern and the team made everything easy.", author: "Sarah M.", role: "Dental implants, USA", stars: 5 },
   { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient", role: "Medellín package", stars: 5 },
-  { quote: "The specialists were excellent and the recovery in Manizales was perfect. I recommend Nebula Smile to anyone considering dental travel.", author: "James K.", role: "Smile design", stars: 5 },
+  { quote: "The specialists were excellent and the recovery in Manizales was perfect. I recommend MedVoyage Smile to anyone considering dental travel.", author: "James K.", role: "Smile design", stars: 5 },
 ];
 
 /** Trusted partners / institutions (verified public info only; images are placeholders until approved assets). */

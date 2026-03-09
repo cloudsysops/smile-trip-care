@@ -1,4 +1,4 @@
-# Cómo contribuir — Nebula Smile
+# Cómo contribuir — MedVoyage Smile
 
 Gracias por contribuir. Sigue estas pautas para mantener el flujo claro y el código alineado con el resto del equipo.
 

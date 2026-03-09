@@ -1,4 +1,4 @@
-# Agentes — Nebula Smile
+# Agentes — MedVoyage Smile
 
 **Si eres un agente (IA o humano) trabajando en este repo, lee esto primero.**
 
@@ -39,6 +39,14 @@ Cada tarea está asignada a un tipo de agente (Repo/CI, Frontend, Backend, QA, D
 ## Auditoría y buenas prácticas
 
 - **[TAREAS_AUDITORIA_BUENAS_PRACTICAS](docs/TAREAS_AUDITORIA_BUENAS_PRACTICAS.md)** — Tareas para auditar el proyecto (seguridad, validación, tests, frontend, infra, docs). Asignar por responsable y ejecutar; marcar al completar.
+
+## Visión de producto y plan
+
+- **[PRODUCT_VISION.md](docs/PRODUCT_VISION.md)** — Objetivo del producto: marketplace global de turismo médico (empezando por dental en Colombia). Pilares: assessment, AI matching, packages, patient portal, clinic marketplace, payments. Cursor y agentes deben alinear features y prioridades con esta visión.
+- **[PLAN_12_MESES_ESCALADO.md](docs/PLAN_12_MESES_ESCALADO.md)** — Plan por fases: validación (0–3 meses), producto fuerte (3–6), marketplace (6–12). Objetivo: primeros 10–20 pacientes, luego automatización y expansión.
+- **[GROWTH_STRATEGY_FIRST_100_PATIENTS.md](docs/GROWTH_STRATEGY_FIRST_100_PATIENTS.md)** — Estrategia para los primeros 100 pacientes: nicho inicial, SEO internacional, contenido, Google Ads, proceso de cierre humano, red de clínicas, automatización. Integrado con el flujo actual (landing → assessment → lead → admin → Stripe).
+- **[PLAN_90_DIAS_PRIMEROS_100_PACIENTES.md](docs/PLAN_90_DIAS_PRIMEROS_100_PACIENTES.md)** — Plan operativo 90 días: ~2.000 leads → 100 pacientes. Fase 1 (día 1–30) landings + contenido + Ads; Fase 2 (30–60) contacto rápido + paquetes + testimonios; Fase 3 (60–90) más keywords, más países, referidos. Proyección: $140k con 100 pacientes.
+- **[EXPANSION_GEOGRAFICA_MARKETPLACE.md](docs/EXPANSION_GEOGRAFICA_MARKETPLACE.md)** — Modelo de expansión por ciudades (hub Medellín + satélites) y países. Estructura de URLs (/cities/[city], /veneers-medellin), tabla `cities`, asociación providers→ciudades, paquetes por ciudad, matching ciudad/clínica/doctor. Orden de implementación: 1) cities en DB, 2) rutas /cities/[city], 3) páginas SEO por ciudad, 4) asociar clínicas a ciudades.
 
 ## Referencias rápidas
 

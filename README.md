@@ -1,12 +1,12 @@
-# Nebula Smile
+# MedVoyage Smile
 
-**AI-Powered Medical Tourism Platform**
+**Premium Dental Tourism Platform**
 
 ---
 
 ## Overview
 
-Nebula Smile is a coordination and hospitality platform (USA LLC) connecting international patients with verified dental clinics in Colombia. Medical services are billed by clinics in Colombia. The platform offers free smile assessments, curated packages, concierge travel coordination, and savings up to 70% for dental transformation in Medellín and Manizales.
+MedVoyage Smile is a coordination and hospitality platform (USA LLC) connecting international patients with verified dental clinics in Colombia. Medical services are billed by clinics in Colombia. The platform offers free smile assessments, curated packages, concierge travel coordination, and savings up to 70% for dental transformation in Medellín and Manizales.
 
 **🤖 Agentes (IA):** Run the **Sprint Salir a vender** ([docs/SPRINT_SALIR_A_VENDER.md](docs/SPRINT_SALIR_A_VENDER.md)) first; then [AGENTS.md](AGENTS.md) and [docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md](docs/PLAN_AGENTES_PRODUCCION_Y_MEJORAS.md). Goal: production ready to sell and continuous improvements.
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { branding } from "@/lib/branding";
 import { getSpecialistBySlug } from "@/lib/specialists";
 import SpecialistHero from "@/app/components/specialist-profile/SpecialistHero";
 import SpecialistAbout from "@/app/components/specialist-profile/SpecialistAbout";
@@ -37,7 +38,7 @@ export default async function SpecialistProfilePage({ params }: PageProps) {
       <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
           <Link href="/" className="text-lg font-semibold text-white hover:text-zinc-200">
-            Nebula Smile
+            {branding.productName}
           </Link>
           <nav className="flex items-center gap-3">
             <Link href="/#specialists" className="text-sm font-medium text-zinc-400 hover:text-white">
@@ -104,7 +105,7 @@ export default async function SpecialistProfilePage({ params }: PageProps) {
           <section className="rounded-2xl border border-zinc-700 bg-zinc-900/60 p-6 md:p-8">
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">Trust and safety</h2>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              Nebula Smile coordinates the experience—from free evaluation to travel and recovery—while medical services are provided by licensed specialists and institutions in Colombia. We do not provide medical advice, diagnosis, or treatment. This specialist is part of our curated network of trusted partners.
+              {branding.productName} coordinates the experience—from free evaluation to travel and recovery—while medical services are provided by licensed specialists and institutions in Colombia. We do not provide medical advice, diagnosis, or treatment. This specialist is part of our curated network of trusted partners.
             </p>
           </section>
         </div>

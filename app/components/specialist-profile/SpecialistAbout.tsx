@@ -19,7 +19,7 @@ export default function SpecialistAbout({ description, bio, name }: Props) {
         ) : (
           <>
             <p className="leading-relaxed">
-              {name} is part of the Nebula Smile curated network of trusted specialists. Our partners are selected for their experience, professional standards, and focus on international patients seeking quality oral health and dental care in Colombia.
+              {name} is part of the MedVoyage Smile curated network of trusted specialists. Our partners are selected for their experience, professional standards, and focus on international patients seeking quality oral health and dental care in Colombia.
             </p>
             <p className="mt-4 leading-relaxed">
               From free evaluation to treatment and recovery, we coordinate your journey so you can focus on your care. All specialists in our network work with licensed institutions and maintain a commitment to patient comfort and outcomes.
@@ -27,7 +27,7 @@ export default function SpecialistAbout({ description, bio, name }: Props) {
           </>
         )}
         <p className="mt-6 text-sm text-zinc-500">
-          This profile is part of a curated network—not an open marketplace. Nebula Smile connects you with vetted specialists and coordinates your experience from evaluation through recovery.
+          This profile is part of a curated network—not an open marketplace. MedVoyage Smile connects you with vetted specialists and coordinates your experience from evaluation through recovery.
         </p>
       </div>
     </section>

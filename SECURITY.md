@@ -1,4 +1,4 @@
-# Política de seguridad — Nebula Smile
+# Política de seguridad — MedVoyage Smile
 
 ## Reportar vulnerabilidades
 

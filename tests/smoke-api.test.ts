@@ -11,7 +11,7 @@ describe("API smoke tests", () => {
     expect(payload).toMatchObject({
       ok: true,
       status: "ok",
-      service: "nebula-smile",
+      service: "medvoyage-smile",
       request_id: expect.any(String),
     });
   });

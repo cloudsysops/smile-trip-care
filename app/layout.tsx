@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const metaTitle = "Nebula Smile — AI-Powered Dental Tourism Platform";
+const metaTitle = "MedVoyage Smile — Premium Dental Tourism Platform";
 const metaDescription =
-  "Nebula Smile connects international patients with verified dental clinics in Colombia, offering concierge medical tourism and savings up to 70%.";
+  "MedVoyage Smile connects international patients with verified dental clinics in Colombia, offering concierge medical tourism and savings up to 70%.";
 
 export const metadata: Metadata = {
   title: metaTitle,

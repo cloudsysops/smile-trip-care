@@ -1,4 +1,4 @@
-# Nebula Smile — Module Status
+# MedVoyage Smile — Module Status
 
 ## Startup Sprint Tracker
 
