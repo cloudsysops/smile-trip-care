@@ -10,6 +10,7 @@ export default function WhatsAppFloat() {
   const show =
     pathname === "/" ||
     pathname === "/assessment" ||
+    pathname === "/assessment/proposal" ||
     pathname === "/thank-you" ||
     (pathname.startsWith(PACKAGES_PREFIX) && pathname.length > PACKAGES_PREFIX.length);
 

@@ -62,7 +62,7 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
       if (leadId) {
         const params = new URLSearchParams({ lead_id: leadId });
         if (recommendedSlug) params.set("recommended_package_slug", recommendedSlug);
-        router.push(`/thank-you?${params.toString()}`);
+        router.push(`/assessment/proposal?${params.toString()}`);
         return;
       }
       setStatus("success");
