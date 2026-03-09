@@ -4,6 +4,12 @@ Quick links for running and verifying the platform. No code required.
 
 ---
 
+## Business readiness
+
+**→ [BUSINESS_READINESS_CHECKLIST.md](BUSINESS_READINESS_CHECKLIST.md)** — Checklist: deploy, domain, contact, WhatsApp, package slugs, first test sale, Stripe webhook, admin flow, lead response playbook.
+
+---
+
 ## Run your first sale
 
 **→ [TEST_FIRST_SALE.md](TEST_FIRST_SALE.md)** — Step-by-step: create a lead, recommend a package, collect the deposit with a test card, and confirm everything updated. Anyone on the team can follow this without opening the codebase.

@@ -142,6 +142,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <WhatsAppButton
+            message="Hi! I just completed my Smile Assessment on MedVoyage Smile and I'd like to speak with a coordinator."
             label="Message us on WhatsApp"
             variant="inline"
             className="inline-flex min-h-[48px] items-center justify-center rounded-full border-0 bg-emerald-600 px-6 font-semibold hover:bg-emerald-700"

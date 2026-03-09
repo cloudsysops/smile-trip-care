@@ -1,7 +1,8 @@
 "use client";
 
 const DEFAULT_MESSAGE = "Hi, I'm interested in the MedVoyage Smile program.";
-const FALLBACK_NUMBER = "573001234567"; // Replace via NEXT_PUBLIC_WHATSAPP_NUMBER
+/** Default when NEXT_PUBLIC_WHATSAPP_NUMBER is not set. Use env in production. */
+const FALLBACK_NUMBER = "14014427003";
 
 function buildWaLink(text: string): string {
   const num = typeof process.env.NEXT_PUBLIC_WHATSAPP_NUMBER === "string"
