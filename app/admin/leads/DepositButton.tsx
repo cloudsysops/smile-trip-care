@@ -25,14 +25,17 @@ export default function DepositButton({ leadId, amountCents }: Props) {
   async function handleClick() {
     setLoading(true);
     try {
-      const origin = globalThis.location.origin;
+      const base =
+        typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
+          ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
+          : globalThis.location.origin;
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lead_id: leadId,
-          success_url: `${origin}/admin/leads/${leadId}?paid=1`,
-          cancel_url: `${origin}/admin/leads/${leadId}`,
+          success_url: `${base}/admin/leads/${leadId}?paid=1`,
+          cancel_url: `${base}/admin/leads/${leadId}`,
         }),
       });
       const data = await res.json().catch(() => ({}));

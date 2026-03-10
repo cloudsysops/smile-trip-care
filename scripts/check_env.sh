@@ -2,6 +2,9 @@
 # Validate environment variables for local/production.
 # Loads .env and .env.local if present, then checks required vars.
 # Run from repo root: ./scripts/check_env.sh
+#
+# For Vercel: use Production env for main, Preview env for other branches.
+# See docs/ENVIRONMENTS.md and docs/DEPLOYMENT_STRATEGY.md.
 
 set -euo pipefail
 

@@ -62,11 +62,15 @@ export async function POST(request: Request) {
       );
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
-    const origin = new URL(request.url).origin;
+    const requestOrigin = new URL(request.url).origin;
+    const baseOrigin =
+      typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
+        ? new URL(process.env.NEXT_PUBLIC_SITE_URL.trim()).origin
+        : requestOrigin;
     const defaultSuccess = isAdmin ? `/admin/leads/${lead_id}?paid=1` : `/patient?paid=1`;
     const defaultCancel = isAdmin ? `/admin/leads/${lead_id}` : `/patient`;
-    const successUrl = resolveInternalReturnUrl(success_url, origin, defaultSuccess);
-    const cancelUrl = resolveInternalReturnUrl(cancel_url, origin, defaultCancel);
+    const successUrl = resolveInternalReturnUrl(success_url, baseOrigin, defaultSuccess);
+    const cancelUrl = resolveInternalReturnUrl(cancel_url, baseOrigin, defaultCancel);
     if (!successUrl || !cancelUrl) {
       return NextResponse.json({ error: "Invalid return URLs" }, { status: 400 });
     }
