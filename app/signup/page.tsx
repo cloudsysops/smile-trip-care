@@ -66,7 +66,7 @@ function SignupForm() {
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-[420px]">
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-8 shadow-xl">
-            <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
+            <h1 className="font-serif text-2xl font-normal tracking-tight text-white md:text-3xl">
               Create patient account
             </h1>
             <p className="mt-2 text-sm text-zinc-400">
@@ -132,6 +132,9 @@ function SignupForm() {
                 {loading ? "Creating account…" : "Create account"}
               </button>
             </form>
+            <p className="mt-5 text-center text-xs text-zinc-500">
+              Secure sign-up. Your data is protected.
+            </p>
           </div>
 
           <p className="mt-6 text-center text-sm text-zinc-500">

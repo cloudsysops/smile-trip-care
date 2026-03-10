@@ -42,15 +42,15 @@ export default async function PackagesPage({ searchParams }: Props) {
           >
             ← {branding.productName}
           </Link>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-white md:text-3xl">Treatment packages</h1>
+          <h1 className="mt-3 font-serif text-2xl font-normal tracking-tight text-white md:text-3xl">Treatment packages</h1>
           <p className="mt-2 max-w-2xl text-sm text-zinc-400">
             Premium dental and recovery journeys in Medellín and Manizales. Compare options and start with a free assessment.
           </p>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 md:py-10">
-        <section className="mb-8">
+      <main className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <section className="mb-10">
           <PackageFiltersForm basePath="/packages" searchParams={params} showTypeFilter={true} />
         </section>
         {packages.length === 0 ? (

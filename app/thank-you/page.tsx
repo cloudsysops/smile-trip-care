@@ -48,14 +48,14 @@ export default async function ThankYouPage({ searchParams }: Props) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-10 sm:py-16">
+      <main className="mx-auto max-w-2xl px-4 py-12 sm:py-20">
         <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-8 text-center sm:p-10">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/20">
             <svg className="h-8 w-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">
+          <h1 className="mt-4 font-serif text-2xl font-normal tracking-tight text-white md:text-3xl">
             Request received — your free evaluation is in progress
           </h1>
           <p className="mt-3 text-zinc-300">
@@ -68,8 +68,8 @@ export default async function ThankYouPage({ searchParams }: Props) {
             </p>
           )}
           <p className="mt-2 text-sm text-zinc-500">
-            We usually respond within <span className="font-medium text-zinc-300">24 hours</span> on business days. No
-            commitment — this is a free evaluation to help you plan your smile journey.
+            We usually respond within <span className="font-medium text-zinc-300">24 hours</span> on business days. Expect a
+            WhatsApp message to confirm your plan. No commitment — this is a free evaluation to help you plan your smile journey.
           </p>
         </div>
 

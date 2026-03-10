@@ -32,14 +32,14 @@ export default function DentalImplantsColombiaPage() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+      <main className="mx-auto max-w-6xl px-4 py-16 sm:py-24">
         {/* Hero */}
-        <section className="mb-16 grid gap-10 md:grid-cols-2 md:items-center">
+        <section className="mb-20 grid gap-10 md:grid-cols-2 md:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
               Dental implants · Colombia
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+            <h1 className="mt-3 font-serif text-3xl font-normal tracking-tight text-white sm:text-4xl md:text-5xl">
               Dental Implants in Colombia —{" "}
               <span className="text-emerald-400">Save up to 70% vs U.S.</span>
             </h1>
@@ -95,7 +95,7 @@ export default function DentalImplantsColombiaPage() {
         </section>
 
         {/* Treatment overview */}
-        <section className="mb-16 grid gap-10 md:grid-cols-2 md:items-start">
+        <section className="mb-20 grid gap-10 md:grid-cols-2 md:items-start">
           <div>
             <h2 className="text-xl font-semibold text-white sm:text-2xl">Dental implants — overview</h2>
             <p className="mt-3 text-sm text-zinc-300 sm:text-base">

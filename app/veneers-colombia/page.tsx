@@ -39,7 +39,7 @@ export default function VeneersColombiaPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
               Veneers · Hollywood smile
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+            <h1 className="mt-3 font-serif text-3xl font-normal tracking-tight text-white sm:text-4xl md:text-5xl">
               Veneers in Colombia —{" "}
               <span className="text-emerald-400">Hollywood smile without Hollywood prices</span>
             </h1>
@@ -95,7 +95,7 @@ export default function VeneersColombiaPage() {
         </section>
 
         {/* Treatment overview */}
-        <section className="mb-16 grid gap-10 md:grid-cols-2 md:items-start">
+        <section className="mb-20 grid gap-10 md:grid-cols-2 md:items-start">
           <div>
             <h2 className="text-xl font-semibold text-white sm:text-2xl">Veneers and Hollywood smile</h2>
             <p className="mt-3 text-sm text-zinc-300 sm:text-base">

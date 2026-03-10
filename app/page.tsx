@@ -10,6 +10,7 @@ import SpecialistCard from "./components/landing/specialist-card";
 import ExperienceCard from "./components/landing/experience-card";
 import PartnerInstitutionCard from "./components/landing/partner-institution-card";
 import ImagePlaceholder from "./components/landing/image-placeholder";
+import AuthorityBar from "./components/landing/AuthorityBar";
 import type { PublicAsset } from "@/lib/assets";
 
 function getPackageImage(assets: PublicAsset[], location: string): PublicAsset | null {
@@ -125,68 +126,68 @@ export default async function Home() {
         </p>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:py-5">
-          <Link href="/" className="text-lg font-semibold text-white hover:text-zinc-200">{branding.productName}</Link>
+          <Link href="/" className="text-lg font-semibold text-zinc-900 hover:text-zinc-700">{branding.productName}</Link>
           <nav className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+            <Link href="/login" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
               Sign in
             </Link>
             <Link
               href="/assessment"
-              className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-200 sm:px-5 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
+              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 sm:px-5 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white/80"
             >
-              Start Free Smile Evaluation
+              Get My Free Treatment Plan
             </Link>
             <Link
               href="/packages"
-              className="hidden rounded-full border border-zinc-600 px-4 py-2 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:bg-zinc-800/80 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+              className="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white/80"
             >
-              View Packages
+              See My Savings
             </Link>
-            <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+            <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
               How it works
             </Link>
-            <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+            <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
               Specialists
             </Link>
-            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
               Clinical network
             </Link>
-            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
+            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
               Partners
             </Link>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:py-12 md:py-16">
-        {/* 1. Hero — Silicon Valley style */}
-        <section id="hero" className="mb-20 scroll-mt-6 md:mb-28">
-          <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-12">
+      <main className="mx-auto max-w-6xl px-4 py-16 sm:py-24 md:py-32">
+        {/* 1. Hero — Split layout: value prop left, visual right */}
+        <section id="hero" className="mb-24 scroll-mt-6 md:mb-32 py-16 md:py-24">
+          <div className="grid gap-12 md:grid-cols-2 md:items-center md:gap-16">
             <div>
-              <h1 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-                World-class dental care in Colombia — without the fear or the cost.
+              <h1 className="font-serif mb-6 text-3xl font-normal tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+                Your New Smile, 70% Less. Experience Medellín&apos;s World-Class Dental Care.
               </h1>
-              <p className="mb-8 max-w-lg text-lg text-zinc-400">
-                Save up to 70% vs US and Europe. Verified clinics in Medellín and Manizales, secure payments, and a coordinator so you’re never alone.
+              <p className="mb-10 max-w-lg text-lg leading-relaxed text-zinc-400">
+                A full-service concierge experience. From consultation to recovery, we manage every detail of your dental journey in Colombia.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                 <Link
                   href="/assessment"
                   className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-900 hover:bg-zinc-100 sm:w-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
                 >
-                  Start Free Smile Evaluation
+                  Get My Free Treatment Plan
                 </Link>
                 <Link
                   href="/packages"
-                  className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border-2 border-zinc-600 px-8 py-4 text-base font-semibold text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/80 sm:w-auto focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                  className="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border-2 border-zinc-600 px-8 py-4 text-base font-semibold text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/80 sm:w-auto focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
                 >
-                  View Packages
+                  See My Savings
                 </Link>
               </div>
-              <p className="mt-3 text-sm text-zinc-500" aria-hidden="true">
-                No commitment · Response within 24 hours
+              <p className="mt-4 text-sm text-zinc-500" aria-hidden="true">
+                Trusted by international patients · Secure deposit · Guided by concierge coordinators · No commitment
               </p>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:aspect-square">
@@ -210,9 +211,11 @@ export default async function Home() {
           </div>
         </section>
 
+        <AuthorityBar />
+
         {/* 2. Trust — pillars + badges */}
-        <section id="trust" className="mb-20 scroll-mt-6 md:mb-28">
-          <div className="mb-10 flex flex-wrap items-center justify-center gap-6 border-y border-zinc-800 py-8">
+        <section id="trust" className="mb-24 scroll-mt-6 md:mb-32 py-16 md:py-24">
+          <div className="mb-10 flex flex-wrap items-center justify-center gap-6 border-y border-zinc-800 py-12">
             <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
                 <svg className="h-4 w-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
@@ -782,7 +785,7 @@ export default async function Home() {
         {/* 11. Final CTA */}
         <section id="cta" className="mb-20 scroll-mt-6 md:mb-28" aria-labelledby="final-cta-title">
           <div className="rounded-2xl border-2 border-emerald-500/50 bg-zinc-900/80 p-8 text-center md:p-14">
-            <h2 id="final-cta-title" className="mb-3 text-2xl font-bold text-white md:text-4xl">
+            <h2 id="final-cta-title" className="font-serif mb-3 text-2xl font-normal text-white md:text-4xl">
               Get Your Personalized Smile Plan
             </h2>
             <p className="mx-auto mb-8 max-w-md text-zinc-400">

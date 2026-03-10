@@ -19,7 +19,7 @@ export default function MarketplacePackageCard({ pkg }: Props) {
   const cityLabel = cities.length > 1 ? `${pkg.location} → ${pkg.recovery_city}` : pkg.location;
 
   return (
-    <li className="flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 transition hover:border-zinc-600">
+    <li className="flex flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/90 shadow-lg shadow-black/20 transition hover:border-zinc-600 hover:shadow-xl hover:shadow-black/25">
       <div className="flex flex-1 flex-col p-5">
         <div className="mb-2 flex flex-wrap items-center gap-2">
           {pkg.provider_name && (

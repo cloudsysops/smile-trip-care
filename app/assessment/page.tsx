@@ -20,7 +20,7 @@ export default async function AssessmentPage({ searchParams }: Props) {
           >
             ← {branding.productName}
           </Link>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">Free smile evaluation</h1>
+          <h1 className="mt-4 font-serif text-2xl font-normal tracking-tight text-white md:text-3xl">Free smile evaluation</h1>
           <p className="mt-2 text-zinc-400">
             Share your details and goals. We&apos;ll review your case and get in touch within 24 hours—no commitment.
           </p>
@@ -33,7 +33,7 @@ export default async function AssessmentPage({ searchParams }: Props) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-8 md:py-12">
+      <main className="mx-auto max-w-2xl px-4 py-12 md:py-24">
         <AssessmentForm
           packages={packages}
           prefillPackageSlug={prefillPackageSlug}

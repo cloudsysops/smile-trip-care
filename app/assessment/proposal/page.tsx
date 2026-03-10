@@ -69,15 +69,15 @@ export default async function ProposalPage({ searchParams }: Props) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-4 py-8 sm:py-12">
+      <main className="mx-auto max-w-2xl px-4 py-12 sm:py-24">
         {/* Hero: Your Personalized Smile Preview */}
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-6 text-center sm:p-8">
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/30 p-6 text-center shadow-lg shadow-emerald-950/30 sm:p-8">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20">
             <svg className="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="mt-4 font-serif text-2xl font-normal tracking-tight text-white sm:text-3xl">
             Your Personalized Smile Preview
           </h1>
           <p className="mt-2 text-zinc-300">
@@ -86,7 +86,7 @@ export default async function ProposalPage({ searchParams }: Props) {
         </div>
 
         {/* Estimated savings card */}
-        <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6" aria-labelledby="savings-heading">
+        <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-xl shadow-black/20" aria-labelledby="savings-heading">
           <h2 id="savings-heading" className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
             Estimated savings vs. U.S. prices
           </h2>
