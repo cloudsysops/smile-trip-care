@@ -27,6 +27,17 @@ const US_RANGE_BY_TREATMENT: Record<string, string> = {
   "General": "Varies by treatment",
 };
 
+/** Midpoint US estimate in cents for "You save $X" when we have MedVoyage price. Illustrative only. */
+const US_MID_CENTS_BY_TREATMENT: Record<string, number> = {
+  "Dental Implants": 1_150_000, // ~$11,500
+  "Implants": 1_150_000,
+  "Veneers": 850_000, // ~$8,500
+  "Hollywood Smile": 1_000_000, // ~$10,000
+  "Full Mouth": 1_750_000, // ~$17,500
+  "Aesthetic": 700_000, // ~$7,000
+  "General": 1_000_000,
+};
+
 function getSavingsRange(specialties: string[]): string {
   const key = specialties.find((s) => SAVINGS_BY_TREATMENT[s] != null);
   return key ? SAVINGS_BY_TREATMENT[key] : DEFAULT_SAVINGS;
@@ -35,6 +46,11 @@ function getSavingsRange(specialties: string[]): string {
 function getUsRange(specialties: string[]): string {
   const key = specialties.find((s) => US_RANGE_BY_TREATMENT[s] != null);
   return key ? US_RANGE_BY_TREATMENT[key] : "Varies by treatment";
+}
+
+function getUsMidCents(specialties: string[]): number | null {
+  const key = specialties.find((s) => US_MID_CENTS_BY_TREATMENT[s] != null);
+  return key ? US_MID_CENTS_BY_TREATMENT[key] ?? null : null;
 }
 
 const JOURNEY_STEPS = [
@@ -75,6 +91,15 @@ export default async function ProposalPage({ searchParams }: Props) {
 
   const savingsRange = getSavingsRange(treatmentTypes);
   const usRange = getUsRange(treatmentTypes);
+  const usMidCents = getUsMidCents(treatmentTypes);
+  const medvoyagePriceCents =
+    recommendedPackage?.price_cents != null && recommendedPackage.price_cents > 0
+      ? recommendedPackage.price_cents
+      : null;
+  const savingsDollars =
+    usMidCents != null && medvoyagePriceCents != null && usMidCents > medvoyagePriceCents
+      ? Math.round((usMidCents - medvoyagePriceCents) / 100)
+      : null;
   const treatmentLabel =
     treatmentTypes[0] ?? recommendedPackage?.name ?? "my treatment";
   const whatsAppMessage = `Hi! I completed my assessment for ${treatmentLabel} and saw the estimated savings. Can a coordinator help me review my treatment plan?`;
@@ -98,7 +123,7 @@ export default async function ProposalPage({ searchParams }: Props) {
             </svg>
           </div>
           <h1 className="mt-4 font-serif text-2xl font-normal tracking-tight text-white sm:text-3xl">
-            Your Personalized Smile Preview
+            Your personalized smile preview
           </h1>
           <p className="mt-2 text-zinc-300">
             Based on your assessment, here&apos;s what you can expect with {branding.productName}—and your next steps.
@@ -107,7 +132,7 @@ export default async function ProposalPage({ searchParams }: Props) {
 
         {/* Savings Widget: US vs MedVoyage comparison */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-xl shadow-black/20" aria-labelledby="savings-heading">
-          <h2 id="savings-heading" className="text-lg font-semibold text-white">
+          <h2 id="savings-heading" className="text-xl font-serif font-normal text-white">
             Your estimated savings
           </h2>
           <p className="mt-1 text-sm text-zinc-400">
@@ -142,8 +167,19 @@ export default async function ProposalPage({ searchParams }: Props) {
             </div>
             <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/30 p-4">
               <p className="text-xs font-medium uppercase tracking-wider text-emerald-400/90">You save</p>
-              <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-400">{savingsRange}</p>
-              <p className="mt-0.5 text-xs text-zinc-500">vs. typical U.S. prices</p>
+              {savingsDollars != null ? (
+                <>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-400">
+                    ${savingsDollars.toLocaleString()}
+                  </p>
+                  <p className="mt-0.5 text-xs text-zinc-500">vs. typical U.S. prices</p>
+                </>
+              ) : (
+                <>
+                  <p className="mt-1 text-2xl font-bold tabular-nums text-emerald-400">{savingsRange}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">vs. typical U.S. prices</p>
+                </>
+              )}
             </div>
           </div>
           <p className="mt-3 text-xs text-zinc-500">
@@ -153,7 +189,7 @@ export default async function ProposalPage({ searchParams }: Props) {
 
         {/* Journey timeline */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6" aria-labelledby="journey-heading">
-          <h2 id="journey-heading" className="text-lg font-semibold text-white">
+          <h2 id="journey-heading" className="text-xl font-serif font-normal text-white">
             Your journey timeline
           </h2>
           <p className="mt-1 text-sm text-zinc-400">
@@ -208,7 +244,7 @@ export default async function ProposalPage({ searchParams }: Props) {
 
         {/* Why MedVoyage trust block */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6" aria-labelledby="trust-heading">
-          <h2 id="trust-heading" className="text-lg font-semibold text-white">
+          <h2 id="trust-heading" className="text-xl font-serif font-normal text-white">
             Why MedVoyage
           </h2>
           <p className="mt-1 text-sm text-zinc-400">
@@ -217,19 +253,19 @@ export default async function ProposalPage({ searchParams }: Props) {
           <ul className="mt-4 space-y-3 text-sm text-zinc-300">
             <li className="flex gap-3">
               <span className="text-emerald-400" aria-hidden>✓</span>
-              <span>International patient coordination—flights, stay, and clinic visits</span>
+              <span>International patient coordination</span>
             </li>
             <li className="flex gap-3">
               <span className="text-emerald-400" aria-hidden>✓</span>
-              <span>Secure deposit (Stripe)—pay when you&apos;re ready to book</span>
+              <span>Secure deposit process</span>
             </li>
             <li className="flex gap-3">
               <span className="text-emerald-400" aria-hidden>✓</span>
-              <span>24h response on business days—we get back to you fast</span>
+              <span>24h specialist review</span>
             </li>
             <li className="flex gap-3">
               <span className="text-emerald-400" aria-hidden>✓</span>
-              <span>Guided care from assessment through treatment and follow-up</span>
+              <span>Concierge travel support</span>
             </li>
           </ul>
         </section>

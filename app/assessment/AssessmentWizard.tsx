@@ -11,6 +11,7 @@ const STEPS = ["Treatment", "Smile history", "Timeline", "Contact"];
 type WizardData = {
   package_slug: string;
   treatment_focus: string;
+  smile_history: string;
   message: string;
   travel_companions: string;
   budget_range: string;
@@ -24,6 +25,7 @@ type WizardData = {
 const defaultData: WizardData = {
   package_slug: "",
   treatment_focus: "",
+  smile_history: "",
   message: "",
   travel_companions: "",
   budget_range: "",
@@ -84,7 +86,7 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
       phone: data.phone || undefined,
       country: data.country || undefined,
       package_slug: data.package_slug || undefined,
-      message: data.message || undefined,
+      message: [data.smile_history, data.message].filter(Boolean).join("\n\n") || undefined,
       travel_companions: data.travel_companions || undefined,
       budget_range: data.budget_range || undefined,
       selected_specialties: data.treatment_focus ? [data.treatment_focus] : undefined,
@@ -173,30 +175,36 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
         {/* Step 0: Treatment Selection */}
         {step === 0 && (
           <section className="space-y-6" aria-labelledby="step-treatment">
-            <h2 id="step-treatment" className="text-lg font-semibold text-white">
-              What are you looking for?
+            <h2 id="step-treatment" className="text-xl font-serif font-normal text-white">
+              Treatment selection
             </h2>
             <p className="text-sm text-zinc-400">
-              Select a package or treatment focus so we can tailor your evaluation.
+              What are you looking for? We&apos;ll tailor your evaluation.
             </p>
-            <div>
-              <label htmlFor="wizard-treatment-focus" className={labelClass}>
-                Primary focus
-              </label>
-              <select
-                id="wizard-treatment-focus"
-                value={data.treatment_focus}
-                onChange={(e) => update({ treatment_focus: e.target.value })}
-                className={`${inputClass} min-h-[48px]`}
-                aria-label="Treatment focus"
-              >
-                <option value="">Select (optional)</option>
-                <option value="Dental Implants">Dental Implants</option>
-                <option value="Veneers">Veneers</option>
-                <option value="Hollywood Smile">Hollywood Smile</option>
-                <option value="General">General</option>
-              </select>
-            </div>
+            <fieldset className="space-y-3">
+              <legend className="sr-only">Primary focus</legend>
+              {[
+                { value: "Dental Implants", label: "Implant" },
+                { value: "Veneers", label: "Veneers" },
+                { value: "Hollywood Smile", label: "Hollywood smile" },
+                { value: "General", label: "Consultation" },
+              ].map((opt) => (
+                <label
+                  key={opt.value}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-600 bg-zinc-900/60 px-4 py-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30"
+                >
+                  <input
+                    type="radio"
+                    name="treatment_focus"
+                    value={opt.value}
+                    checked={data.treatment_focus === opt.value}
+                    onChange={() => update({ treatment_focus: opt.value })}
+                    className="h-4 w-4 border-zinc-500 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-white">{opt.label}</span>
+                </label>
+              ))}
+            </fieldset>
             <div>
               <label htmlFor="wizard-package_slug" className={labelClass}>
                 Package interest
@@ -233,24 +241,48 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
         {/* Step 1: Smile History */}
         {step === 1 && (
           <section className="space-y-6" aria-labelledby="step-history">
-            <h2 id="step-history" className="text-lg font-semibold text-white">
-              Your smile goals
+            <h2 id="step-history" className="text-xl font-serif font-normal text-white">
+              Smile history
             </h2>
             <p className="text-sm text-zinc-400">
-              Anything you share helps us personalize your plan. Optional.
+              Helps us personalize your plan.
             </p>
+            <fieldset className="space-y-3">
+              <legend className="sr-only">Your smile history</legend>
+              {[
+                "First time exploring options",
+                "I\u2019ve had some work done",
+                "Looking to replace or upgrade",
+                "Not sure yet",
+              ].map((opt) => (
+                <label
+                  key={opt}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-600 bg-zinc-900/60 px-4 py-3 has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-950/30"
+                >
+                  <input
+                    type="radio"
+                    name="smile_history"
+                    value={opt}
+                    checked={data.smile_history === opt}
+                    onChange={() => update({ smile_history: opt })}
+                    className="h-4 w-4 border-zinc-500 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-white">{opt}</span>
+                </label>
+              ))}
+            </fieldset>
             <div>
               <label htmlFor="wizard-message" className={labelClass}>
-                Message
+                Anything else? (optional)
               </label>
               <textarea
                 id="wizard-message"
                 value={data.message}
                 onChange={(e) => update({ message: e.target.value })}
-                rows={5}
+                rows={3}
                 maxLength={2000}
-                className={`${inputClass} resize-y min-h-[140px]`}
-                placeholder="Tell us about your goals, current situation, or questions…"
+                className={`${inputClass} resize-y min-h-[80px]`}
+                placeholder="Goals, current situation, or questions…"
               />
             </div>
           </section>
@@ -259,8 +291,8 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
         {/* Step 2: Timeline */}
         {step === 2 && (
           <section className="space-y-6" aria-labelledby="step-timeline">
-            <h2 id="step-timeline" className="text-lg font-semibold text-white">
-              Timeline & preferences
+            <h2 id="step-timeline" className="text-xl font-serif font-normal text-white">
+              Timeline
             </h2>
             <p className="text-sm text-zinc-400">
               Helps us suggest the right package and timing.
@@ -308,9 +340,9 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
         {step === 3 && (
           <form onSubmit={handleSubmit} className="space-y-6" id="wizard-form">
             <section className="space-y-6" aria-labelledby="step-contact">
-              <h2 id="step-contact" className="text-lg font-semibold text-white">
-                Your contact details
-              </h2>
+<h2 id="step-contact" className="text-xl font-serif font-normal text-white">
+              Contact info
+            </h2>
               <p className="text-sm text-zinc-400">
                 We’ll use this to send your personalized plan. We respond within 24 hours.
               </p>
