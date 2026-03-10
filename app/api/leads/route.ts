@@ -10,7 +10,7 @@ import { enqueueLeadCreatedAutomationJobs } from "@/lib/ai/automation";
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
-
+  log.info("POST /api/leads hit", { requestId });
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object" || Array.isArray(body)) {
@@ -83,7 +83,12 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      log.error("Lead insert failed", { error: error.message });
+      log.error("Lead insert failed", {
+        request_id: requestId,
+        supabase_code: error.code ?? "unknown",
+        supabase_message: error.message,
+        supabase_details: typeof error.details === "string" ? error.details : undefined,
+      });
       return NextResponse.json(
         { error: "We could not save your request. Please try again.", request_id: requestId },
         { status: 500 }
