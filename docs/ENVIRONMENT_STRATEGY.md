@@ -2,13 +2,15 @@
 
 How environment variables are organized, required vs optional, and where they are used. No secrets are stored in the repo.
 
+**Two-environment setup:** Production (main) and Staging/Preview (other branches). See [ENVIRONMENTS.md](ENVIRONMENTS.md) and [DEPLOYMENT_STRATEGY.md](DEPLOYMENT_STRATEGY.md) for Vercel/Supabase/Stripe mapping and founder checklist.
+
 ---
 
 ## Strategy
 
 1. **Single source of shape:** `.env.example` defines groups and placeholders.
 2. **Local:** Copy to `.env.local` and set values; never commit `.env.local`.
-3. **Production (Vercel):** Set same names in Project → Environment Variables; no secrets in code.
+3. **Vercel:** Set same names in Project → Environment Variables; use **Production** for main, **Preview** for other branches. No secrets in code.
 4. **Secrets stay server-side:** No `NEXT_PUBLIC_*` for keys or tokens; only for non-sensitive URLs/IDs (e.g. Supabase URL, Stripe publishable key).
 
 ---

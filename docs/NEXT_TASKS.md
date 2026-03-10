@@ -6,6 +6,12 @@
 
 ---
 
+## Auditoría completa y plan de mejoras (Backend, Frontend, DevOps, Integración, Marketing, Branding)
+
+**Documento:** [AUDIT_AND_IMPROVEMENT_PLAN.md](AUDIT_AND_IMPROVEMENT_PLAN.md) — Reporte de estado por área y plan priorizado en sprints (S1–S6). Usar junto con PLAN_MEJORAS_PRODUCCION_POR_SPRINT para ejecutar tareas.
+
+---
+
 ## Plan de mejoras para producción (por sprint, asignable a agentes)
 
 **Documento:** [PLAN_MEJORAS_PRODUCCION_POR_SPRINT.md](PLAN_MEJORAS_PRODUCCION_POR_SPRINT.md)
