@@ -79,6 +79,18 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
     e.preventDefault();
     const currentUrl = new URL(window.location.href);
     const utm = (k: string) => currentUrl.searchParams.get(k)?.trim() || undefined;
+    const rawReferrer = document.referrer?.trim() || "";
+    let referrer_url: string | undefined;
+    if (rawReferrer) {
+      try {
+        new URL(rawReferrer);
+        referrer_url = rawReferrer.length <= 2000 ? rawReferrer : undefined;
+      } catch {
+        referrer_url = undefined;
+      }
+    } else {
+      referrer_url = undefined;
+    }
     const body = {
       first_name: data.first_name,
       last_name: data.last_name,
@@ -96,12 +108,13 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
       utm_term: utm("utm_term"),
       utm_content: utm("utm_content"),
       landing_path: `${currentUrl.pathname}${currentUrl.search}`,
-      referrer_url: document.referrer?.trim() || undefined,
+      referrer_url,
       company_website: "",
     };
 
     setStatus("loading");
     setErrorMessage("");
+    const requestUrl = `${currentUrl.origin}/api/leads`;
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
@@ -109,6 +122,16 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
         body: JSON.stringify(body),
       });
       const resData = await res.json().catch(() => ({}));
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[Assessment submit]", {
+          requestUrl,
+          responseStatus: res.status,
+          responseBody: resData,
+          redirectUrl: res.ok && typeof resData.lead_id === "string"
+            ? `/assessment/proposal?${new URLSearchParams({ lead_id: resData.lead_id, ...(resData.recommended_package_slug && { recommended_package_slug: resData.recommended_package_slug }) }).toString()}`
+            : null,
+        });
+      }
       if (!res.ok) {
         setStatus("error");
         setErrorMessage((resData.error as string) || "Something went wrong. Please try again.");
@@ -128,7 +151,10 @@ export default function AssessmentWizard({ packages, prefillPackageSlug = "" }: 
         return;
       }
       setStatus("idle");
-    } catch {
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[Assessment submit error]", { requestUrl, error: err });
+      }
       setStatus("error");
       setErrorMessage("Network error. Please try again.");
     }

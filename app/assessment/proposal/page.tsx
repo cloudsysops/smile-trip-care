@@ -54,11 +54,10 @@ function getUsMidCents(specialties: string[]): number | null {
 }
 
 const JOURNEY_STEPS = [
-  { label: "Assessment", desc: "You share your goals and we review your case." },
-  { label: "Specialist review", desc: "Our team matches you with the best option." },
-  { label: "Treatment planning", desc: "Personalized plan and transparent quote." },
-  { label: "Travel", desc: "We coordinate flights, stay, and clinic visits." },
-  { label: "Smile transformation", desc: "Treatment and follow-up in Colombia." },
+  { label: "Complete your assessment", desc: "Share your goals, photos, and basic history in a few minutes." },
+  { label: "Dental specialists review", desc: "Our vetted specialists review your case and propose options." },
+  { label: "Coordinator plans your trip", desc: "Your dental travel coordinator helps plan treatment and travel dates." },
+  { label: "Smile transformation in Colombia", desc: "Receive treatment in Colombia with guided care and follow-up." },
 ];
 
 const RECOMMENDATION_DISCLAIMER =
@@ -68,6 +67,9 @@ type Props = Readonly<{ searchParams: Promise<{ lead_id?: string; recommended_pa
 
 export default async function ProposalPage({ searchParams }: Props) {
   const { lead_id, recommended_package_slug } = await searchParams;
+  if (process.env.NODE_ENV === "development") {
+    console.warn("[Proposal page]", { lead_id, recommended_package_slug });
+  }
   const recommendedPackage =
     recommended_package_slug?.trim()
       ? await getPublishedPackageBySlug(recommended_package_slug.trim())
@@ -130,13 +132,13 @@ export default async function ProposalPage({ searchParams }: Props) {
           </p>
         </div>
 
-        {/* Savings Widget: US vs MedVoyage comparison */}
+        {/* Savings Widget: Typical US cost vs Colombia */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-xl shadow-black/20" aria-labelledby="savings-heading">
           <h2 id="savings-heading" className="text-xl font-serif font-normal text-white">
-            Your estimated savings
+            Typical US cost vs Colombia
           </h2>
           <p className="mt-1 text-sm text-zinc-400">
-            Compare typical U.S. costs with {branding.productName}—your final quote comes after specialist review.
+            Compare typical U.S. costs with estimated Colombia packages from {branding.productName}—your final quote comes after specialist review.
           </p>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-zinc-700 bg-zinc-800/60 p-4">
@@ -187,10 +189,10 @@ export default async function ProposalPage({ searchParams }: Props) {
           </p>
         </section>
 
-        {/* Journey timeline */}
+        {/* Journey timeline: How your smile journey works */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6" aria-labelledby="journey-heading">
           <h2 id="journey-heading" className="text-xl font-serif font-normal text-white">
-            Your journey timeline
+            How your smile journey works
           </h2>
           <p className="mt-1 text-sm text-zinc-400">
             From assessment to smile transformation—we coordinate every step.
@@ -242,13 +244,13 @@ export default async function ProposalPage({ searchParams }: Props) {
           </div>
         )}
 
-        {/* Why MedVoyage trust block */}
+        {/* Why patients trust MedVoyage Smile */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6" aria-labelledby="trust-heading">
           <h2 id="trust-heading" className="text-xl font-serif font-normal text-white">
-            Why MedVoyage
+            Why patients trust MedVoyage Smile
           </h2>
           <p className="mt-1 text-sm text-zinc-400">
-            International care, secure payments, and a dedicated team from first contact to follow-up.
+            International patient coordination, secure deposits, and a dedicated team from first contact to follow-up.
           </p>
           <ul className="mt-4 space-y-3 text-sm text-zinc-300">
             <li className="flex gap-3">
@@ -257,7 +259,7 @@ export default async function ProposalPage({ searchParams }: Props) {
             </li>
             <li className="flex gap-3">
               <span className="text-emerald-400" aria-hidden>✓</span>
-              <span>Secure deposit process</span>
+              <span>Secure Stripe deposit process</span>
             </li>
             <li className="flex gap-3">
               <span className="text-emerald-400" aria-hidden>✓</span>
@@ -281,7 +283,7 @@ export default async function ProposalPage({ searchParams }: Props) {
         <div className="mt-8 flex flex-col gap-3 sm:flex-wrap sm:items-center sm:justify-center sm:gap-3">
           <WhatsAppButton
             message={whatsAppMessage}
-            label="Chat on WhatsApp"
+            label="Talk to a dental travel coordinator"
             variant="inline"
             className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border-0 bg-emerald-600 px-6 font-semibold hover:bg-emerald-700 sm:w-auto"
           />
