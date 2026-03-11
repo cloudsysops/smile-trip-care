@@ -2,6 +2,8 @@
 
 Checklist oficial para el sprint **Deploy & production verification**. Completar en orden antes de dar por cerrado el track Deploy en [STATUS.md](../STATUS.md).
 
+**Resumen go-live:** Ver [GO_LIVE_CHECKLIST.md](GO_LIVE_CHECKLIST.md). **Webhooks por ambiente:** Ver [STRIPE_WEBHOOKS_ENVIRONMENTS.md](STRIPE_WEBHOOKS_ENVIRONMENTS.md).
+
 ---
 
 ## Pre-requisitos (local)
