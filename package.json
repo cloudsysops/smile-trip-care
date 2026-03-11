@@ -9,7 +9,12 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "verify": "bash scripts/verify_all.sh",
+    "verify:schema": "bash scripts/check-supabase-schema.sh",
+    "doctor": "bash scripts/doctor-release.sh",
+    "smoke:deploy": "bash scripts/smoke-deploy.sh",
     "smoke:assets": "node scripts/smoke_assets_validation.js",
     "db:migrate": "bash scripts/run_migrations.sh"
   },
@@ -24,6 +29,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
