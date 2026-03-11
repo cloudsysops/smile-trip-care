@@ -18,7 +18,8 @@
     "smoke:assets": "node scripts/smoke_assets_validation.js",
     "db:migrate": "bash scripts/run_migrations.sh",
     "growth:leads": "tsx scripts/growth/find-leads.ts",
-    "audit:prod": "bash scripts/production-readiness-audit.sh"
+    "audit:prod": "bash scripts/production-readiness-audit.sh",
+    "audit:full": "bash scripts/full-production-audit.sh"
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
