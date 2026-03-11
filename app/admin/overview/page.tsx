@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
+import StatCard from "@/app/components/dashboard/StatCard";
+import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 
 function startOfTodayUTC(): string {
   const d = new Date();
@@ -106,38 +108,42 @@ export default async function AdminOverviewPage() {
         </div>
       </header>
       <main className="mx-auto max-w-4xl px-6 py-8">
-        <h2 className="mb-6 text-2xl font-semibold">Overview</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Leads hoy</p>
-            <p className="mt-1 text-2xl font-semibold">{leadsToday}</p>
-            <Link href="/admin/leads" className="mt-2 inline-block text-sm text-emerald-600 hover:underline">
-              Ver leads →
-            </Link>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Leads esta semana</p>
-            <p className="mt-1 text-2xl font-semibold">{leadsWeek}</p>
-            <Link href="/admin/leads" className="mt-2 inline-block text-sm text-emerald-600 hover:underline">
-              Ver leads →
-            </Link>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Pendientes de aprobación</p>
-            <p className="mt-1 text-2xl font-semibold">{pendingApproval}</p>
-            <p className="mt-1 text-xs text-zinc-500">
-              {providersPending} proveedores, {specialistsPending} especialistas
-            </p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Reservas con depósito</p>
-            <p className="mt-1 text-2xl font-semibold">{bookingsDeposit}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Ingresos del mes</p>
-            <p className="mt-1 text-2xl font-semibold">{incomeFormatted}</p>
-          </div>
-        </div>
+        <DashboardLayout
+          title="Overview"
+          description="High-level funnel and network metrics for the admin."
+        >
+          <DashboardSection>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <StatCard
+                label="Leads hoy"
+                value={leadsToday}
+                href="/admin/leads"
+              />
+              <StatCard
+                label="Leads esta semana"
+                value={leadsWeek}
+                href="/admin/leads"
+              />
+              <StatCard
+                label="Pendientes de aprobación"
+                value={pendingApproval}
+                helper={
+                  <>
+                    {providersPending} proveedores, {specialistsPending} especialistas
+                  </>
+                }
+              />
+              <StatCard
+                label="Reservas con depósito"
+                value={bookingsDeposit}
+              />
+              <StatCard
+                label="Ingresos del mes"
+                value={incomeFormatted}
+              />
+            </div>
+          </DashboardSection>
+        </DashboardLayout>
       </main>
     </div>
   );

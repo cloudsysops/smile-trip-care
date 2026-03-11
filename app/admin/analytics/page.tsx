@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import AdminShell from "../_components/AdminShell";
 import AnalyticsCharts from "./AnalyticsCharts";
+import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 
 function startOfTodayUTC(): string {
   const d = new Date();
@@ -88,52 +89,57 @@ export default async function AdminAnalyticsPage() {
 
   return (
     <AdminShell title="Analytics" currentSection="analytics" mainContainerClassName="max-w-4xl">
-      <div className="space-y-6">
-        <p className="text-sm text-zinc-600">
-          Lightweight conversion dashboard. Use these metrics to see what’s working.
-        </p>
+      <DashboardLayout
+        title="Analytics"
+        description="Lightweight conversion dashboard. Use these metrics to see what’s working."
+      >
+        <DashboardSection>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">Total leads</p>
+              <p className="mt-1 text-2xl font-semibold">{metrics.totalLeads}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">Leads today</p>
+              <p className="mt-1 text-2xl font-semibold">{metrics.leadsToday}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">Leads this week</p>
+              <p className="mt-1 text-2xl font-semibold">{metrics.leadsThisWeek}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">High priority leads</p>
+              <p className="mt-1 text-2xl font-semibold">{metrics.highPriorityLeads}</p>
+              <p className="mt-1 text-xs text-zinc-500">Has package or budget</p>
+            </div>
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">Packages requested</p>
+              <p className="mt-1 text-2xl font-semibold">{metrics.packagesRequested}</p>
+            </div>
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">Assessment → package interest</p>
+              <p className="mt-1 text-2xl font-semibold">{metrics.assessmentCompletionRate}%</p>
+              <p className="mt-1 text-xs text-zinc-500">Leads with a package selected</p>
+            </div>
+          </div>
+        </DashboardSection>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Total leads</p>
-            <p className="mt-1 text-2xl font-semibold">{metrics.totalLeads}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Leads today</p>
-            <p className="mt-1 text-2xl font-semibold">{metrics.leadsToday}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Leads this week</p>
-            <p className="mt-1 text-2xl font-semibold">{metrics.leadsThisWeek}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">High priority leads</p>
-            <p className="mt-1 text-2xl font-semibold">{metrics.highPriorityLeads}</p>
-            <p className="mt-1 text-xs text-zinc-500">Has package or budget</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Packages requested</p>
-            <p className="mt-1 text-2xl font-semibold">{metrics.packagesRequested}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Assessment → package interest</p>
-            <p className="mt-1 text-2xl font-semibold">{metrics.assessmentCompletionRate}%</p>
-            <p className="mt-1 text-xs text-zinc-500">Leads with a package selected</p>
-          </div>
-        </div>
+        <DashboardSection>
+          <AnalyticsCharts leadsByCountry={metrics.leadsByCountry} />
+        </DashboardSection>
 
-        <AnalyticsCharts leadsByCountry={metrics.leadsByCountry} />
-
-        <p className="text-xs text-zinc-500">
-          <Link href="/admin/leads" className="underline hover:no-underline">
-            View leads
-          </Link>
-          {" · "}
-          <Link href="/admin/overview" className="underline hover:no-underline">
-            Overview
-          </Link>
-        </p>
-      </div>
+        <DashboardSection className="pt-2">
+          <p className="text-xs text-zinc-500">
+            <Link href="/admin/leads" className="underline hover:no-underline">
+              View leads
+            </Link>
+            {" · "}
+            <Link href="/admin/overview" className="underline hover:no-underline">
+              Overview
+            </Link>
+          </p>
+        </DashboardSection>
+      </DashboardLayout>
     </AdminShell>
   );
 }

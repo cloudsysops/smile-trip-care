@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import DataTable, { type DataTableColumn } from "@/app/components/dashboard/DataTable";
+import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 
 type Lead = {
   id: string;
@@ -145,13 +147,100 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
     [prioritizedLeads, showActionQueueOnly],
   );
 
+  const columns: DataTableColumn<LeadWithPriority>[] = [
+    {
+      header: "Name",
+      cell: (lead) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-zinc-900">
+            {lead.first_name} {lead.last_name}
+          </span>
+          <span className="text-xs text-zinc-500">
+            {new Date(lead.created_at).toLocaleDateString()}
+          </span>
+        </div>
+      ),
+    },
+    {
+      header: "Email",
+      cell: (lead) => lead.email,
+    },
+    {
+      header: "Treatment interest",
+      cell: (lead) =>
+        lead.selected_specialties?.[0] ??
+        lead.recommended_package_slug ??
+        lead.package_slug ??
+        "—",
+    },
+    {
+      header: "Score",
+      cell: (lead) => (
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${scoreBadgeClass(
+            leadScore(lead),
+          )}`}
+        >
+          {leadScore(lead).toUpperCase()}
+        </span>
+      ),
+    },
+    {
+      header: "Priority",
+      cell: (lead) => (
+        <span
+          className={`rounded-full px-2.5 py-1 text-xs font-medium ${badgeClass(
+            lead.priority,
+          )}`}
+        >
+          {badgeLabel(lead.priority)}
+        </span>
+      ),
+    },
+    {
+      header: "Status",
+      cell: (lead) => lead.status,
+    },
+    {
+      header: "Next action",
+      cell: (lead) => (
+        <span className="text-xs font-medium text-zinc-700">
+          {nextActionLabel(lead)}
+        </span>
+      ),
+    },
+    {
+      header: "Next follow-up",
+      cell: (lead) =>
+        lead.next_follow_up_at
+          ? new Date(lead.next_follow_up_at).toLocaleString()
+          : "—",
+    },
+    {
+      header: "Last contacted",
+      cell: (lead) =>
+        lead.last_contacted_at
+          ? new Date(lead.last_contacted_at).toLocaleString()
+          : "—",
+    },
+    {
+      header: "",
+      cell: (lead) => (
+        <Link
+          href={`/admin/leads/${lead.id}`}
+          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+        >
+          Open
+        </Link>
+      ),
+    },
+  ];
+
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-zinc-600">
-          {visibleLeads.length} lead{visibleLeads.length === 1 ? "" : "s"}
-          {showActionQueueOnly ? " in action queue" : " total"}
-        </p>
+    <DashboardLayout
+      title="Leads"
+      description="Actionable view of assessment leads with priority and next steps."
+      actions={
         <button
           type="button"
           onClick={() => setShowActionQueueOnly((current) => !current)}
@@ -159,81 +248,19 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
         >
           {showActionQueueOnly ? "Show all" : "Show action queue"}
         </button>
-      </div>
-
-      <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-zinc-200 bg-zinc-50">
-            <tr>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Name</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Email</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Treatment interest</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Score</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Priority</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Status</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Next action</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Next follow-up</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">Created</th>
-              <th className="px-4 py-3.5" />
-            </tr>
-          </thead>
-          <tbody>
-            {visibleLeads.map((lead) => (
-              <tr key={lead.id} className="border-b border-zinc-100">
-                <td className="px-4 py-3">
-                  <div className="flex flex-col">
-                    <span className="font-medium text-zinc-900">
-                      {lead.first_name} {lead.last_name}
-                    </span>
-                    <span className="text-xs text-zinc-500">
-                      {new Date(lead.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">{lead.email}</td>
-                <td className="px-4 py-3 text-xs text-zinc-700">
-                  {lead.selected_specialties?.[0] ?? lead.recommended_package_slug ?? lead.package_slug ?? "—"}
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${scoreBadgeClass(leadScore(lead))}`}>
-                    {leadScore(lead).toUpperCase()}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${badgeClass(lead.priority)}`}>
-                    {badgeLabel(lead.priority)}
-                  </span>
-                </td>
-                <td className="px-4 py-3">{lead.status}</td>
-                <td className="px-4 py-3">
-                  <span className="text-xs font-medium text-zinc-700">{nextActionLabel(lead)}</span>
-                </td>
-                <td className="px-4 py-3">
-                  {lead.next_follow_up_at
-                    ? new Date(lead.next_follow_up_at).toLocaleString()
-                    : "—"}
-                </td>
-                <td className="px-4 py-3">
-                  {lead.last_contacted_at
-                    ? new Date(lead.last_contacted_at).toLocaleString()
-                    : "—"}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/admin/leads/${lead.id}`}
-                    className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
-                  >
-                    Open
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {visibleLeads.length === 0 && (
-          <p className="p-8 text-center text-zinc-500">No leads yet. New assessments will appear here.</p>
-        )}
-      </div>
-    </div>
+      }
+    >
+      <DashboardSection>
+        <p className="mb-3 text-sm text-zinc-600">
+          {visibleLeads.length} lead{visibleLeads.length === 1 ? "" : "s"}
+          {showActionQueueOnly ? " in action queue" : " total"}
+        </p>
+        <DataTable
+          columns={columns}
+          rows={visibleLeads}
+          emptyMessage="No leads yet. New assessments will appear here."
+        />
+      </DashboardSection>
+    </DashboardLayout>
   );
 }
