@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
 BASE_URL="${1:-}"
 
 if [ -z "$BASE_URL" ]; then
   echo "Usage:"
   echo "  ./scripts/production-readiness-audit.sh https://your-domain.com"
+  exit 1
+fi
+
+if ! command -v curl >/dev/null 2>&1; then
+  echo "ERROR: curl is required for production-readiness-audit.sh but was not found in PATH."
+  echo "Please install curl on this machine or run the audit from an environment that has curl available."
   exit 1
 fi
 
