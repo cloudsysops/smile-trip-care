@@ -102,7 +102,7 @@ export default async function PatientDashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <header className="border-b border-zinc-200 bg-white shadow-sm">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-5 sm:px-6">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-5 sm:px-6">
           <div className="flex items-center gap-4">
             <Link href="/" className="text-sm font-medium text-zinc-500 hover:text-zinc-900">
               {branding.productName}
@@ -116,7 +116,14 @@ export default async function PatientDashboardPage() {
               </Link>
             </nav>
           </div>
-          <h1 className="text-lg font-bold text-zinc-900 sm:text-xl">Patient dashboard</h1>
+          <div className="flex shrink-0 items-center gap-4">
+            <h1 className="text-lg font-bold text-zinc-900 sm:text-xl">Patient dashboard</h1>
+            <form action="/api/auth/signout" method="post" className="inline">
+              <button type="submit" className="text-sm text-zinc-600 hover:underline">
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">

@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { requireCoordinator } from "@/lib/auth";
 import { getCoordinatorDashboardData } from "@/lib/dashboard-data";
+import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
+import StatCard from "@/app/components/dashboard/StatCard";
 
 export default async function CoordinatorDashboardPage() {
   try {
@@ -16,31 +17,13 @@ export default async function CoordinatorDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/coordinator" className="text-sm font-medium text-zinc-900 underline">
-              Overview
-            </Link>
-          </nav>
-          <h1 className="text-xl font-semibold">Coordinator dashboard</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-4xl px-6 py-8">
+      <RoleDashboardHeader title="Coordinator dashboard" navItems={[{ href: "/coordinator", label: "Overview", active: true }]} homeLabel="Home" />
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <h2 className="mb-6 text-2xl font-semibold">Operations & travel coordination</h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Active leads</p>
-            <p className="mt-1 text-2xl font-semibold">{leads.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Bookings in progress</p>
-            <p className="mt-1 text-2xl font-semibold">{bookings.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Consultations (requested/scheduled)</p>
-            <p className="mt-1 text-2xl font-semibold">{consultations.length}</p>
-          </div>
+          <StatCard label="Active leads" value={leads.length} helper="new, contacted, qualified" />
+          <StatCard label="Bookings in progress" value={bookings.length} helper="draft through pending" />
+          <StatCard label="Consultations" value={consultations.length} helper="requested or scheduled" />
         </div>
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <div>

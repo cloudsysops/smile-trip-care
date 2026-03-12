@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireSpecialist } from "@/lib/auth";
 import { getSpecialistDashboardData } from "@/lib/dashboard-data";
+import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
 
 export default async function SpecialistDashboardPage() {
   let profile;
@@ -15,17 +16,8 @@ export default async function SpecialistDashboardPage() {
   if (!specialistId) {
     return (
       <div className="min-h-screen bg-zinc-50">
-        <header className="border-b border-zinc-200 bg-white px-6 py-4">
-          <div className="mx-auto flex max-w-4xl items-center justify-between">
-            <nav className="flex items-center gap-3">
-              <Link href="/specialist" className="text-sm font-medium text-zinc-900 underline">
-                Specialist
-              </Link>
-            </nav>
-            <h1 className="text-xl font-semibold">Specialist dashboard</h1>
-          </div>
-        </header>
-        <main className="mx-auto max-w-4xl px-6 py-8">
+        <RoleDashboardHeader title="Specialist dashboard" navItems={[{ href: "/specialist", label: "Overview", active: true }]} homeLabel="Home" />
+        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
           <p className="text-zinc-600">Your account is not linked to a specialist. Contact an admin.</p>
         </main>
       </div>
@@ -37,17 +29,15 @@ export default async function SpecialistDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/specialist" className="text-sm font-medium text-zinc-900 underline">
-              Overview
-            </Link>
-          </nav>
-          <h1 className="text-xl font-semibold">Specialist dashboard</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-4xl px-6 py-8">
+      <RoleDashboardHeader
+        title="Specialist dashboard"
+        navItems={[
+          { href: "/specialist", label: "Overview", active: true },
+          { href: "/specialist/progress", label: "Progress" },
+        ]}
+        homeLabel="Home"
+      />
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <h2 className="mb-6 text-2xl font-semibold">
           {specialist?.name ?? "Specialist"} {specialist?.specialty ? ` · ${specialist.specialty}` : ""}
         </h2>

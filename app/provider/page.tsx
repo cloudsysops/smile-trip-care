@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { requireProviderManager } from "@/lib/auth";
 import { getProviderDashboardData } from "@/lib/dashboard-data";
+import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
+import StatCard from "@/app/components/dashboard/StatCard";
 
 export default async function ProviderDashboardPage() {
   let profile;
@@ -15,17 +16,8 @@ export default async function ProviderDashboardPage() {
   if (!providerId) {
     return (
       <div className="min-h-screen bg-zinc-50">
-        <header className="border-b border-zinc-200 bg-white px-6 py-4">
-          <div className="mx-auto flex max-w-4xl items-center justify-between">
-            <nav className="flex items-center gap-3">
-              <Link href="/provider" className="text-sm font-medium text-zinc-900 underline">
-                Provider
-              </Link>
-            </nav>
-            <h1 className="text-xl font-semibold">Provider dashboard</h1>
-          </div>
-        </header>
-        <main className="mx-auto max-w-4xl px-6 py-8">
+        <RoleDashboardHeader title="Provider dashboard" navItems={[{ href: "/provider", label: "Overview", active: true }]} homeLabel="Home" />
+        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
           <p className="text-zinc-600">Your account is not linked to a provider. Contact an admin.</p>
         </main>
       </div>
@@ -40,37 +32,16 @@ export default async function ProviderDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/provider" className="text-sm font-medium text-zinc-900 underline">
-              Overview
-            </Link>
-          </nav>
-          <h1 className="text-xl font-semibold">Provider dashboard</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-4xl px-6 py-8">
+      <RoleDashboardHeader title="Provider dashboard" navItems={[{ href: "/provider", label: "Overview", active: true }]} homeLabel="Home" />
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <h2 className="mb-6 text-2xl font-semibold">
           {provider?.name ?? "Provider"} {provider?.city ? ` · ${provider.city}` : ""}
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Packages</p>
-            <p className="mt-1 text-2xl font-semibold">{packages.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Specialists</p>
-            <p className="mt-1 text-2xl font-semibold">{specialists.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Experiences</p>
-            <p className="mt-1 text-2xl font-semibold">{experiences.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Recent bookings</p>
-            <p className="mt-1 text-2xl font-semibold">{bookings.length}</p>
-          </div>
+          <StatCard label="Packages" value={packages.length} />
+          <StatCard label="Specialists" value={specialists.length} />
+          <StatCard label="Experiences" value={experiences.length} />
+          <StatCard label="Recent bookings" value={bookings.length} helper="last 20" />
         </div>
         <div className="mt-8">
           <h3 className="mb-2 text-lg font-medium">Recent bookings</h3>
