@@ -133,6 +133,9 @@ export default async function Home() {
             <Link href="/login" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
               Sign in
             </Link>
+            <Link href="/signup" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+              Sign up
+            </Link>
             <Link
               href="/assessment"
               className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 sm:px-5 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white/80"

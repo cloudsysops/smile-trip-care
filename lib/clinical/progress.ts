@@ -105,6 +105,23 @@ export async function getProgressForAdmin(): Promise<TreatmentProgressRow[]> {
 }
 
 /**
+ * Get latest treatment progress row for a lead (by lead_id). Used in admin for visibility.
+ * RLS: admin can read all; returns null if none.
+ */
+export async function getLatestProgressForLead(leadId: string): Promise<TreatmentProgressRow | null> {
+  const supabase = getServerSupabase();
+  const { data, error } = await supabase
+    .from("treatment_progress")
+    .select("id, patient_id, specialist_id, lead_id, booking_id, stage_key, stage_label, status, notes, attachments, created_at, updated_at")
+    .eq("lead_id", leadId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data as TreatmentProgressRow | null;
+}
+
+/**
  * Get one treatment_progress row by id. RLS applies (patient/specialist/admin).
  */
 export async function getProgressById(id: string): Promise<TreatmentProgressRow | null> {

@@ -13,6 +13,7 @@ import LeadCopilotPanel from "./LeadCopilotPanel";
 import LeadFollowUpSection from "./LeadFollowUpSection";
 import OutboundQueuePanel from "../OutboundQueuePanel";
 import { ItineraryOutputSchema, LeadTriageOutputSchema, SalesResponderOutputSchema } from "@/lib/ai/schemas";
+import { getLatestProgressForLead } from "@/lib/clinical/progress";
 import AdminShell from "../../_components/AdminShell";
 
 type Props = Readonly<{ params: Promise<{ id: string }> }>;
@@ -107,6 +108,7 @@ export default async function AdminLeadDetailPage({ params }: Props) {
 
   const publishedPackages = await getPublishedPackages();
   const packageOptions = publishedPackages.map((p) => ({ id: p.id, slug: p.slug, name: p.name }));
+  const latestProgress = await getLatestProgressForLead(lead.id);
 
   return (
     <AdminShell
@@ -231,6 +233,24 @@ export default async function AdminLeadDetailPage({ params }: Props) {
             )}
           </dl>
         </section>
+
+        {latestProgress && (
+          <section className="rounded-lg border border-zinc-200 bg-white p-6">
+            <h2 className="text-sm font-semibold text-zinc-900">Treatment progress</h2>
+            <p className="mt-1 text-xs text-zinc-500">Latest update from specialist</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">
+                {latestProgress.stage_label}
+              </span>
+              <span className="text-xs text-zinc-500">
+                {new Date(latestProgress.created_at).toLocaleDateString(undefined, { dateStyle: "medium" })}
+              </span>
+            </div>
+            {latestProgress.notes?.trim() && (
+              <p className="mt-2 text-sm text-zinc-700 line-clamp-2">{latestProgress.notes.trim()}</p>
+            )}
+          </section>
+        )}
 
         <LeadCopilotPanel
           leadId={lead.id}

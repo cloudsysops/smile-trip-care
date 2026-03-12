@@ -30,7 +30,16 @@ export default function SpecialistProgressUpdateForm({ leadId, onSuccess }: Prop
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Failed to save");
+        const raw = data.error ?? "Failed to save";
+        const isNoPatientAccount =
+          res.status === 400 &&
+          typeof raw === "string" &&
+          (raw.includes("patient account") || raw.includes("sign up"));
+        setError(
+          isNoPatientAccount
+            ? "This patient hasn’t created an account yet. Ask them to sign up using the same email they used for their assessment. Once they have an account, you can add progress and they’ll see it on their dashboard."
+            : raw
+        );
         return;
       }
       setNotes("");
@@ -81,9 +90,16 @@ export default function SpecialistProgressUpdateForm({ leadId, onSuccess }: Prop
           />
         </div>
         {error && (
-          <p className="text-sm text-red-600" role="alert">
+          <div
+            className={`rounded-lg border px-3 py-2 text-sm ${
+              error.startsWith("This patient hasn't")
+                ? "border-amber-200 bg-amber-50 text-amber-900"
+                : "border-red-200 bg-red-50 text-red-800"
+            }`}
+            role="alert"
+          >
             {error}
-          </p>
+          </div>
         )}
         <button
           type="submit"
