@@ -7,7 +7,7 @@ import {
 
 describe("auth role helpers", () => {
   it("getRedirectPathForRole returns correct paths", () => {
-    expect(getRedirectPathForRole("admin" as ProfileRole)).toBe("/admin");
+    expect(getRedirectPathForRole("admin" as ProfileRole)).toBe("/admin/overview");
     expect(getRedirectPathForRole("coordinator" as ProfileRole)).toBe("/coordinator");
     expect(getRedirectPathForRole("provider_manager" as ProfileRole)).toBe("/provider");
     expect(getRedirectPathForRole("specialist" as ProfileRole)).toBe("/specialist");
@@ -60,6 +60,6 @@ describe("GET /api/auth/me", () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toHaveProperty("role", "admin");
-    expect(data).toHaveProperty("redirectPath", "/admin");
+    expect(data).toHaveProperty("redirectPath", "/admin/overview");
   });
 });
