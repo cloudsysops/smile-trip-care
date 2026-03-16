@@ -24,13 +24,13 @@
   },
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
-    "@supabase/supabase-js": "^2.98.0",
+    "@supabase/supabase-js": "^2.99.1",
     "next": "16.1.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "recharts": "^3.8.0",
-    "stripe": "^20.4.0",
-    "vercel": "^50.28.0",
+    "stripe": "^20.4.1",
+    "vercel": "^50.32.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -44,6 +44,6 @@
     "tailwindcss": "^4",
     "tsx": "^4.19.2",
     "typescript": "^5",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.0"
   }
 }
