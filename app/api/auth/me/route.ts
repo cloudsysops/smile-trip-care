@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentProfile, getRedirectPathForRole } from "@/lib/auth";
+import { getCurrentProfile, getCurrentUser, getRedirectPathForRole } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 
 /**
@@ -11,9 +11,14 @@ export async function GET() {
   const log = createLogger(requestId);
   const ctx = await getCurrentProfile();
   if (!ctx) {
-    log.info("auth/me: 401 (no session or no active profile)");
+    const user = await getCurrentUser();
+    log.info("auth/me: 401", {
+      step: user ? "noProfileOrInactive" : "noSession",
+      hasUser: !!user,
+    });
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  log.info("auth/me: 200", { role: ctx.profile.role });
   return NextResponse.json({
     role: ctx.profile.role,
     redirectPath: getRedirectPathForRole(ctx.profile.role),

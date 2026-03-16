@@ -10,6 +10,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams?.get("next") ?? "";
+  const message = searchParams?.get("message") ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +75,16 @@ function LoginForm() {
     }
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
-      setError("Invalid email or password");
+      const msg = err.message ?? "";
+      const needsConfirm =
+        msg.toLowerCase().includes("confirm") ||
+        msg.toLowerCase().includes("not confirmed") ||
+        (err as { code?: string }).code === "email_not_confirmed";
+      setError(
+        needsConfirm
+          ? "Please confirm your email first. Check your inbox and spam folder, then try again."
+          : "Invalid email or password"
+      );
       setLoading(false);
       return;
     }
@@ -109,6 +119,12 @@ function LoginForm() {
             <p className="mt-2 text-sm text-zinc-400">
               Use your account to access your dashboard. Patient accounts can be created via sign up; team accounts are created by the admin.
             </p>
+
+            {message === "confirm_email" && (
+              <p className="mt-4 rounded-lg border border-emerald-800/60 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200" aria-live="polite">
+                Check your email to confirm your account, then sign in below.
+              </p>
+            )}
 
             <div className="mt-6 border-b border-zinc-800 pb-6">
               <button

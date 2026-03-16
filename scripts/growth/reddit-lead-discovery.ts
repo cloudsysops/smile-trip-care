@@ -8,16 +8,28 @@ const SUBREDDITS = [
   "veneers",
   "dentistry",
   "medicaltourism",
+  "askdentists",
+  "expats",
+  "travel",
   "cosmeticsurgery",
 ] as const;
 
 const KEYWORDS = [
   "implant",
+  "implants",
   "veneers",
+  "veneer",
+  "dentures",
   "hollywood smile",
   "dentist cost",
+  "dental cost",
+  "too expensive",
+  "price quote",
   "dental tourism",
   "teeth abroad",
+  "colombia",
+  "mexico",
+  "abroad",
 ];
 
 export type RedditLeadPost = {

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requirePatient } from "@/lib/auth";
 import { branding } from "@/lib/branding";
+import { createLogger } from "@/lib/logger";
 import { getPatientDashboardData } from "@/lib/dashboard-data";
 import { getPublishedPackages, getPackageWithRelations } from "@/lib/packages";
 import { getSpecialistById } from "@/lib/specialists";
@@ -13,6 +14,7 @@ import CareCoordinatorSection from "@/app/components/dashboard/CareCoordinatorSe
 import AftercareSection from "@/app/components/dashboard/AftercareSection";
 import TreatmentProgressTimeline from "@/app/components/dashboard/TreatmentProgressTimeline";
 import PatientNextStepCard from "@/app/components/dashboard/PatientNextStepCard";
+import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 import { getProgressForPatient } from "@/lib/clinical/progress";
 import type { PackageWithRelations } from "@/lib/packages";
 
@@ -22,6 +24,8 @@ export default async function PatientDashboardPage() {
     const ctx = await requirePatient();
     profile = ctx.profile;
   } catch {
+    const log = createLogger(crypto.randomUUID());
+    log.info("patient: requirePatient threw, redirecting to login");
     redirect("/login?next=/patient");
   }
   const email = profile.email ?? "";
@@ -127,50 +131,84 @@ export default async function PatientDashboardPage() {
         </div>
       </header>
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <div className="mb-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Profile</p>
-          <p className="mt-1 text-xs text-zinc-600">Your account and contact details.</p>
-          <p className="mt-2 font-semibold text-zinc-900">{profile.full_name || profile.email || "—"}</p>
-          <p className="mt-0.5 text-sm text-zinc-600">{profile.email}</p>
-        </div>
+        <DashboardLayout
+          title="My journey"
+          description="Your treatment plan, travel details, and clinical progress in one place."
+        >
+          <DashboardSection title="Profile">
+            <div className="mb-2 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Profile</p>
+              <p className="mt-1 text-xs text-zinc-600">Your account and contact details.</p>
+              <p className="mt-2 font-semibold text-zinc-900">
+                {profile.full_name || profile.email || "—"}
+              </p>
+              <p className="mt-0.5 text-sm text-zinc-600">{profile.email}</p>
+            </div>
+          </DashboardSection>
 
-        {showJourneyPortal && pkgForJourney && (
-          <>
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">Your journey</h2>
-            <p className="mb-1 text-sm text-zinc-600">Your treatment plan, travel details, and timeline in one place.</p>
-            <p className="mb-6 text-lg font-semibold text-zinc-900">Treatment plan, travel, and timeline</p>
-            <div className="mb-8 grid gap-6 lg:grid-cols-2">
-              <TreatmentPlanSection
-                procedureType={pkgForJourney.name}
-                estimatedDuration={pkgForJourney.duration_days != null ? `${pkgForJourney.duration_days} days` : null}
-                clinic={packageWithRelations?.provider_name ?? null}
-                doctor={primarySpecialistName}
-              />
-              <TravelPlanSection
-                city={pkgForJourney.location ?? null}
-                recommendedDates={activeBooking?.start_date && activeBooking?.end_date ? `${new Date(activeBooking.start_date).toLocaleDateString()} – ${new Date(activeBooking.end_date).toLocaleDateString()}` : null}
-                airportTransfer={hasTransfer ? "Included in package" : (includedText ? "See package details" : null)}
-                hotelSuggestion={hasHotel ? "Included in package" : (includedText ? "See package details" : null)}
-              />
-            </div>
-            <div className="mb-8 grid gap-6 lg:grid-cols-2">
-              <TreatmentTimelineSection steps={timelineSteps} />
-              <CareCoordinatorSection coordinatorName={null} />
-            </div>
-            <div className="mb-8">
-              <AftercareSection instructions={null} />
-            </div>
-          </>
-        )}
+          {showJourneyPortal && pkgForJourney && (
+            <DashboardSection
+              title="Your journey"
+              description="Treatment plan, travel, and high-level timeline."
+            >
+              <div className="mb-8 grid gap-6 lg:grid-cols-2">
+                <TreatmentPlanSection
+                  procedureType={pkgForJourney.name}
+                  estimatedDuration={
+                    pkgForJourney.duration_days != null
+                      ? `${pkgForJourney.duration_days} days`
+                      : null
+                  }
+                  clinic={packageWithRelations?.provider_name ?? null}
+                  doctor={primarySpecialistName}
+                />
+                <TravelPlanSection
+                  city={pkgForJourney.location ?? null}
+                  recommendedDates={
+                    activeBooking?.start_date && activeBooking?.end_date
+                      ? `${new Date(activeBooking.start_date).toLocaleDateString()} – ${new Date(
+                          activeBooking.end_date,
+                        ).toLocaleDateString()}`
+                      : activeBooking
+                        ? "Dates to be confirmed"
+                        : null
+                  }
+                  airportTransfer={
+                    hasTransfer
+                      ? "Included in package"
+                      : includedText
+                        ? "See package details"
+                        : null
+                  }
+                  hotelSuggestion={
+                    hasHotel
+                      ? "Included in package"
+                      : includedText
+                        ? "See package details"
+                        : null
+                  }
+                />
+              </div>
+              <div className="mb-8 grid gap-6 lg:grid-cols-2">
+                <TreatmentTimelineSection steps={timelineSteps} />
+                <CareCoordinatorSection coordinatorName={null} />
+              </div>
+              <div className="mb-2">
+                <AftercareSection instructions={null} />
+              </div>
+            </DashboardSection>
+          )}
 
-        <div className="mb-8">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-zinc-500">Clinical progress</h2>
-          <p className="mb-6 text-sm text-zinc-600">Updates from your care team and where you are in your journey</p>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <TreatmentProgressTimeline items={progressList} />
-            <PatientNextStepCard latest={latestProgress} />
-          </div>
-        </div>
+          <DashboardSection
+            title="Clinical progress"
+            description="Updates from your care team and where you are in your journey."
+          >
+            <div className="grid gap-6 lg:grid-cols-2">
+              <TreatmentProgressTimeline items={progressList} />
+              <PatientNextStepCard latest={latestProgress} />
+            </div>
+          </DashboardSection>
+        </DashboardLayout>
 
         {travelPackage && (
           <div className="mb-8 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6 shadow-sm">

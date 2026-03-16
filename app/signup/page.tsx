@@ -50,14 +50,24 @@ function SignupForm() {
       setLoading(false);
       return;
     }
-    const { error: signUpError } = await supabase.auth.signUp({
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName.trim() || undefined } },
+      options: {
+        data: { full_name: fullName.trim() || undefined },
+        emailRedirectTo: origin ? `${origin}/auth/callback` : undefined,
+      },
     });
     if (signUpError) {
       setError(signUpError.message || "Sign up failed");
       setLoading(false);
+      return;
+    }
+    // When Supabase requires email confirmation, session is null; profile is created on first login via /auth/callback.
+    if (!signUpData.session) {
+      router.push("/login?message=confirm_email&next=/patient");
+      router.refresh();
       return;
     }
     const res = await fetch("/api/signup", {
@@ -67,6 +77,11 @@ function SignupForm() {
       credentials: "include",
     });
     if (!res.ok) {
+      if (res.status === 401) {
+        router.push("/login?message=confirm_email&next=/patient");
+        router.refresh();
+        return;
+      }
       const data = await res.json().catch(() => ({}));
       setError((data.error as string) || "Could not create account");
       setLoading(false);

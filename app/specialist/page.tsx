@@ -3,6 +3,8 @@ import Link from "next/link";
 import { requireSpecialist } from "@/lib/auth";
 import { getSpecialistDashboardData } from "@/lib/dashboard-data";
 import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
+import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
+import EmptyState from "@/app/components/ui/EmptyState";
 
 export default async function SpecialistDashboardPage() {
   let profile;
@@ -38,51 +40,61 @@ export default async function SpecialistDashboardPage() {
         homeLabel="Home"
       />
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-        <h2 className="mb-6 text-2xl font-semibold">
-          {specialist?.name ?? "Specialist"} {specialist?.specialty ? ` · ${specialist.specialty}` : ""}
-        </h2>
-        <div className="mb-6 rounded-lg border border-zinc-200 bg-white p-5">
-          <p className="text-sm font-medium text-zinc-500">Consultation requests</p>
-          <p className="mt-1 text-2xl font-semibold">{consultations.length}</p>
-        </div>
-        <div>
-          <h3 className="mb-2 text-lg font-medium">Consultations</h3>
-          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-            {consultations.length === 0 ? (
-              <p className="p-6 text-sm text-zinc-500">No consultation requests yet.</p>
-            ) : (
-              <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-zinc-200 bg-zinc-50">
-                  <tr>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Lead ID</th>
-                    <th className="px-4 py-3 font-medium">Requested</th>
-                    <th className="px-4 py-3 font-medium">Scheduled</th>
-                    <th className="px-4 py-3 font-medium">Progress</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {consultations.slice(0, 15).map((c) => (
-                    <tr key={c.id} className="border-b border-zinc-100">
-                      <td className="px-4 py-3">{c.status}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{c.lead_id.slice(0, 8)}…</td>
-                      <td className="px-4 py-3 text-zinc-600">{c.requested_at ? new Date(c.requested_at).toLocaleDateString() : "—"}</td>
-                      <td className="px-4 py-3 text-zinc-600">{c.scheduled_at ? new Date(c.scheduled_at).toLocaleDateString() : "—"}</td>
-                      <td className="px-4 py-3">
-                        <Link
-                          href={`/specialist/progress?lead_id=${encodeURIComponent(c.lead_id)}`}
-                          className="text-sm font-medium text-emerald-600 hover:underline"
-                        >
-                          Update progress
-                        </Link>
-                      </td>
+        <DashboardLayout
+          title={specialist?.name ?? "Specialist"}
+          description={specialist?.specialty ? `Specialist · ${specialist.specialty}` : "Specialist overview"}
+        >
+          <DashboardSection>
+            <div className="mb-2 rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm font-medium text-zinc-500">Consultation requests</p>
+              <p className="mt-1 text-2xl font-semibold">{consultations.length}</p>
+            </div>
+          </DashboardSection>
+          <DashboardSection title="Consultations">
+            <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+              {consultations.length === 0 ? (
+                <EmptyState
+                  title="No consultation requests yet"
+                  description="When admin assigns or schedules consultations for you, they will appear here."
+                />
+              ) : (
+                <table className="min-w-full text-left text-sm">
+                  <thead className="border-b border-zinc-200 bg-zinc-50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Status</th>
+                      <th className="px-4 py-3 font-medium">Lead ID</th>
+                      <th className="px-4 py-3 font-medium">Requested</th>
+                      <th className="px-4 py-3 font-medium">Scheduled</th>
+                      <th className="px-4 py-3 font-medium">Progress</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
+                  </thead>
+                  <tbody>
+                    {consultations.slice(0, 15).map((c) => (
+                      <tr key={c.id} className="border-b border-zinc-100">
+                        <td className="px-4 py-3">{c.status}</td>
+                        <td className="px-4 py-3 font-mono text-xs">{c.lead_id.slice(0, 8)}…</td>
+                        <td className="px-4 py-3 text-zinc-600">
+                          {c.requested_at ? new Date(c.requested_at).toLocaleDateString() : "—"}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-600">
+                          {c.scheduled_at ? new Date(c.scheduled_at).toLocaleDateString() : "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/specialist/progress?lead_id=${encodeURIComponent(c.lead_id)}`}
+                            className="text-sm font-medium text-emerald-600 hover:underline"
+                          >
+                            Update progress
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </DashboardSection>
+        </DashboardLayout>
       </main>
     </div>
   );
