@@ -25,9 +25,35 @@ export function resolveActiveRole(
   activeRole: string | null,
   availableRoles: string[],
 ): ProfileRole {
-  if (activeRole && availableRoles.includes(activeRole)) {
-    return activeRole as ProfileRole;
+  const KNOWN_ROLES: readonly ProfileRole[] = [
+    "admin",
+    "coordinator",
+    "provider_manager",
+    "specialist",
+    "patient",
+    "user",
+    "host",
+  ];
+
+  const availableKnown = availableRoles.filter((r): r is ProfileRole => KNOWN_ROLES.includes(r as ProfileRole));
+
+  if (activeRole) {
+    const activeKnown = KNOWN_ROLES.includes(activeRole as ProfileRole) ? (activeRole as ProfileRole) : null;
+    if (activeKnown && availableKnown.includes(activeKnown)) {
+      return activeKnown;
+    }
   }
+
+  // If active role is missing/invalid, use primary role only if the profile has it assigned.
+  if (availableKnown.includes(primaryRole)) {
+    return primaryRole;
+  }
+
+  // As a safe fallback, pick the first assigned role.
+  if (availableKnown.length > 0) {
+    return availableKnown[0];
+  }
+
   return primaryRole;
 }
 

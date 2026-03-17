@@ -1,7 +1,8 @@
-import { getCurrentProfile, getRedirectPathForRole } from "@/lib/auth";
+import { getCurrentProfile, getEffectiveRoleForProfile, getRedirectPathForRole } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
-import { getProfileRoles, resolveActiveRole } from "@/lib/services/roles.service";
+import { getProfileRoles } from "@/lib/services/roles.service";
 import { getHostByProfileId } from "@/lib/services/hosts.service";
+import { getSpecialistById } from "@/lib/specialists";
 
 export default async function DebugAuthPage() {
   const requestId = crypto.randomUUID();
@@ -30,7 +31,7 @@ export default async function DebugAuthPage() {
   const { user, profile } = ctx;
   const rolesRows = await getProfileRoles(profile.id);
   const availableRoles = rolesRows.map((r) => r.role);
-  const effectiveRole = resolveActiveRole(profile.role, (profile as { active_role?: string | null }).active_role ?? null, availableRoles);
+  const effectiveRole = await getEffectiveRoleForProfile(profile);
   const redirectPath = getRedirectPathForRole(effectiveRole);
   const siteUrl =
     typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
@@ -39,6 +40,7 @@ export default async function DebugAuthPage() {
 
   const isAdmin = effectiveRole === "admin";
   const host = await getHostByProfileId(profile.id);
+  const specialist = profile.specialist_id ? await getSpecialistById(profile.specialist_id) : null;
 
   log.info("debug/auth: profile inspected", {
     request_id: requestId,
@@ -65,6 +67,7 @@ export default async function DebugAuthPage() {
               <p>User ID: <code>{user.id}</code></p>
               <p>Email: <code>{user.email ?? "null"}</code></p>
               <p>Primary role: <code>{profile.role}</code></p>
+              <p>active_role (raw): <code>{profile.active_role ?? "null"}</code></p>
               <p>Active/effective role: <code>{effectiveRole}</code></p>
               <p>Redirect path: <code>{redirectPath}</code></p>
               {availableRoles.length > 0 && (
@@ -92,6 +95,28 @@ export default async function DebugAuthPage() {
               ) : (
                 <p className="text-(--color-text-secondary)">
                   No host entity found for this profile. Legacy experiences and non-host accounts are expected to have no host.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-(--color-text-secondary)">
+              Specialist (marketplace)
+            </h2>
+            <div className="mt-2 rounded-lg bg-black/20 px-4 py-3 text-xs text-(--color-text-primary)">
+              {specialist ? (
+                <>
+                  <p>Status: <span className="text-emerald-300">specialist profile present</span></p>
+                  <p>Specialist ID: <code>{specialist.id}</code></p>
+                  <p>Name: <code>{specialist.name}</code></p>
+                  <p>Specialty: <code>{specialist.specialty}</code></p>
+                  <p>City: <code>{specialist.city ?? "—"}</code></p>
+                </>
+              ) : (
+                <p className="text-(--color-text-secondary)">
+                  No specialist entity found. Profiles without a `specialist_id` are expected to have no
+                  specialist.
                 </p>
               )}
             </div>

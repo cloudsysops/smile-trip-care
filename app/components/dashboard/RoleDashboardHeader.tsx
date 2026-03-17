@@ -22,26 +22,30 @@ export default function RoleDashboardHeader({
   maxWidth = "max-w-4xl",
 }: Props) {
   return (
-    <header className="border-b border-zinc-200 bg-white px-4 py-4 sm:px-6">
+    <header className="border-b border-zinc-800 bg-zinc-950/95 px-4 py-4 sm:px-6 backdrop-blur">
       <div className={`mx-auto flex ${maxWidth} items-center justify-between gap-4`}>
         <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <Link href={homeHref} className="text-sm font-medium text-zinc-600 hover:text-zinc-900 shrink-0">
+          <Link href={homeHref} className="text-sm font-medium text-zinc-400 hover:text-zinc-100 shrink-0">
             {homeLabel}
           </Link>
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`text-sm shrink-0 ${item.active ? "font-medium text-zinc-900 underline" : "text-zinc-600 hover:text-zinc-900 hover:underline"}`}
+              className={`text-sm shrink-0 ${
+                item.active
+                  ? "font-medium text-zinc-100 underline"
+                  : "text-zinc-400 hover:text-zinc-100 hover:underline"
+              }`}
             >
               {item.label}
             </Link>
           ))}
         </div>
         <div className="flex shrink-0 items-center gap-4">
-          <h1 className="truncate text-lg font-semibold text-zinc-900 sm:text-xl">{title}</h1>
+          <h1 className="truncate text-lg font-semibold text-zinc-100 sm:text-xl">{title}</h1>
           <form action="/api/auth/signout" method="post" className="inline">
-            <button type="submit" className="text-sm text-zinc-600 hover:underline">
+            <button type="submit" className="text-sm text-zinc-400 hover:text-zinc-100 hover:underline">
               Sign out
             </button>
           </form>

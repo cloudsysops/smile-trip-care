@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentProfile } from "@/lib/auth";
 import { getHostByProfileId } from "@/lib/services/hosts.service";
+import AuthDashboardHeader from "@/app/components/dashboard/AuthDashboardHeader";
 import StripeConnectButton from "./StripeConnectButton";
 
 export default async function HostDashboardPage() {
@@ -12,9 +13,9 @@ export default async function HostDashboardPage() {
   if (!host) {
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-50">
+        <AuthDashboardHeader title="Host dashboard" homeHref="/" homeLabel="Home" maxWidth="max-w-3xl" navItems={[]} />
         <main className="mx-auto max-w-3xl px-4 py-10">
-          <h1 className="text-2xl font-semibold">Host dashboard</h1>
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className="text-sm text-zinc-300">
             Your account is not configured as a host. Contact an admin if you should have host access.
           </p>
         </main>
@@ -38,14 +39,7 @@ export default async function HostDashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
       <main className="mx-auto max-w-5xl px-4 py-10">
-        <header className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold">Host dashboard</h1>
-            <p className="mt-1 text-sm text-zinc-400">
-              Manage your hosting role and prepare your account to receive payouts.
-            </p>
-          </div>
-        </header>
+        <AuthDashboardHeader title="Host dashboard" homeHref="/" homeLabel="Home" maxWidth="max-w-5xl" navItems={[]} />
 
         <section className="mt-8 grid gap-6 md:grid-cols-2">
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5">

@@ -2,11 +2,13 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { getServerSupabase } from "@/lib/supabase/server";
 import type { User } from "@supabase/supabase-js";
+import { getProfileRoles, resolveActiveRole } from "@/lib/services/roles.service";
 
 export type ProfileRole =
   | "admin"
   | "coordinator"
   | "provider_manager"
+  | "host"
   | "specialist"
   | "patient"
   | "user";
@@ -16,6 +18,7 @@ export type Profile = {
   email: string | null;
   full_name: string | null;
   role: ProfileRole;
+  active_role: ProfileRole | null;
   provider_id: string | null;
   specialist_id: string | null;
   is_active: boolean;
@@ -50,7 +53,7 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 const PROFILE_SELECT =
-  "id, email, full_name, role, provider_id, specialist_id, is_active, created_at, updated_at";
+  "id, email, full_name, role, active_role, provider_id, specialist_id, is_active, created_at, updated_at";
 
 /**
  * Get current user's profile from profiles table. Returns null if not authenticated or no profile / inactive.
@@ -72,6 +75,7 @@ export async function getCurrentProfile(): Promise<{ user: User; profile: Profil
       email: profile.email ?? null,
       full_name: profile.full_name ?? null,
       role: profile.role as ProfileRole,
+      active_role: (profile.active_role as ProfileRole | null) ?? null,
       provider_id: profile.provider_id ?? null,
       specialist_id: profile.specialist_id ?? null,
       is_active: profile.is_active ?? true,
@@ -81,11 +85,12 @@ export async function getCurrentProfile(): Promise<{ user: User; profile: Profil
   };
 }
 
-type RedirectRole = "admin" | "coordinator" | "provider_manager" | "specialist" | "patient";
+type RedirectRole = "admin" | "coordinator" | "provider_manager" | "host" | "specialist" | "patient";
 
 /** Resolve role for redirect: treat legacy 'user' as patient. */
 export function roleRedirectRole(role: ProfileRole): RedirectRole {
   if (role === "user") return "patient";
+  if (role === "host") return "host";
   return role === "admin" || role === "coordinator" || role === "provider_manager" || role === "specialist" || role === "patient"
     ? role
     : "patient";
@@ -101,6 +106,8 @@ export function getRedirectPathForRole(role: ProfileRole): string {
       return "/coordinator";
     case "provider_manager":
       return "/provider";
+    case "host":
+      return "/host";
     case "specialist":
       return "/specialist";
     case "patient":
@@ -111,12 +118,26 @@ export function getRedirectPathForRole(role: ProfileRole): string {
 }
 
 /**
+ * Effective role resolution for multi-role users.
+ * - If `profile.active_role` exists and is assigned in `profile_roles`, use it.
+ * - Else, prefer `profile.role` if assigned.
+ * - Else, fallback to first assigned role.
+ * - Else, fallback to `profile.role` (safe).
+ */
+export async function getEffectiveRoleForProfile(profile: Profile): Promise<ProfileRole> {
+  const rolesRows = await getProfileRoles(profile.id);
+  const availableRoles = rolesRows.map((r) => r.role);
+  return resolveActiveRole(profile.role, profile.active_role ?? null, availableRoles);
+}
+
+/**
  * Require admin: get user + profile, check role = 'admin'. Throws if not admin.
  */
 export async function requireAdmin(): Promise<{ user: User; profile: Profile }> {
   const ctx = await getCurrentProfile();
   if (!ctx) throw new Error("Unauthorized");
-  if (ctx.profile.role !== "admin") throw new Error("Forbidden");
+  const effectiveRole = await getEffectiveRoleForProfile(ctx.profile);
+  if (effectiveRole !== "admin") throw new Error("Forbidden");
   return { user: ctx.user, profile: ctx.profile };
 }
 
@@ -126,7 +147,8 @@ export async function requireAdmin(): Promise<{ user: User; profile: Profile }> 
 export async function requireCoordinator(): Promise<{ user: User; profile: Profile }> {
   const ctx = await getCurrentProfile();
   if (!ctx) throw new Error("Unauthorized");
-  if (ctx.profile.role !== "coordinator" && ctx.profile.role !== "admin") {
+  const effectiveRole = await getEffectiveRoleForProfile(ctx.profile);
+  if (effectiveRole !== "coordinator" && effectiveRole !== "admin") {
     throw new Error("Forbidden");
   }
   return { user: ctx.user, profile: ctx.profile };
@@ -138,7 +160,8 @@ export async function requireCoordinator(): Promise<{ user: User; profile: Profi
 export async function requireProviderManager(): Promise<{ user: User; profile: Profile }> {
   const ctx = await getCurrentProfile();
   if (!ctx) throw new Error("Unauthorized");
-  if (ctx.profile.role !== "provider_manager" && ctx.profile.role !== "admin") {
+  const effectiveRole = await getEffectiveRoleForProfile(ctx.profile);
+  if (effectiveRole !== "provider_manager" && effectiveRole !== "admin") {
     throw new Error("Forbidden");
   }
   return { user: ctx.user, profile: ctx.profile };
@@ -150,7 +173,8 @@ export async function requireProviderManager(): Promise<{ user: User; profile: P
 export async function requireSpecialist(): Promise<{ user: User; profile: Profile }> {
   const ctx = await getCurrentProfile();
   if (!ctx) throw new Error("Unauthorized");
-  if (ctx.profile.role !== "specialist" && ctx.profile.role !== "admin") {
+  const effectiveRole = await getEffectiveRoleForProfile(ctx.profile);
+  if (effectiveRole !== "specialist" && effectiveRole !== "admin") {
     throw new Error("Forbidden");
   }
   return { user: ctx.user, profile: ctx.profile };
@@ -162,10 +186,11 @@ export async function requireSpecialist(): Promise<{ user: User; profile: Profil
 export async function requirePatient(): Promise<{ user: User; profile: Profile }> {
   const ctx = await getCurrentProfile();
   if (!ctx) throw new Error("Unauthorized");
+  const effectiveRole = await getEffectiveRoleForProfile(ctx.profile);
   const ok =
-    ctx.profile.role === "patient" ||
-    ctx.profile.role === "user" ||
-    ctx.profile.role === "admin";
+    effectiveRole === "patient" ||
+    effectiveRole === "user" ||
+    effectiveRole === "admin";
   if (!ok) throw new Error("Forbidden");
   return { user: ctx.user, profile: ctx.profile };
 }

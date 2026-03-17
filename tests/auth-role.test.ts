@@ -13,6 +13,7 @@ describe("auth role helpers", () => {
     expect(getRedirectPathForRole("specialist" as ProfileRole)).toBe("/specialist");
     expect(getRedirectPathForRole("patient" as ProfileRole)).toBe("/patient");
     expect(getRedirectPathForRole("user" as ProfileRole)).toBe("/patient");
+    expect(getRedirectPathForRole("host" as ProfileRole)).toBe("/host");
   });
 
   it("roleRedirectRole maps user to patient", () => {
@@ -22,11 +23,13 @@ describe("auth role helpers", () => {
 });
 
 const getCurrentProfileMock = vi.hoisted(() => vi.fn());
+const getEffectiveRoleForProfileMock = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/auth", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/auth")>();
   return {
     ...actual,
     getCurrentProfile: getCurrentProfileMock,
+    getEffectiveRoleForProfile: getEffectiveRoleForProfileMock,
   };
 });
 
@@ -41,6 +44,7 @@ describe("GET /api/auth/me", () => {
   });
 
   it("returns role and redirectPath when authenticated", async () => {
+    getEffectiveRoleForProfileMock.mockImplementation(async (profile: { role: ProfileRole }) => profile.role);
     getCurrentProfileMock.mockResolvedValueOnce({
       user: { id: "u1" },
       profile: {
