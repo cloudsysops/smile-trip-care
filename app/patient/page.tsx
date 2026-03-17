@@ -14,6 +14,7 @@ import CareCoordinatorSection from "@/app/components/dashboard/CareCoordinatorSe
 import AftercareSection from "@/app/components/dashboard/AftercareSection";
 import TreatmentProgressTimeline from "@/app/components/dashboard/TreatmentProgressTimeline";
 import PatientNextStepCard from "@/app/components/dashboard/PatientNextStepCard";
+import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 import { getProgressForPatient } from "@/lib/clinical/progress";
 import type { PackageWithRelations } from "@/lib/packages";
@@ -372,11 +373,18 @@ export default async function PatientDashboardPage() {
                     </tbody>
                   </table>
                 </div>
+                <p className="mt-3 text-xs text-zinc-500">
+                  Want more detail about how deposits and payouts work?{" "}
+                  <Link href="/how-payments-work" className="text-emerald-600 hover:text-emerald-700">
+                    Read how payments work →
+                  </Link>
+                </p>
               </div>
             )}
           </div>
         )}
       </main>
+      <FeedbackButton page="/patient" />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { branding } from "@/lib/branding";
 import { getPublishedPackageBySlug } from "@/lib/packages";
 import { getPublishedAssets } from "@/lib/assets";
+import { WhatsAppButton } from "@/app/components/WhatsAppButton";
 
 type SearchValue = string | string[] | undefined;
 type Props = {
@@ -177,17 +178,30 @@ export default async function PackagePage({ params, searchParams }: Props) {
         <section className="rounded-2xl border-2 border-emerald-600 bg-emerald-50 p-8 text-center shadow-sm md:p-10">
           <h2 className="text-xl font-bold text-zinc-900">Ready to start your journey?</h2>
           <p className="mt-2 text-sm text-zinc-700">
-            Complete our free assessment. We&apos;ll review your case and coordinate next steps—no commitment.
+            Complete our free assessment or chat with a coordinator about customizing this package for your smile and
+            travel plans.
           </p>
-          <Link
-            href={assessmentHref}
-            className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-emerald-600 px-8 font-semibold text-white shadow-md transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-          >
-            Start free assessment
-          </Link>
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+            <Link
+              href={assessmentHref}
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-emerald-600 px-8 font-semibold text-white shadow-md transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            >
+              Start assessment
+            </Link>
+            <Link
+              href={`/build-package?base=${encodeURIComponent(slug)}`}
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border border-emerald-600 px-8 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
+            >
+              Customize package
+            </Link>
+            <WhatsAppButton
+              message={`Hi, I'm looking at the ${pkg.name} package and would like to chat about dental + travel options.`}
+              className="mt-2 sm:mt-0"
+            />
+          </div>
           <Link
             href="/packages"
-            className="mt-3 block text-sm font-medium text-emerald-700 hover:text-emerald-800"
+            className="mt-4 block text-sm font-medium text-emerald-700 hover:text-emerald-800"
           >
             Compare all packages
           </Link>

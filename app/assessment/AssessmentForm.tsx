@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PackageRow } from "@/lib/packages";
+import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
 
 type Props = Readonly<{ packages: PackageRow[]; prefillPackageSlug?: string }>;
 
@@ -261,6 +262,7 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
           <p className="mt-3 text-center text-xs text-zinc-500">We respond within 24 hours. No commitment.</p>
         </div>
       </form>
+      <FeedbackButton page="/assessment" />
     </>
   );
 }

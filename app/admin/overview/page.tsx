@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import StatCard from "@/app/components/dashboard/StatCard";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
+import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
 
 function startOfTodayUTC(): string {
   const d = new Date();
@@ -145,6 +146,7 @@ export default async function AdminOverviewPage() {
           </DashboardSection>
         </DashboardLayout>
       </main>
+      <FeedbackButton page="/admin/overview" />
     </div>
   );
 }

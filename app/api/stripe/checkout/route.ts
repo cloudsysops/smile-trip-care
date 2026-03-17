@@ -49,9 +49,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Forbidden", request_id: requestId }, { status: 403 });
   }
   try {
+    log.info("stripe/checkout: request received", {
+      request_id: requestId,
+      lead_id: undefined,
+      actor_role: ctx.profile.role,
+    });
     const config = getServerConfig();
     if (!config.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Stripe not configured", request_id: requestId }, { status: 500 });
+      log.error("stripe/checkout: STRIPE_SECRET_KEY missing");
+      return NextResponse.json(
+        { error: "Stripe not configured. Contact support.", request_id: requestId },
+        { status: 500 },
+      );
     }
     const body = await request.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(body);
@@ -62,6 +71,11 @@ export async function POST(request: Request) {
       );
     }
     const { lead_id, amount_cents, success_url, cancel_url } = parsed.data;
+    log.info("stripe/checkout: parsed body", {
+      request_id: requestId,
+      lead_id,
+      actor_role: ctx.profile.role,
+    });
     const requestOrigin = new URL(request.url).origin;
     const baseOrigin =
       typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
@@ -82,7 +96,10 @@ export async function POST(request: Request) {
       .eq("id", lead_id)
       .maybeSingle();
     if (leadError) {
-      log.error("Failed to validate lead before checkout", { error: leadError.message, lead_id });
+      log.error("stripe/checkout: failed to validate lead before checkout", {
+        error: leadError.message,
+        lead_id,
+      });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
     if (!leadRow) {
@@ -105,7 +122,7 @@ export async function POST(request: Request) {
         .eq("slug", packageSlug)
         .maybeSingle();
       if (packageError) {
-        log.error("Failed to load package pricing", {
+        log.error("stripe/checkout: failed to load package pricing", {
           error: packageError.message,
           package_slug: packageSlug,
         });
@@ -140,7 +157,7 @@ export async function POST(request: Request) {
       .eq("id", lead_id)
       .maybeSingle();
     if (leadErr) {
-      log.error("Failed to fetch lead", { error: leadErr.message, lead_id });
+      log.error("stripe/checkout: failed to fetch lead", { error: leadErr.message, lead_id });
       return NextResponse.json(
         { error: "Internal server error", request_id: requestId },
         { status: 500 }
@@ -160,22 +177,34 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(config.STRIPE_SECRET_KEY);
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "usd",
-            unit_amount: resolvedAmountCents,
-            product_data: { name: `Deposit — ${packageName ?? branding.productName}` },
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "usd",
+              unit_amount: resolvedAmountCents,
+              product_data: { name: `Deposit — ${packageName ?? branding.productName}` },
+            },
           },
-        },
-      ],
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: { lead_id },
-    });
+        ],
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        metadata: { lead_id },
+      });
+    } catch (stripeErr) {
+      log.error("stripe/checkout: Stripe session creation failed", {
+        error: stripeErr instanceof Error ? stripeErr.message : String(stripeErr),
+        lead_id,
+      });
+      return NextResponse.json(
+        { error: "Stripe checkout unavailable. Please try again later.", request_id: requestId },
+        { status: 502 },
+      );
+    }
 
     const { error } = await supabase.from("payments").insert({
       lead_id,
@@ -184,7 +213,7 @@ export async function POST(request: Request) {
       status: "pending",
     });
     if (error) {
-      log.error("Failed to persist checkout session", { error: error.message, lead_id });
+      log.error("stripe/checkout: failed to persist checkout session", { error: error.message, lead_id });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
 

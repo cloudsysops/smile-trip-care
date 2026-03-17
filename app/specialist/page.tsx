@@ -5,6 +5,7 @@ import { getSpecialistDashboardData } from "@/lib/dashboard-data";
 import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 import EmptyState from "@/app/components/ui/EmptyState";
+import SpecialistStripeConnectButton from "./StripeConnectButton";
 
 export default async function SpecialistDashboardPage() {
   let profile;
@@ -26,7 +27,16 @@ export default async function SpecialistDashboardPage() {
     );
   }
   const data = await getSpecialistDashboardData(specialistId);
-  const specialist = data.specialist as { id: string; name: string; specialty: string; city: string; approval_status: string; published: boolean } | null;
+  const specialist = data.specialist as {
+    id: string;
+    name: string;
+    specialty: string;
+    city: string;
+    approval_status: string;
+    published: boolean;
+    stripe_onboarding_complete?: boolean | null;
+    stripe_details_submitted?: boolean | null;
+  } | null;
   const consultations = data.consultations as { id: string; lead_id: string; status: string; requested_at: string | null; scheduled_at: string | null }[];
 
   return (
@@ -44,6 +54,21 @@ export default async function SpecialistDashboardPage() {
           title={specialist?.name ?? "Specialist"}
           description={specialist?.specialty ? `Specialist · ${specialist.specialty}` : "Specialist overview"}
         >
+          <DashboardSection>
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-white p-5">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">Payout setup</p>
+                <p className="mt-1 text-sm text-zinc-600">
+                  {specialist?.stripe_onboarding_complete
+                    ? "Ready for automated payouts"
+                    : specialist?.stripe_details_submitted
+                      ? "Stripe details submitted · pending verification"
+                      : "Stripe account not connected yet"}
+                </p>
+              </div>
+              <SpecialistStripeConnectButton disabled={!!specialist?.stripe_onboarding_complete} />
+            </div>
+          </DashboardSection>
           <DashboardSection>
             <div className="mb-2 rounded-lg border border-zinc-200 bg-white p-5">
               <p className="text-sm font-medium text-zinc-500">Consultation requests</p>

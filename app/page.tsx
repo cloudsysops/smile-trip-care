@@ -882,6 +882,15 @@ export default async function Home() {
               <Link href="/legal" className="block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
                 Privacy &amp; legal
               </Link>
+              <Link href="/trust-and-safety" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                Trust &amp; safety
+              </Link>
+              <Link href="/how-payments-work" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                How payments work
+              </Link>
+              <Link href="/our-clinical-network" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                Clinical network
+              </Link>
             </div>
           </div>
           <p className="mt-10 text-center text-sm text-zinc-500">

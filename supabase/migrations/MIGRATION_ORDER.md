@@ -29,6 +29,8 @@ O en Supabase SQL Editor, ejecutar en este orden:
 19. 0019_leads_qualification_indexes.sql  
 20. 0020_leads_recommended_package.sql  
 21. 0021_treatment_progress.sql  
+22. 0022_patient_pipeline.sql  
+23. 0023_profile_roles.sql  
 
 Luego opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`.
 

@@ -4,6 +4,7 @@ import { getPublishedPackagesWithFilters } from "@/lib/packages";
 import type { PackageType } from "@/lib/packages";
 import MarketplacePackageCard from "@/app/components/marketplace/MarketplacePackageCard";
 import PackageFiltersForm from "@/app/components/marketplace/PackageFiltersForm";
+import { WhatsAppButton } from "@/app/components/WhatsAppButton";
 
 type Props = { searchParams: Promise<{ city?: string; type?: string; minPrice?: string; maxPrice?: string; minDuration?: string; maxDuration?: string }> };
 
@@ -60,11 +61,31 @@ export default async function PackagesPage({ searchParams }: Props) {
             <Link href="/packages" className="mt-4 inline-block text-sm font-semibold text-emerald-400 hover:text-emerald-300">View all packages →</Link>
           </div>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {packages.map((pkg) => (
-              <MarketplacePackageCard key={pkg.id} pkg={pkg} />
-            ))}
-          </ul>
+          <>
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {packages.map((pkg) => (
+                <MarketplacePackageCard key={pkg.id} pkg={pkg} />
+              ))}
+            </ul>
+            <div className="mt-10 flex flex-col items-center gap-4 text-center">
+              <p className="text-sm text-zinc-400">
+                Prefer to talk to a human? Share your situation and we&apos;ll coordinate the best package for you.
+              </p>
+              <WhatsAppButton
+                message="Hi, I'm browsing packages and would like help choosing the best dental + travel plan in Colombia."
+              />
+              <p className="mt-2 text-xs text-zinc-500">
+                Curious about safety and payments?{" "}
+                <Link href="/trust-and-safety" className="text-emerald-400 hover:text-emerald-300">
+                  Trust &amp; safety
+                </Link>{" "}
+                ·{" "}
+                <Link href="/how-payments-work" className="text-emerald-400 hover:text-emerald-300">
+                  How payments work
+                </Link>
+              </p>
+            </div>
+          </>
         )}
         {packages.length > 0 && (
           <p className="mt-8 text-center text-sm text-zinc-500">
