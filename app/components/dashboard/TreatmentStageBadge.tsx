@@ -10,10 +10,10 @@ type Props = Readonly<{
 export default function TreatmentStageBadge({ stageLabel, status }: Props) {
   const statusStyle =
     status === "completed"
-      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+      ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
       : status === "cancelled"
-        ? "bg-zinc-100 text-zinc-600 border-zinc-200"
-        : "bg-sky-100 text-sky-800 border-sky-200";
+        ? "bg-zinc-700/20 text-zinc-300 border-zinc-700/30"
+        : "bg-sky-500/10 text-sky-300 border-sky-500/30";
 
   return (
     <span
