@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import DataTable, { type DataTableColumn } from "@/app/components/dashboard/DataTable";
+import AdminDataTable, { type AdminDataTableColumn } from "@/app/admin/_components/AdminDataTable";
 import { generateSuggestedReply } from "@/lib/growth/aiResponder";
 import HarvesterActions from "./HarvesterActions";
 
@@ -38,10 +38,10 @@ function ScoreBadge({ row }: { row: ExternalLead }) {
   const reason = row.score_reason ?? "";
   const style =
     score === "high"
-      ? "border border-emerald-400 bg-emerald-100 text-emerald-900 font-semibold"
+      ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-semibold"
       : score === "medium"
-        ? "border border-amber-400 bg-amber-100 text-amber-900"
-        : "border border-zinc-200 bg-zinc-100 text-zinc-700";
+        ? "border border-amber-500/30 bg-amber-500/10 text-amber-300"
+        : "border border-zinc-700 bg-zinc-700/20 text-zinc-300";
   return (
     <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs ${style}`} title={reason}>
       {score}
@@ -80,7 +80,7 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
     setRepliedIds((prev) => ({ ...prev, [id]: replied }));
   };
 
-  const columns: DataTableColumn<ExternalLead>[] = useMemo(
+  const columns: AdminDataTableColumn<ExternalLead>[] = useMemo(
     () => [
       {
         header: "Source",
@@ -90,11 +90,11 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
         header: "Content",
         cell: (row) => (
           <div className="space-y-1">
-            <p className="text-sm text-zinc-800 line-clamp-3">{row.content}</p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm text-zinc-200 line-clamp-3">{row.content}</p>
+            <p className="text-xs text-zinc-400">
               Suggested reply:
               <br />
-              <span className="block whitespace-pre-wrap rounded border border-zinc-200 bg-zinc-50 px-2 py-1">
+              <span className="block whitespace-pre-wrap rounded border border-zinc-700 bg-zinc-900/40 px-2 py-1">
                 {generateSuggestedReply(row.content, row.keyword)}
               </span>
             </p>
@@ -111,7 +111,7 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
           <span>
             {row.status.replaceAll("_", " ")}
             {repliedIds[row.id] && (
-              <span className="ml-1 text-emerald-600" title="Marked replied in this session or saved locally">
+              <span className="ml-1 text-emerald-300" title="Marked replied in this session or saved locally">
                 · Replied (local)
               </span>
             )}
@@ -147,14 +147,14 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3 border-b border-zinc-200 pb-3">
-        <span className="text-sm font-medium text-zinc-700">Filters:</span>
+      <div className="flex flex-wrap items-center gap-3 border-b border-zinc-800 pb-3">
+        <span className="text-sm font-medium text-zinc-200">Filters:</span>
         <label className="flex items-center gap-1.5 text-sm">
           Source
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs"
+            className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-200"
           >
             {sources.map((s) => (
               <option key={s} value={s}>
@@ -168,7 +168,7 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs"
+            className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-200"
           >
             {statuses.map((s) => (
               <option key={s} value={s}>
@@ -182,7 +182,7 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
           <select
             value={scoreFilter}
             onChange={(e) => setScoreFilter(e.target.value)}
-            className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs"
+            className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-200"
           >
             <option value={SCORE_ALL}>All scores</option>
             <option value="high">High</option>
@@ -190,13 +190,13 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
             <option value="low">Low</option>
           </select>
         </label>
-        <span className="ml-auto text-xs text-zinc-500">
+        <span className="ml-auto text-xs text-zinc-400">
           Showing {filteredLeads.length} of {leads.length}
         </span>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
-        <p className="font-medium text-zinc-700">Score legend</p>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-400">
+        <p className="font-medium text-zinc-200">Score legend</p>
         <p className="mt-0.5">
           <strong>High:</strong> treatment + cost + abroad ·{" "}
           <strong>Medium:</strong> treatment + (cost or abroad) · <strong>Low:</strong> weaker
@@ -205,12 +205,12 @@ export default function HarvesterTableWithFilters({ leads, initialRepliedIds }: 
       </div>
 
       {aiUsedCount > 0 && (
-        <p className="text-xs text-zinc-500" aria-live="polite">
+        <p className="text-xs text-zinc-400" aria-live="polite">
           AI replies this session: <strong>{aiUsedCount}</strong>
         </p>
       )}
 
-      <DataTable
+      <AdminDataTable
         columns={columns}
         rows={filteredLeads}
         emptyMessage="No leads match the current filters."

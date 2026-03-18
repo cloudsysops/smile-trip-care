@@ -24,8 +24,8 @@ function parseFilters(params: Record<string, string | undefined>) {
 }
 
 export const metadata = {
-  title: "Packages | MedVoyage Smile",
-  description: "Browse health, tour, and combo packages in Medellín and Manizales.",
+  title: "Packages | SmileTripCare",
+  description: "Browse curated health, travel, and combo packages in Medellín and Manizales.",
 };
 
 export default async function PackagesPage({ searchParams }: Props) {

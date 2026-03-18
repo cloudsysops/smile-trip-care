@@ -4,9 +4,12 @@
 
 import { runChatJson } from "@/lib/ai/openai";
 
-const ASSESSMENT_URL =
-  process.env.NEXT_PUBLIC_ASSESSMENT_URL ||
-  "https://smile-transformation-platform-dev.vercel.app/assessment";
+const siteOrigin =
+  typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
+    ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
+    : "http://localhost:3000";
+
+const ASSESSMENT_URL = process.env.NEXT_PUBLIC_ASSESSMENT_URL ?? `${siteOrigin}/assessment`;
 
 const SYSTEM_PROMPT = `You are a helpful, non-salesy advisor for people researching dental treatment and dental tourism.
 

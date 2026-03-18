@@ -5,6 +5,13 @@
  * This is intentionally simple and synchronous – no external calls.
  */
 export function generateSuggestedReply(postText: string, keywordHint?: string): string {
+  const siteOrigin =
+    typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
+      ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
+      : "http://localhost:3000";
+
+  const assessmentUrl = `${siteOrigin}/assessment`;
+
   const trimmed = postText.trim();
   const summaryHint =
     trimmed.length > 0
@@ -38,7 +45,7 @@ export function generateSuggestedReply(postText: string, keywordHint?: string): 
     "If you're considering options, you can start with a free smile assessment with our team. We'll review your case, suggest a treatment plan, and give you an idea of costs and timeline—no commitment.",
     "",
     "You can take the free assessment here:",
-    "https://smile-transformation-platform-dev.vercel.app/assessment",
+    assessmentUrl,
     "",
     "Once you submit it, a coordinator will follow up within about one business day to answer questions and discuss next steps.",
   ].join("\n");

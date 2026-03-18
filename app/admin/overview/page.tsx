@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
-import StatCard from "@/app/components/dashboard/StatCard";
+import AdminStatCard from "@/app/admin/_components/AdminStatCard";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
 import AuthDashboardHeader from "@/app/components/dashboard/AuthDashboardHeader";
@@ -100,17 +100,17 @@ export default async function AdminOverviewPage() {
         >
           <DashboardSection>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <StatCard
+              <AdminStatCard
                 label="Leads hoy"
                 value={leadsToday}
                 href="/admin/leads"
               />
-              <StatCard
+              <AdminStatCard
                 label="Leads esta semana"
                 value={leadsWeek}
                 href="/admin/leads"
               />
-              <StatCard
+              <AdminStatCard
                 label="Pendientes de aprobación"
                 value={pendingApproval}
                 helper={
@@ -119,11 +119,11 @@ export default async function AdminOverviewPage() {
                   </>
                 }
               />
-              <StatCard
+              <AdminStatCard
                 label="Reservas con depósito"
                 value={bookingsDeposit}
               />
-              <StatCard
+              <AdminStatCard
                 label="Ingresos del mes"
                 value={incomeFormatted}
               />

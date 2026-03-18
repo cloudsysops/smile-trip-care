@@ -27,7 +27,7 @@ const US_RANGE_BY_TREATMENT: Record<string, string> = {
   "General": "Varies by treatment",
 };
 
-/** Midpoint US estimate in cents for "You save $X" when we have MedVoyage price. Illustrative only. */
+/** Midpoint US estimate in cents for "You save $X" when we have SmileTripCare pricing. Illustrative only. */
 const US_MID_CENTS_BY_TREATMENT: Record<string, number> = {
   "Dental Implants": 1_150_000, // ~$11,500
   "Implants": 1_150_000,
@@ -262,7 +262,7 @@ export default async function ProposalPage({ searchParams }: Props) {
           </div>
         )}
 
-        {/* Why patients trust MedVoyage Smile */}
+        {/* Why patients trust SmileTripCare */}
         <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6" aria-labelledby="trust-heading">
           <h2 id="trust-heading" className="text-xl font-serif font-normal text-white">
             Why patients trust {branding.productName}

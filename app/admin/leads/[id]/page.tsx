@@ -115,7 +115,7 @@ export default async function AdminLeadDetailPage({ params }: Props) {
       title={`Lead: ${lead.first_name} ${lead.last_name}`}
       currentSection="leads"
       headerLeading={
-        <Link href="/admin/leads" className="text-sm text-zinc-600 hover:underline">
+        <Link href="/admin/leads" className="text-sm text-zinc-400 hover:underline">
           ← Back to leads
         </Link>
       }
@@ -124,50 +124,50 @@ export default async function AdminLeadDetailPage({ params }: Props) {
     >
       <div className="space-y-6">
         {/* Primary overview: status, recommendation, deposit */}
-        <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-6 sm:grid-cols-3">
+        <section className="grid gap-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-6 sm:grid-cols-3">
           {lead.status !== "deposit_paid" && (
-            <p className="sm:col-span-3 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-sm font-medium text-amber-800">
+            <p className="sm:col-span-3 rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-sm font-medium text-amber-200">
               {!(lead.recommended_package_slug as string)?.trim()
                 ? "Ready to recommend package — set a recommendation below, then collect deposit when the lead is ready."
                 : "Ready to collect deposit — use the Collect deposit button when the lead is ready to pay."}
             </p>
           )}
-          <div className="sm:col-span-1 border-b border-zinc-100 pb-4 sm:border-b-0 sm:border-r sm:pr-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Lead status</h2>
-            <p className="mt-2 text-sm font-semibold text-zinc-900">{lead.status}</p>
-            <p className="mt-1 text-xs text-zinc-500">
+          <div className="sm:col-span-1 border-b border-zinc-800 pb-4 sm:border-b-0 sm:border-r sm:pr-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-300">Lead status</h2>
+            <p className="mt-2 text-sm font-semibold text-zinc-100">{lead.status}</p>
+            <p className="mt-1 text-xs text-zinc-400">
               Created {new Date(lead.created_at).toLocaleDateString(undefined, { dateStyle: "medium" })}
             </p>
             {lead.last_contacted_at && (
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-zinc-400">
                 Last contacted {new Date(lead.last_contacted_at).toLocaleString()}
               </p>
             )}
             {lead.next_follow_up_at && (
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-xs text-zinc-400">
                 Next follow-up {new Date(lead.next_follow_up_at).toLocaleString()}
               </p>
             )}
           </div>
-          <div className="sm:col-span-1 border-b border-zinc-100 pb-4 sm:border-b-0 sm:border-r sm:px-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Package (recommend if not set)</h2>
-            <p className="mt-2 text-sm text-zinc-900">
+          <div className="sm:col-span-1 border-b border-zinc-800 pb-4 sm:border-b-0 sm:border-r sm:px-4">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-300">Package (recommend if not set)</h2>
+            <p className="mt-2 text-sm text-zinc-100">
               {lead.recommended_package_slug && lead.recommended_package_slug !== ""
                 ? lead.recommended_package_slug
                 : lead.package_slug
                   ? `From form: ${lead.package_slug}`
                   : "No package selected yet"}
             </p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-zinc-400">
               Use <span className="font-semibold">Recommend package</span> below to choose the journey for this lead.
             </p>
           </div>
           <div className="sm:col-span-1 pt-4 sm:pt-0 sm:pl-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Deposit (collect when ready)</h2>
-            <p className="mt-2 text-sm text-zinc-900">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-300">Deposit (collect when ready)</h2>
+            <p className="mt-2 text-sm text-zinc-100">
               {lead.status === "deposit_paid" ? "Paid" : "Collect via Stripe Checkout when lead is ready."}
             </p>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-xs text-zinc-400">
               When you&apos;re ready to secure the booking, click Collect deposit below.
             </p>
             <div className="mt-3">
@@ -177,52 +177,52 @@ export default async function AdminLeadDetailPage({ params }: Props) {
         </section>
 
         {/* Lead details */}
-        <section className="rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="text-sm font-semibold text-zinc-900">Lead details</h2>
+        <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+          <h2 className="text-sm font-semibold text-zinc-100">Lead details</h2>
           <dl className="mt-3 grid gap-3 text-sm">
             <div>
-              <dt className="font-medium text-zinc-500">Email</dt>
+              <dt className="font-medium text-zinc-300">Email</dt>
               <dd>{lead.email}</dd>
             </div>
             {lead.phone && (
               <div>
-                <dt className="font-medium text-zinc-500">Phone</dt>
+                <dt className="font-medium text-zinc-300">Phone</dt>
                 <dd>{lead.phone}</dd>
               </div>
             )}
             {lead.country && (
               <div>
-                <dt className="font-medium text-zinc-500">Country</dt>
+                <dt className="font-medium text-zinc-300">Country</dt>
                 <dd>{lead.country}</dd>
               </div>
             )}
             {lead.package_slug && (
               <div>
-                <dt className="font-medium text-zinc-500">Package from form</dt>
+                <dt className="font-medium text-zinc-300">Package from form</dt>
                 <dd>{lead.package_slug}</dd>
               </div>
             )}
             {lead.message && (
               <div>
-                <dt className="font-medium text-zinc-500">Message</dt>
+                <dt className="font-medium text-zinc-300">Message</dt>
                 <dd className="whitespace-pre-wrap">{lead.message}</dd>
               </div>
             )}
             {lead.follow_up_notes && (
               <div>
-                <dt className="font-medium text-zinc-500">Follow-up notes</dt>
+                <dt className="font-medium text-zinc-300">Follow-up notes</dt>
                 <dd className="whitespace-pre-wrap">{lead.follow_up_notes}</dd>
               </div>
             )}
             {attributionFields.some((item) => item.value) && (
               <div className="space-y-1 pt-2">
-                <dt className="font-medium text-zinc-500">Attribution</dt>
+                <dt className="font-medium text-zinc-300">Attribution</dt>
                 <dd>
                   <ul className="space-y-1">
                     {attributionFields.map((item) =>
                       item.value ? (
                         <li key={item.label}>
-                          <span className="font-medium text-zinc-500">{item.label}:</span>{" "}
+                          <span className="font-medium text-zinc-300">{item.label}:</span>{" "}
                           <span className="break-all">{item.value}</span>
                         </li>
                       ) : null,
@@ -235,19 +235,19 @@ export default async function AdminLeadDetailPage({ params }: Props) {
         </section>
 
         {latestProgress && (
-          <section className="rounded-lg border border-zinc-200 bg-white p-6">
-            <h2 className="text-sm font-semibold text-zinc-900">Treatment progress</h2>
-            <p className="mt-1 text-xs text-zinc-500">Latest update from specialist</p>
+          <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+            <h2 className="text-sm font-semibold text-zinc-100">Treatment progress</h2>
+            <p className="mt-1 text-xs text-zinc-400">Latest update from specialist</p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">
+              <span className="inline-flex items-center rounded-full border border-sky-500/30 bg-sky-500/10 px-2.5 py-0.5 text-xs font-medium text-sky-200">
                 {latestProgress.stage_label}
               </span>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-zinc-400">
                 {new Date(latestProgress.created_at).toLocaleDateString(undefined, { dateStyle: "medium" })}
               </span>
             </div>
             {latestProgress.notes?.trim() && (
-              <p className="mt-2 text-sm text-zinc-700 line-clamp-2">{latestProgress.notes.trim()}</p>
+              <p className="mt-2 text-sm text-zinc-200 line-clamp-2">{latestProgress.notes.trim()}</p>
             )}
           </section>
         )}

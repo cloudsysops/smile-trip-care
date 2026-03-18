@@ -3,7 +3,7 @@ import { branding } from "@/lib/branding";
 
 export const metadata = {
   title: `Trust & safety | ${branding.productName}`,
-  description: "How we vet clinics, specialists, and hosts, and how we coordinate safe medical travel to Colombia.",
+  description: `${branding.productName} explains how we vet clinics, specialists, and hosts, and how we coordinate safe medical travel to Colombia.`,
 };
 
 export default function TrustAndSafetyPage() {

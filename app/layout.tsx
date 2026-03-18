@@ -16,9 +16,9 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const metaTitle = "MedVoyage Smile — Premium Dental Tourism Platform";
+const metaTitle = "SmileTripCare | Medical Tourism & Dental Travel";
 const metaDescription =
-  "MedVoyage Smile connects international patients with verified dental clinics in Colombia, offering concierge medical tourism and savings up to 70%.";
+  "SmileTripCare connects international patients with trusted dental clinics in Colombia—coordinated end-to-end with curated specialists and guided travel care.";
 
 const siteUrl = typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
   ? process.env.NEXT_PUBLIC_SITE_URL.trim()

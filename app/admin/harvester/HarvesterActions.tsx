@@ -113,14 +113,14 @@ export default function HarvesterActions({
           type="button"
           onClick={handleGenerateClick}
           disabled={ai.status === "loading"}
-          className="rounded-full border border-zinc-200 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50 disabled:opacity-60"
+          className="rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800/40 disabled:opacity-60"
         >
           {ai.status === "loading" ? "Generating…" : "Generate AI reply"}
         </button>
         <button
           type="button"
           onClick={handleCopyClick}
-          className="rounded-full border border-zinc-200 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
+          className="rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800/40"
           title="Copy the AI or template reply"
         >
           Copy reply
@@ -130,8 +130,8 @@ export default function HarvesterActions({
           onClick={handleMarkRepliedClick}
           className={
             isReplied
-              ? "rounded-full border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs text-emerald-800"
-              : "rounded-full border border-zinc-200 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
+              ? "rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-300"
+              : "rounded-full border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800/40"
           }
         >
           {isReplied ? "Replied" : "Mark replied"}
@@ -141,14 +141,14 @@ export default function HarvesterActions({
             href={url}
             target="_blank"
             rel="noreferrer"
-            className="rounded-full border border-zinc-200 px-2 py-1 text-xs text-emerald-700 hover:bg-emerald-50"
+            className="rounded-full border border-zinc-700 px-2 py-1 text-xs text-emerald-300 hover:bg-emerald-500/10"
           >
             Open post
           </a>
         )}
       </div>
       {ai.status === "success" && (
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1.5 text-[11px] text-emerald-900">
+        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1.5 text-[11px] text-emerald-200">
           <p className="font-medium">
             AI reply{" "}
             {ai.fallbackUsed ? "(template used as fallback)" : "(generated)"}
@@ -157,12 +157,12 @@ export default function HarvesterActions({
         </div>
       )}
       {ai.status === "error" && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1.5 text-[11px] text-amber-900">
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-200">
           {ai.message}
         </div>
       )}
       {copyFeedback && (
-        <p className="text-[11px] text-zinc-500" aria-live="polite">
+        <p className="text-[11px] text-zinc-400" aria-live="polite">
           {copyFeedback}
         </p>
       )}

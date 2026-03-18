@@ -95,14 +95,14 @@ export default function LeadFollowUpForm({
   }
 
   return (
-    <form onSubmit={handleSave} className="rounded-lg border border-zinc-200 bg-white p-6">
+    <form onSubmit={handleSave} className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
       <div className="flex items-center justify-between gap-4">
         <h2 className="font-semibold">Follow-up planner</h2>
         <button
           type="button"
           onClick={markContactedAndSchedule}
           disabled={saving}
-          className="rounded border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+          className="rounded border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-zinc-800/40 disabled:opacity-50"
         >
           Mark contacted + follow up in 24h
         </button>
@@ -110,7 +110,7 @@ export default function LeadFollowUpForm({
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="last_contacted_at" className="block text-sm font-medium text-zinc-600">
+          <label htmlFor="last_contacted_at" className="block text-sm font-medium text-zinc-300">
             Last contacted at
           </label>
           <input
@@ -118,11 +118,11 @@ export default function LeadFollowUpForm({
             type="datetime-local"
             value={lastContactedAt}
             onChange={(e) => setLastContactedAt(e.target.value)}
-            className="mt-1 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
           />
         </div>
         <div>
-          <label htmlFor="next_follow_up_at" className="block text-sm font-medium text-zinc-600">
+          <label htmlFor="next_follow_up_at" className="block text-sm font-medium text-zinc-300">
             Next follow-up at
           </label>
           <input
@@ -130,16 +130,16 @@ export default function LeadFollowUpForm({
             type="datetime-local"
             value={nextFollowUpAt}
             onChange={(e) => setNextFollowUpAt(e.target.value)}
-            className="mt-1 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+            className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
           />
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-zinc-400">
             {hasFollowUpScheduled ? "Follow-up scheduled." : "No follow-up scheduled yet."}
           </p>
         </div>
       </div>
 
       <div className="mt-4">
-        <label htmlFor="follow_up_notes" className="block text-sm font-medium text-zinc-600">
+        <label htmlFor="follow_up_notes" className="block text-sm font-medium text-zinc-300">
           Follow-up notes
         </label>
         <textarea
@@ -149,7 +149,7 @@ export default function LeadFollowUpForm({
           value={followUpNotes}
           onChange={(e) => setFollowUpNotes(e.target.value)}
           placeholder="Objections, preferred channel, next action..."
-          className="mt-1 w-full rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500"
         />
       </div>
 

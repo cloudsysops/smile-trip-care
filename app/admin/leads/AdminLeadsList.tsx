@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import DataTable, { type DataTableColumn } from "@/app/components/dashboard/DataTable";
+import AdminDataTable, { type AdminDataTableColumn } from "@/app/admin/_components/AdminDataTable";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 
 type Lead = {
@@ -65,14 +65,14 @@ function priorityScore(priority: LeadWithPriority["priority"]): number {
 function badgeClass(priority: LeadWithPriority["priority"]): string {
   switch (priority) {
     case "overdue":
-      return "bg-red-100 text-red-700";
+      return "bg-red-500/10 text-red-300";
     case "due_soon":
-      return "bg-amber-100 text-amber-800";
+      return "bg-amber-500/10 text-amber-300";
     case "unplanned":
-      return "bg-zinc-200 text-zinc-700";
+      return "bg-zinc-700/20 text-zinc-300";
     case "normal":
     default:
-      return "bg-emerald-100 text-emerald-700";
+      return "bg-emerald-500/10 text-emerald-300";
   }
 }
 
@@ -103,9 +103,9 @@ function leadScore(lead: Lead): "high" | "medium" | "low" {
 }
 
 function scoreBadgeClass(score: "high" | "medium" | "low"): string {
-  if (score === "high") return "bg-emerald-100 text-emerald-700";
-  if (score === "medium") return "bg-amber-100 text-amber-800";
-  return "bg-zinc-100 text-zinc-700";
+  if (score === "high") return "bg-emerald-500/10 text-emerald-300";
+  if (score === "medium") return "bg-amber-500/10 text-amber-300";
+  return "bg-zinc-700/20 text-zinc-300";
 }
 
 /** Operator-friendly next action: recommend package vs collect deposit */
@@ -147,15 +147,15 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
     [prioritizedLeads, showActionQueueOnly],
   );
 
-  const columns: DataTableColumn<LeadWithPriority>[] = [
+  const columns: AdminDataTableColumn<LeadWithPriority>[] = [
     {
       header: "Name",
       cell: (lead) => (
         <div className="flex flex-col">
-          <span className="font-medium text-zinc-900">
+          <span className="font-medium text-zinc-100">
             {lead.first_name} {lead.last_name}
           </span>
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-zinc-400">
             {new Date(lead.created_at).toLocaleDateString()}
           </span>
         </div>
@@ -228,7 +228,7 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
       cell: (lead) => (
         <Link
           href={`/admin/leads/${lead.id}`}
-          className="rounded-full border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+          className="rounded-full border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-zinc-800/40"
         >
           Open
         </Link>
@@ -244,18 +244,18 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
         <button
           type="button"
           onClick={() => setShowActionQueueOnly((current) => !current)}
-          className="rounded border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+          className="rounded border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-zinc-800/40"
         >
           {showActionQueueOnly ? "Show all" : "Show action queue"}
         </button>
       }
     >
       <DashboardSection>
-        <p className="mb-3 text-sm text-zinc-600">
+        <p className="mb-3 text-sm text-zinc-400">
           {visibleLeads.length} lead{visibleLeads.length === 1 ? "" : "s"}
           {showActionQueueOnly ? " in action queue" : " total"}
         </p>
-        <DataTable
+        <AdminDataTable
           columns={columns}
           rows={visibleLeads}
           emptyMessage="No leads yet. New assessments will appear here."

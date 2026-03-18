@@ -1,6 +1,13 @@
 import { generateSuggestedReply } from "@/lib/growth/aiResponder";
 import { generateText } from "./provider";
 
+const siteOrigin =
+  typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
+    ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
+    : "http://localhost:3000";
+
+const assessmentUrl = `${siteOrigin}/assessment`;
+
 export type AiReplyResult = Readonly<{
   reply: string;
   fallbackUsed: boolean;
@@ -21,7 +28,7 @@ function buildPrompt(postText: string, keyword?: string): string {
     "- stays under 6 sentences.",
     "",
     "Always end the message with a clear call to action that points them to our free assessment at this URL:",
-    "https://smile-transformation-platform-dev.vercel.app/assessment",
+    assessmentUrl,
     "",
     "Write in clear, neutral English. Do not include markdown or bullet points; just plain text.",
     "",

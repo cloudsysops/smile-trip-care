@@ -137,7 +137,7 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
   }
 
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+    <section className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
       <h2 className="text-lg font-semibold">AI Actions</h2>
       <div className="flex flex-wrap gap-2">
         <button
@@ -175,20 +175,20 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
       </div>
 
       {error && (
-        <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
           {error}
         </div>
       )}
 
-      <div className="space-y-3 rounded border border-zinc-200 p-4">
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
         <h3 className="font-semibold">Latest triage</h3>
         {triage ? (
           <div className="space-y-2 text-sm">
-            <p><span className="font-medium text-zinc-600">Priority:</span> {triage.priority}</p>
-            <p><span className="font-medium text-zinc-600">Recommended city:</span> {triage.recommended_city}</p>
-            <p><span className="font-medium text-zinc-600">Next step:</span> {triage.next_step}</p>
+            <p><span className="font-medium text-zinc-300">Priority:</span> {triage.priority}</p>
+            <p><span className="font-medium text-zinc-300">Recommended city:</span> {triage.recommended_city}</p>
+            <p><span className="font-medium text-zinc-300">Next step:</span> {triage.next_step}</p>
             <div>
-              <p className="font-medium text-zinc-600">Questions to ask</p>
+              <p className="font-medium text-zinc-300">Questions to ask</p>
               <ul className="list-inside list-disc">
                 {triage.questions_to_ask.length > 0 ? (
                   triage.questions_to_ask.map((q) => <li key={q}>{q}</li>)
@@ -199,68 +199,68 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
             </div>
           </div>
         ) : (
-          <p className="text-sm text-zinc-600">No triage generated yet.</p>
+          <p className="text-sm text-zinc-400">No triage generated yet.</p>
         )}
       </div>
 
-      <div className="space-y-3 rounded border border-zinc-200 p-4">
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
         <h3 className="font-semibold">Latest sales reply</h3>
         {message ? (
           <div className="space-y-4 text-sm">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-400">
               Tone: {message.tone} · Follow-up: {message.followup_in_hours}h
               {message.generated_at ? ` · Generated: ${new Date(message.generated_at).toLocaleString()}` : ""}
             </p>
             <div>
               <div className="mb-1 flex items-center justify-between gap-2">
-                <p className="font-medium text-zinc-600">WhatsApp message</p>
+                <p className="font-medium text-zinc-300">WhatsApp message</p>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(message.whatsapp_message, "wa")}
-                  className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50"
+                  className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
                 >
                   {copiedKey === "wa" ? "Copied" : "Copy"}
                 </button>
               </div>
-              <p className="whitespace-pre-wrap rounded bg-zinc-50 p-2">{message.whatsapp_message}</p>
+              <p className="whitespace-pre-wrap rounded bg-zinc-900/40 p-2 text-zinc-100">{message.whatsapp_message}</p>
             </div>
             <div>
               <div className="mb-1 flex items-center justify-between gap-2">
-                <p className="font-medium text-zinc-600">Email subject</p>
+                <p className="font-medium text-zinc-300">Email subject</p>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(message.email_subject, "subject")}
-                  className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50"
+                  className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
                 >
                   {copiedKey === "subject" ? "Copied" : "Copy"}
                 </button>
               </div>
-              <p className="rounded bg-zinc-50 p-2">{message.email_subject}</p>
+              <p className="rounded bg-zinc-900/40 p-2 text-zinc-100">{message.email_subject}</p>
             </div>
             <div>
               <div className="mb-1 flex items-center justify-between gap-2">
-                <p className="font-medium text-zinc-600">Email body</p>
+                <p className="font-medium text-zinc-300">Email body</p>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(message.email_body, "email")}
-                  className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50"
+                  className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
                 >
                   {copiedKey === "email" ? "Copied" : "Copy"}
                 </button>
               </div>
-              <p className="whitespace-pre-wrap rounded bg-zinc-50 p-2">{message.email_body}</p>
+              <p className="whitespace-pre-wrap rounded bg-zinc-900/40 p-2 text-zinc-100">{message.email_body}</p>
             </div>
           </div>
         ) : (
-          <p className="text-sm text-zinc-600">No reply generated yet.</p>
+          <p className="text-sm text-zinc-400">No reply generated yet.</p>
         )}
       </div>
 
-      <div className="space-y-3 rounded border border-zinc-200 p-4">
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
         <h3 className="font-semibold">Ops tasks</h3>
         {ops ? (
           <div className="space-y-2 text-sm">
-            <p className="text-zinc-600">{ops.summary}</p>
+            <p className="text-zinc-300">{ops.summary}</p>
             <ul className="list-inside list-disc space-y-1">
               {ops.tasks.map((t, i) => (
                 <li key={i}>
@@ -271,28 +271,28 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
             </ul>
           </div>
         ) : (
-          <p className="text-sm text-zinc-600">No ops tasks generated yet.</p>
+          <p className="text-sm text-zinc-400">No ops tasks generated yet.</p>
         )}
       </div>
 
-      <div className="space-y-3 rounded border border-zinc-200 p-4">
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold">Itineraries history</h3>
           <button
             type="button"
             onClick={() => copyToClipboard(JSON.stringify(itineraryHistory, null, 2), "itinerary-json")}
-            className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50"
+            className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
           >
             {copiedKey === "itinerary-json" ? "Copied" : "Copy JSON"}
           </button>
         </div>
         {itineraryHistory.length === 0 ? (
-          <p className="text-sm text-zinc-600">No itinerary generated yet.</p>
+          <p className="text-sm text-zinc-400">No itinerary generated yet.</p>
         ) : (
           <ul className="space-y-3">
             {itineraryHistory.map((row) => (
-              <li key={row.id} className="rounded border border-zinc-200 p-3 text-sm">
-                <p className="text-xs text-zinc-500">
+              <li key={row.id} className="rounded border border-zinc-800 bg-zinc-900/40 p-3 text-sm">
+                <p className="text-xs text-zinc-400">
                   {new Date(row.created_at).toLocaleString()} · {row.city ?? "Unknown city"}
                 </p>
                 {row.content_json?.day_by_day ? (
@@ -304,7 +304,7 @@ export default function AiActionsPanel({ leadId, initialTriage, initialMessage, 
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-2 text-zinc-600">No itinerary detail stored.</p>
+                  <p className="mt-2 text-zinc-400">No itinerary detail stored.</p>
                 )}
               </li>
             ))}

@@ -4,10 +4,10 @@ import path from "node:path";
 import AdminShell from "@/app/admin/_components/AdminShell";
 import { requireAdmin } from "@/lib/auth";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
-import StatCard from "@/app/components/dashboard/StatCard";
 import EmptyState from "@/app/components/ui/EmptyState";
 import { readHarvesterRepliedState } from "@/lib/growth/harvesterState";
 import HarvesterTableWithFilters from "./HarvesterTableWithFilters";
+import AdminStatCard from "@/app/admin/_components/AdminStatCard";
 
 type HarvesterStatus = "discovered" | "replied" | "assessment_sent" | "converted_to_lead" | "ignored";
 
@@ -126,19 +126,19 @@ export default async function AdminHarvesterPage() {
       >
         <DashboardSection>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Discovered" value={discoveredCount} helper="New posts to review" />
-            <StatCard label="Replied" value={repliedCount} helper="Replies drafted or sent" />
-            <StatCard
+            <AdminStatCard label="Discovered" value={discoveredCount} helper="New posts to review" />
+            <AdminStatCard label="Replied" value={repliedCount} helper="Replies drafted or sent" />
+            <AdminStatCard
               label="Assessment sent"
               value={assessmentSentCount}
               helper="Invites with assessment link"
             />
-            <StatCard
+            <AdminStatCard
               label="Converted"
               value={convertedCount}
               helper="External leads linked to Smile leads"
             />
-            <StatCard
+            <AdminStatCard
               label="High-score leads"
               value={highScoreCount}
               helper="Strong intent (treatment + cost + abroad)"
@@ -150,7 +150,7 @@ export default async function AdminHarvesterPage() {
           description="Preview real-world posts and prepare helpful, patient-friendly replies."
         >
           {leads.length === 0 ? (
-            <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+            <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
               <EmptyState
                 title="No external leads yet"
                 description="When scrapers or manual discovery add posts from Reddit, Twitter, or other sources, they will appear here for review."

@@ -3,7 +3,7 @@ import { branding } from "@/lib/branding";
 
 export const metadata = {
   title: `How payments work | ${branding.productName}`,
-  description: "Understand deposits, Stripe payments, and how money flows through the platform today.",
+  description: `${branding.productName} explains secure deposits via Stripe and how coordination and payouts work today.`,
 };
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -35,8 +35,9 @@ export default function HowPaymentsWorkPage() {
             How deposits and payments work
           </h1>
           <p className="mt-4 max-w-2xl text-sm text-zinc-300 md:text-base">
-            This page explains how deposits work, what Stripe is used for, and how we handle payouts to clinics, hosts,
-            and specialists today. The goal is transparency—so you know what happens when you pay a deposit.
+            {branding.productName} explains how deposits work, what Stripe is used for, and how we handle payouts to
+            clinics, hosts, and specialists today. The goal is transparency—so you know what happens when you pay a
+            deposit.
           </p>
         </section>
 

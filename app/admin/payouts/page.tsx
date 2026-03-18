@@ -57,24 +57,24 @@ export default async function AdminPayoutsReadinessPage() {
   const { hosts, specialists } = await getStripeReadiness();
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
       <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
         <header className="mb-8">
-          <h1 className="text-2xl font-semibold text-zinc-900">Payout readiness</h1>
-          <p className="mt-2 text-sm text-zinc-600">
+          <h1 className="text-2xl font-semibold text-zinc-100">Payout readiness</h1>
+          <p className="mt-2 text-sm text-zinc-400">
             Stripe Connect status for hosts and specialists. Manual payouts remain the source of truth; this page only
             indicates readiness for future automated payouts.
           </p>
         </header>
 
         <section className="mb-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Hosts</h2>
-          <div className="mt-3 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">Hosts</h2>
+          <div className="mt-3 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
             {hosts.length === 0 ? (
-              <p className="px-4 py-3 text-sm text-zinc-500">No hosts configured yet.</p>
+              <p className="px-4 py-3 text-sm text-zinc-400">No hosts configured yet.</p>
             ) : (
               <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-medium text-zinc-500">
+                <thead className="border-b border-zinc-800 bg-zinc-900/40 text-xs font-medium text-zinc-400">
                   <tr>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">City</th>
@@ -84,14 +84,14 @@ export default async function AdminPayoutsReadinessPage() {
                 </thead>
                 <tbody>
                   {hosts.map((h) => (
-                    <tr key={h.id} className="border-b border-zinc-100">
-                      <td className="px-4 py-3 text-zinc-900">{h.display_name}</td>
-                      <td className="px-4 py-3 text-zinc-600">{h.city ?? "—"}</td>
-                      <td className="px-4 py-3 text-xs text-zinc-500">
+                    <tr key={h.id} className="border-b border-zinc-800">
+                      <td className="px-4 py-3 text-zinc-100">{h.display_name}</td>
+                      <td className="px-4 py-3 text-zinc-400">{h.city ?? "—"}</td>
+                      <td className="px-4 py-3 text-xs text-zinc-300">
                         {h.stripe_account_id ? h.stripe_account_id : "Not created"}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
+                        <span className="inline-flex rounded-full bg-zinc-700/20 px-3 py-1 text-xs font-medium text-zinc-300">
                           {readinessLabel(h)}
                         </span>
                       </td>
@@ -104,13 +104,13 @@ export default async function AdminPayoutsReadinessPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">Specialists</h2>
-          <div className="mt-3 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">Specialists</h2>
+          <div className="mt-3 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
             {specialists.length === 0 ? (
-              <p className="px-4 py-3 text-sm text-zinc-500">No specialists configured yet.</p>
+              <p className="px-4 py-3 text-sm text-zinc-400">No specialists configured yet.</p>
             ) : (
               <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-medium text-zinc-500">
+                <thead className="border-b border-zinc-800 bg-zinc-900/40 text-xs font-medium text-zinc-400">
                   <tr>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">City</th>
@@ -120,14 +120,14 @@ export default async function AdminPayoutsReadinessPage() {
                 </thead>
                 <tbody>
                   {specialists.map((s) => (
-                    <tr key={s.id} className="border-b border-zinc-100">
-                      <td className="px-4 py-3 text-zinc-900">{s.name}</td>
-                      <td className="px-4 py-3 text-zinc-600">{s.city ?? "—"}</td>
-                      <td className="px-4 py-3 text-xs text-zinc-500">
+                    <tr key={s.id} className="border-b border-zinc-800">
+                      <td className="px-4 py-3 text-zinc-100">{s.name}</td>
+                      <td className="px-4 py-3 text-zinc-400">{s.city ?? "—"}</td>
+                      <td className="px-4 py-3 text-xs text-zinc-300">
                         {s.stripe_account_id ? s.stripe_account_id : "Not created"}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700">
+                        <span className="inline-flex rounded-full bg-zinc-700/20 px-3 py-1 text-xs font-medium text-zinc-300">
                           {readinessLabel(s)}
                         </span>
                       </td>

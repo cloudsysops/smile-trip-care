@@ -28,7 +28,7 @@ const WHY_COLOMBIA = [
 const TESTIMONIALS = [
   { quote: "I saved over $8,000 compared to US prices. The clinic was modern and the team made everything easy.", author: "Sarah M.", role: "Dental implants, USA", stars: 5 },
   { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient", role: "Medellín package", stars: 5 },
-  { quote: "The specialists were excellent and the recovery in Manizales was perfect. I recommend MedVoyage Smile to anyone considering dental travel.", author: "James K.", role: "Smile design", stars: 5 },
+  { quote: `The specialists were excellent and the recovery in Manizales was perfect. I recommend ${branding.productName} to anyone considering dental travel.`, author: "James K.", role: "Smile design", stars: 5 },
 ];
 
 /** Trusted partners / institutions (verified public info only; images are placeholders until approved assets). */
@@ -126,15 +126,15 @@ export default async function Home() {
         </p>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:py-5">
-          <Link href="/" className="text-lg font-semibold text-zinc-900 hover:text-zinc-700">{branding.productName}</Link>
+          <Link href="/" className="text-lg font-semibold text-zinc-100 hover:text-white">{branding.productName}</Link>
           <nav className="flex flex-wrap items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Link href="/login" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
+              <Link href="/login" className="text-sm font-medium text-zinc-300 hover:text-white">
                 Sign in
               </Link>
-              <Link href="/signup" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
+              <Link href="/signup" className="text-sm font-medium text-zinc-300 hover:text-white">
                 Sign up
               </Link>
             </div>
@@ -146,20 +146,20 @@ export default async function Home() {
             </Link>
             <Link
               href="/packages"
-              className="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white/80"
+              className="hidden rounded-full border border-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/40 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
             >
               See My Savings
             </Link>
-            <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               How it works
             </Link>
-            <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Specialists
             </Link>
-            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Clinical network
             </Link>
-            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Partners
             </Link>
           </nav>

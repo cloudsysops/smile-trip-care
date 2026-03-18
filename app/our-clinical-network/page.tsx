@@ -3,7 +3,7 @@ import { branding } from "@/lib/branding";
 
 export const metadata = {
   title: `Our clinical network | ${branding.productName}`,
-  description: "How we select clinics, specialists, and treatment packages in Medellín and Manizales.",
+  description: `${branding.productName} explains how we select clinics and specialists in Medellín and Manizales, and how treatment packages are curated.`,
 };
 
 export default function OurClinicalNetworkPage() {
@@ -26,8 +26,9 @@ export default function OurClinicalNetworkPage() {
             Our clinical network in Medellín and Manizales
           </h1>
           <p className="mt-4 max-w-2xl text-sm text-zinc-300 md:text-base">
-            We collaborate with a small, curated group of clinics and specialists in Colombia. This page explains how
-            we select partners, how treatment packages are built, and what “trusted network” means in practice.
+            {branding.productName} collaborates with a small, curated group of clinics and specialists in Colombia. This
+            page explains how we select partners, how treatment packages are built, and what “trusted network” means in
+            practice.
           </p>
         </section>
 

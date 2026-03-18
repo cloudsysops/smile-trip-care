@@ -12,79 +12,79 @@ export default async function AdminProvidersPage() {
   const providers = await getProviders();
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+      <header className="border-b border-zinc-800 bg-zinc-950/95 px-6 py-4 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/admin/overview" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/overview" className="text-sm text-zinc-400 hover:underline">
               Overview
             </Link>
-            <Link href="/admin/leads" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/leads" className="text-sm text-zinc-400 hover:underline">
               Leads
             </Link>
-            <Link href="/admin/providers" className="text-sm font-medium text-zinc-900 underline">
+            <Link href="/admin/providers" className="text-sm font-medium text-zinc-100 underline">
               Providers
             </Link>
-            <Link href="/admin/specialists" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/specialists" className="text-sm text-zinc-400 hover:underline">
               Specialists
             </Link>
-            <Link href="/admin/experiences" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/experiences" className="text-sm text-zinc-400 hover:underline">
               Experiences
             </Link>
-            <Link href="/admin/bookings" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/bookings" className="text-sm text-zinc-400 hover:underline">
               Bookings
             </Link>
-            <Link href="/admin/consultations" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/consultations" className="text-sm text-zinc-400 hover:underline">
               Consultations
             </Link>
-            <Link href="/admin/assets" className="text-sm text-zinc-600 hover:underline">
+            <Link href="/admin/assets" className="text-sm text-zinc-400 hover:underline">
               Assets
             </Link>
           </nav>
-          <h1 className="text-xl font-semibold">Admin — Providers</h1>
+          <h1 className="text-xl font-semibold text-zinc-100">Admin — Providers</h1>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-8">
-        <p className="mb-4 text-sm text-zinc-500">
+        <p className="mb-4 text-sm text-zinc-400">
           Curated network. Only admins create and approve providers. No public signup.
         </p>
         {providers.length === 0 ? (
-          <p className="rounded-lg border border-zinc-200 bg-white p-8 text-zinc-500">No providers yet.</p>
+          <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-8 text-zinc-400">No providers yet.</p>
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
+          <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/60">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50">
-                  <th className="px-4 py-3 font-semibold">Name</th>
-                  <th className="px-4 py-3 font-semibold">Type</th>
-                  <th className="px-4 py-3 font-semibold">City</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                  <th className="px-4 py-3 font-semibold">Published</th>
+                <tr className="border-b border-zinc-800 bg-zinc-900/40">
+                  <th className="px-4 py-3 font-semibold text-zinc-400">Name</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-400">Type</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-400">City</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-400">Status</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-400">Published</th>
                 </tr>
               </thead>
               <tbody>
                 {providers.map((p) => (
-                  <tr key={p.id} className="border-b border-zinc-100">
+                  <tr key={p.id} className="border-b border-zinc-800">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-zinc-900">{p.name}</span>
-                      {p.slug && <span className="ml-1 text-zinc-500">({p.slug})</span>}
+                      <span className="font-medium text-zinc-100">{p.name}</span>
+                      {p.slug && <span className="ml-1 text-zinc-400">({p.slug})</span>}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600">{p.provider_type ?? p.type ?? "—"}</td>
-                    <td className="px-4 py-3 text-zinc-600">{p.city}</td>
+                    <td className="px-4 py-3 text-zinc-400">{p.provider_type ?? p.type ?? "—"}</td>
+                    <td className="px-4 py-3 text-zinc-400">{p.city}</td>
                     <td className="px-4 py-3">
                       <span
                         className={
                           p.approval_status === "approved"
-                            ? "text-emerald-600"
+                            ? "text-emerald-300"
                             : p.approval_status === "rejected" || p.approval_status === "suspended"
-                              ? "text-red-600"
-                              : "text-amber-600"
+                              ? "text-red-300"
+                              : "text-amber-300"
                         }
                       >
                         {p.approval_status ?? "pending"}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{p.published ? "Yes" : "No"}</td>
+                    <td className="px-4 py-3 text-zinc-300">{p.published ? "Yes" : "No"}</td>
                   </tr>
                 ))}
               </tbody>
