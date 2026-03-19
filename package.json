@@ -18,6 +18,7 @@
     "smoke:deploy": "bash scripts/smoke-deploy.sh",
     "smoke:assets": "node scripts/smoke_assets_validation.js",
     "db:migrate": "bash scripts/run_migrations.sh",
+    "test:ai": "tsx scripts/test-ai-integration.ts",
     "growth:leads": "tsx scripts/growth/find-leads.ts",
     "harvest:reddit": "tsx scripts/reddit-harvester.ts",
     "audit:prod": "bash scripts/production-readiness-audit.sh",

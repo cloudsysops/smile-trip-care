@@ -34,20 +34,7 @@ export type TreatmentCategory = Readonly<
   | "general"
 >;
 
-export type SanitizedLead = Readonly<{
-  id: string;
-  status: string;
-  source: string;
-  createdAt: string;
-  country?: string;
-  city?: "Medellín" | "Manizales";
-  treatmentCategory?: TreatmentCategory;
-  /**
-   * Approximate budget range. We only include the field when we can tell it's a range
-   * (not a single exact number).
-   */
-  budgetRange?: string;
-}>;
+export type SanitizedLead = import("@/lib/ai/prompts/lead-triage").SanitizedLead;
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -69,7 +56,7 @@ function normalizeCreatedAt(input: Lead["created_at"] | Lead["createdAt"]): stri
   throw new Error("sanitizeLead: createdAt has invalid type");
 }
 
-function deriveCity(lead: Lead): SanitizedLead["city"] | undefined {
+function derivePreferredCity(lead: Lead): SanitizedLead["basicInfo"]["preferred_city"] | undefined {
   const pkg = (lead.package_slug ?? "").toString().trim();
   if (!pkg) return undefined;
   if (pkg === "smile-medellin") return "Medellín";
@@ -93,7 +80,8 @@ function deriveTreatmentCategory(lead: Lead): TreatmentCategory | undefined {
     }
   }
 
-  // Keyword-only classification. We do NOT forward message content.
+  // We may use message keywords only to classify general treatment intent.
+  // We never forward medical details: message_preview remains null/omitted.
   if (isNonEmptyString(lead.message)) {
     keywordsSource.push(lead.message.toLowerCase());
   }
@@ -154,22 +142,26 @@ export function sanitizeLead(lead: Lead): SanitizedLead {
   const createdAt = normalizeCreatedAt(lead.created_at ?? lead.createdAt);
 
   const country = isNonEmptyString(lead.country) ? lead.country.trim() : undefined;
-  const city = deriveCity(lead);
-  const treatmentCategory = deriveTreatmentCategory(lead);
-  const budgetRange = normalizeBudgetRange(lead);
+  const preferred_city = derivePreferredCity(lead);
+  const category = deriveTreatmentCategory(lead);
+  const budget_range = normalizeBudgetRange(lead);
 
-  // Final allowlist output: do NOT include anything else.
+  // Final allowlist output (only safe, non-PII fields).
+  // `basicInfo` is typed as Readonly, so we build it immutably.
+  const basicInfo: SanitizedLead["basicInfo"] = {
+    ...(country ? { country } : {}),
+    ...(preferred_city ? { preferred_city } : {}),
+    ...(category ? { selected_specialties: [category] } : {}),
+    ...(budget_range ? { budget_range } : {}),
+  };
+
   const result: SanitizedLead = {
     id,
     status,
     source,
     createdAt,
+    basicInfo,
   };
-
-  if (country) result.country = country;
-  if (city) result.city = city;
-  if (treatmentCategory) result.treatmentCategory = treatmentCategory;
-  if (budgetRange) result.budgetRange = budgetRange;
 
   return result;
 }

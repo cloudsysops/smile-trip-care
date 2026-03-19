@@ -34,21 +34,23 @@ describe("AI lead sanitizer (Claude input)", () => {
     expect(out.source).toBe(lead.source);
     expect(out.createdAt).toBe(new Date(lead.created_at as string).toISOString());
 
-    // Derived safe fields
-    expect(out.country).toBe("Colombia");
-    expect(out.city).toBe("Medellín");
-    expect(out.treatmentCategory).toBe("implants");
-    expect(out.budgetRange).toBe("$5,000-$10,000");
+    // Derived safe fields (allowlist only)
+    expect(out.basicInfo.country).toBe("Colombia");
+    expect(out.basicInfo.preferred_city).toBe("Medellín");
+    expect(out.basicInfo.selected_specialties).toEqual(["implants"]);
+    expect(out.basicInfo.budget_range).toBe("$5,000-$10,000");
 
     // Ensure PII / sensitive fields are not forwarded
     expect(out).not.toHaveProperty("email");
     expect(out).not.toHaveProperty("phone");
     expect(out).not.toHaveProperty("first_name");
     expect(out).not.toHaveProperty("last_name");
-    expect(out).not.toHaveProperty("message");
 
     // Ensure payment info not forwarded
     expect(out).not.toHaveProperty("payment_amount_cents");
+
+    // Ensure sensitive content preview is omitted
+    expect(out.basicInfo.message_preview).toBeUndefined();
   });
 
   it("should classify treatment category from message keywords when specialties are missing", () => {
@@ -62,8 +64,8 @@ describe("AI lead sanitizer (Claude input)", () => {
     } satisfies Lead as unknown as Lead;
 
     const out = sanitizeLead(lead);
-    expect(out.city).toBe("Manizales");
-    expect(out.treatmentCategory).toBe("veneers");
+    expect(out.basicInfo.preferred_city).toBe("Manizales");
+    expect(out.basicInfo.selected_specialties).toEqual(["veneers"]);
   });
 
   it("should derive city from package_slug", () => {
@@ -75,7 +77,7 @@ describe("AI lead sanitizer (Claude input)", () => {
       package_slug: "smile-medellin",
     } as Lead);
 
-    expect(med.city).toBe("Medellín");
+    expect(med.basicInfo.preferred_city).toBe("Medellín");
 
     const man = sanitizeLead({
       id: "550e8400-e29b-41d4-a716-446655440003",
@@ -85,7 +87,7 @@ describe("AI lead sanitizer (Claude input)", () => {
       package_slug: "smile-manizales",
     } as Lead);
 
-    expect(man.city).toBe("Manizales");
+    expect(man.basicInfo.preferred_city).toBe("Manizales");
   });
 
   it("should not include budgetRange when input is a single exact number", () => {
@@ -97,7 +99,7 @@ describe("AI lead sanitizer (Claude input)", () => {
       budget_range: "5000",
     } as Lead);
 
-    expect(out.budgetRange).toBeUndefined();
+    expect(out.basicInfo.budget_range).toBeUndefined();
   });
 });
 

@@ -14,6 +14,7 @@ export type SanitizedLead = Readonly<{
    * NOTE: This must NOT include email/phone/full medical history or other PII.
    */
   basicInfo: Readonly<{
+    country?: string | null;
     package_slug?: string | null;
     preferred_city?: "Medellín" | "Manizales" | null;
     selected_specialties?: string[];
@@ -31,13 +32,35 @@ export const LeadSummarySchema = z
 
 export const LeadIntentSchema = z
   .object({
-    intent: z.enum(["urgent_medical", "cosmetic_tourism", "price_comparison", "just_browsing"]),
+    intent: z.enum([
+      "urgent_medical",
+      "cosmetic_tourism",
+      "price_comparison",
+      "just_browsing",
+      "unknown",
+    ]),
+    /**
+     * Optional confidence for the classification.
+     * Present when the model can estimate it; omitted is allowed.
+     */
+    confidence: z.number().min(0).max(1).optional(),
   })
   .strict();
 
 export const RecommendedActionSchema = z
   .object({
-    action: z.enum(["immediate_call", "send_quote", "nurture_email", "assign_specialist"]),
+    action: z.enum([
+      "immediate_call",
+      "send_quote",
+      "nurture_email",
+      "assign_specialist",
+      "manual_review",
+    ]),
+    /**
+     * Optional priority level for the recommended action.
+     * Present when the model can estimate it; omitted is allowed.
+     */
+    priority: z.enum(["low", "medium", "high"]).optional(),
   })
   .strict();
 
@@ -95,6 +118,7 @@ function formatLeadForPrompt(leadData: SanitizedLead): string {
     source,
     createdAt,
     basicInfo: {
+      country,
       package_slug,
       preferred_city,
       selected_specialties,
@@ -111,6 +135,7 @@ function formatLeadForPrompt(leadData: SanitizedLead): string {
     `- source: ${source}`,
     `- createdAt: ${createdAt}`,
     `- basicInfo:`,
+    `  - country: ${country ?? "null"}`,
     `  - package_slug: ${package_slug ?? "null"}`,
     `  - preferred_city: ${preferred_city ?? "null"}`,
     `  - selected_specialties: ${(selected_specialties ?? []).join(", ") || "[]"}`,
@@ -151,8 +176,8 @@ export function getLeadIntentPrompt(leadData: SanitizedLead): string {
 
   return [
     "You are triaging a medical travel lead.",
-    "Task: classify the lead intent into one of: urgent_medical | cosmetic_tourism | price_comparison | just_browsing.",
-    "Return strict JSON only with this shape: {\"intent\": string}.",
+    "Task: classify the lead intent into one of: urgent_medical | cosmetic_tourism | price_comparison | just_browsing | unknown.",
+    "Return strict JSON only with this shape: {\"intent\": string, \"confidence\"?: number}.",
     "",
     "Intent examples:",
     intentExamplesText,
@@ -173,8 +198,8 @@ export function getRecommendedActionPrompt(leadData: SanitizedLead): string {
   return [
     "You are triaging a medical travel lead.",
     "Task: recommend the next step for the coordinator.",
-    "Allowed actions: immediate_call | send_quote | nurture_email | assign_specialist.",
-    "Return strict JSON only with this shape: {\"action\": string}.",
+    "Allowed actions: immediate_call | send_quote | nurture_email | assign_specialist | manual_review.",
+    "Return strict JSON only with this shape: {\"action\": string, \"priority\"?: string}.",
     "",
     "Action examples:",
     actionExamplesText,

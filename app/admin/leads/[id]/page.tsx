@@ -15,6 +15,7 @@ import OutboundQueuePanel from "../OutboundQueuePanel";
 import { ItineraryOutputSchema, LeadTriageOutputSchema, SalesResponderOutputSchema } from "@/lib/ai/schemas";
 import { getLatestProgressForLead } from "@/lib/clinical/progress";
 import AdminShell from "../../_components/AdminShell";
+import AISummaryButton from "@/app/components/ai/AISummaryButton";
 
 type Props = Readonly<{ params: Promise<{ id: string }> }>;
 const StoredMessageSchema = SalesResponderOutputSchema.extend({
@@ -275,6 +276,7 @@ export default async function AdminLeadDetailPage({ params }: Props) {
           currentNextFollowUpAt={(lead.next_follow_up_at as string | null | undefined) ?? null}
           currentFollowUpNotes={(lead.follow_up_notes as string | null | undefined) ?? null}
         />
+        <AISummaryButton leadId={lead.id} />
         <AiActionsPanel
           leadId={lead.id}
           initialTriage={triageMaybe.success ? triageMaybe.data : null}
