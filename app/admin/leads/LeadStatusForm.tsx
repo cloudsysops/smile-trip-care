@@ -25,13 +25,13 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-200 bg-white p-6">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
       <h2 className="font-semibold">Update status</h2>
       <div className="mt-3 flex gap-2">
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
         >
           {STATUSES.map((s) => (
             <option key={s} value={s}>{s}</option>

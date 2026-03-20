@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // Basic smoke test for asset validation schema (run with: npm run smoke:assets)
 async function main() {
   const { z } = await import("zod");

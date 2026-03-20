@@ -1,0 +1,316 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import type { ItineraryOutput, LeadTriageOutput, OpsTasksOutput, SalesResponderOutput } from "@/lib/ai/schemas";
+
+type StoredMessage = SalesResponderOutput & {
+  cta_url?: string;
+  generated_at?: string;
+  lead_snapshot_minimal?: {
+    lead_id: string;
+    name: string;
+    email: string;
+    country: string | null;
+    package_slug: string | null;
+  };
+};
+
+type StoredItinerary = {
+  id: string;
+  city: string | null;
+  content_json: ItineraryOutput | null;
+  created_at: string;
+};
+
+type Props = {
+  leadId: string;
+  initialTriage: LeadTriageOutput | null;
+  initialMessage: StoredMessage | null;
+  initialItineraries: StoredItinerary[];
+  initialOps?: OpsTasksOutput | null;
+};
+
+export default function AiActionsPanel({ leadId, initialTriage, initialMessage, initialItineraries, initialOps = null }: Props) {
+  const [triage, setTriage] = useState<LeadTriageOutput | null>(initialTriage);
+  const [message, setMessage] = useState<StoredMessage | null>(initialMessage);
+  const [itineraryPreview, setItineraryPreview] = useState<ItineraryOutput | null>(null);
+  const [ops, setOps] = useState<OpsTasksOutput | null>(initialOps ?? null);
+  const [loading, setLoading] = useState<"triage" | "reply" | "itinerary" | "ops" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const itineraryHistory = useMemo(() => {
+    if (!itineraryPreview) return initialItineraries;
+    return [
+      {
+        id: "generated-preview",
+        city: itineraryPreview.city,
+        content_json: itineraryPreview,
+        created_at: new Date().toISOString(),
+      },
+      ...initialItineraries,
+    ];
+  }, [initialItineraries, itineraryPreview]);
+
+  async function safeJson(res: Response) {
+    return res.json().catch(() => ({}));
+  }
+
+  const apiBase = "/api/admin/ai";
+
+  async function handleGenerateTriage() {
+    setError(null);
+    setLoading("triage");
+    const res = await fetch(`${apiBase}/triage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lead_id: leadId }),
+    });
+    const data = await safeJson(res);
+    setLoading(null);
+    if (!res.ok) {
+      setError(data?.error ?? "Failed to generate triage");
+      return;
+    }
+    setTriage(data.triage ?? null);
+  }
+
+  async function handleGenerateReply() {
+    setError(null);
+    setLoading("reply");
+    const res = await fetch(`${apiBase}/respond`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lead_id: leadId }),
+    });
+    const data = await safeJson(res);
+    setLoading(null);
+    if (!res.ok) {
+      setError(data?.error ?? "Failed to generate reply");
+      return;
+    }
+    setMessage(data.reply ?? data.message ?? null);
+  }
+
+  async function handleGenerateItinerary() {
+    setError(null);
+    setLoading("itinerary");
+    const res = await fetch(`${apiBase}/itinerary`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lead_id: leadId }),
+    });
+    const data = await safeJson(res);
+    setLoading(null);
+    if (!res.ok) {
+      setError(data?.error ?? "Failed to generate itinerary");
+      return;
+    }
+    setItineraryPreview(data.itinerary ?? null);
+  }
+
+  async function handleGenerateOps() {
+    setError(null);
+    setLoading("ops");
+    const res = await fetch(`${apiBase}/ops`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lead_id: leadId }),
+    });
+    const data = await safeJson(res);
+    setLoading(null);
+    if (!res.ok) {
+      setError(data?.error ?? "Failed to generate ops tasks");
+      return;
+    }
+    setOps(data.ops ?? null);
+  }
+
+  async function copyToClipboard(value: string, key: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedKey(key);
+      window.setTimeout(() => setCopiedKey((current) => (current === key ? null : current)), 1500);
+    } catch {
+      setError("Clipboard not available");
+    }
+  }
+
+  return (
+    <section className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+      <h2 className="text-lg font-semibold">AI Actions</h2>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={handleGenerateTriage}
+          disabled={loading !== null}
+          className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+        >
+          {loading === "triage" ? "Generating…" : "Generate Triage"}
+        </button>
+        <button
+          type="button"
+          onClick={handleGenerateReply}
+          disabled={loading !== null}
+          className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+        >
+          {loading === "reply" ? "Generating…" : "Generate Reply"}
+        </button>
+        <button
+          type="button"
+          onClick={handleGenerateItinerary}
+          disabled={loading !== null}
+          className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+        >
+          {loading === "itinerary" ? "Generating…" : "Generate Itinerary"}
+        </button>
+        <button
+          type="button"
+          onClick={handleGenerateOps}
+          disabled={loading !== null}
+          className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
+        >
+          {loading === "ops" ? "Generating…" : "Generate Ops Tasks"}
+        </button>
+      </div>
+
+      {error && (
+        <div className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
+        <h3 className="font-semibold">Latest triage</h3>
+        {triage ? (
+          <div className="space-y-2 text-sm">
+            <p><span className="font-medium text-zinc-300">Priority:</span> {triage.priority}</p>
+            <p><span className="font-medium text-zinc-300">Recommended city:</span> {triage.recommended_city}</p>
+            <p><span className="font-medium text-zinc-300">Next step:</span> {triage.next_step}</p>
+            <div>
+              <p className="font-medium text-zinc-300">Questions to ask</p>
+              <ul className="list-inside list-disc">
+                {triage.questions_to_ask.length > 0 ? (
+                  triage.questions_to_ask.map((q) => <li key={q}>{q}</li>)
+                ) : (
+                  <li>No additional questions</li>
+                )}
+              </ul>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-400">No triage generated yet.</p>
+        )}
+      </div>
+
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
+        <h3 className="font-semibold">Latest sales reply</h3>
+        {message ? (
+          <div className="space-y-4 text-sm">
+            <p className="text-xs text-zinc-400">
+              Tone: {message.tone} · Follow-up: {message.followup_in_hours}h
+              {message.generated_at ? ` · Generated: ${new Date(message.generated_at).toLocaleString()}` : ""}
+            </p>
+            <div>
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <p className="font-medium text-zinc-300">WhatsApp message</p>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(message.whatsapp_message, "wa")}
+                  className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
+                >
+                  {copiedKey === "wa" ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <p className="whitespace-pre-wrap rounded bg-zinc-900/40 p-2 text-zinc-100">{message.whatsapp_message}</p>
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <p className="font-medium text-zinc-300">Email subject</p>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(message.email_subject, "subject")}
+                  className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
+                >
+                  {copiedKey === "subject" ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <p className="rounded bg-zinc-900/40 p-2 text-zinc-100">{message.email_subject}</p>
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <p className="font-medium text-zinc-300">Email body</p>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(message.email_body, "email")}
+                  className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
+                >
+                  {copiedKey === "email" ? "Copied" : "Copy"}
+                </button>
+              </div>
+              <p className="whitespace-pre-wrap rounded bg-zinc-900/40 p-2 text-zinc-100">{message.email_body}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-400">No reply generated yet.</p>
+        )}
+      </div>
+
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
+        <h3 className="font-semibold">Ops tasks</h3>
+        {ops ? (
+          <div className="space-y-2 text-sm">
+            <p className="text-zinc-300">{ops.summary}</p>
+            <ul className="list-inside list-disc space-y-1">
+              {ops.tasks.map((t, i) => (
+                <li key={i}>
+                  <span className="font-medium">{t.title}</span> — {t.due_relative} · {t.assignee}
+                  {t.notes ? ` · ${t.notes}` : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-sm text-zinc-400">No ops tasks generated yet.</p>
+        )}
+      </div>
+
+      <div className="space-y-3 rounded border border-zinc-800 bg-zinc-900/40 p-4">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="font-semibold">Itineraries history</h3>
+          <button
+            type="button"
+            onClick={() => copyToClipboard(JSON.stringify(itineraryHistory, null, 2), "itinerary-json")}
+            className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200"
+          >
+            {copiedKey === "itinerary-json" ? "Copied" : "Copy JSON"}
+          </button>
+        </div>
+        {itineraryHistory.length === 0 ? (
+          <p className="text-sm text-zinc-400">No itinerary generated yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {itineraryHistory.map((row) => (
+              <li key={row.id} className="rounded border border-zinc-800 bg-zinc-900/40 p-3 text-sm">
+                <p className="text-xs text-zinc-400">
+                  {new Date(row.created_at).toLocaleString()} · {row.city ?? "Unknown city"}
+                </p>
+                {row.content_json?.day_by_day ? (
+                  <ul className="mt-2 space-y-1">
+                    {row.content_json.day_by_day.map((day) => (
+                      <li key={`${row.id}-${day.day}`}>
+                        <span className="font-medium">Day {day.day}:</span> {day.morning}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-zinc-400">No itinerary detail stored.</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  );
+}

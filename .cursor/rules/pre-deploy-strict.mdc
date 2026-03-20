@@ -1,0 +1,38 @@
+PRE-DEPLOY STRICT MODE
+
+Purpose:
+Run before any production deployment or release candidate approval.
+
+## BLOCKING CONDITIONS
+If any of the following are found, deployment should be blocked until resolved:
+- Critical API security issues
+- Critical database/RLS exposure issues
+- Broken auth or authorization paths
+- Failing health/readiness endpoints
+- Unverified webhook signature handling
+- Destructive migrations without safeguards
+- Missing transaction boundaries in critical multi-step writes
+- Sensitive data leaks in logs or responses
+- Unbounded public endpoints without validation/rate limiting
+- Failing tests on core business flows
+
+## REQUIRED CHECKS
+- Run API audit using `audit-api.mdc`
+- Run DB audit using `audit-db.mdc`
+- Review auth-sensitive routes
+- Review payment/webhook flows
+- Review migrations and RLS changes
+- Confirm env var completeness for target environment
+- Confirm health/readiness endpoints are valid
+- Confirm rollback path exists for risky changes
+
+## OUTPUT FORMAT
+Return:
+1. DEPLOYMENT STATUS: PASS / FAIL
+2. Blocking issues
+3. Non-blocking issues
+4. Required fixes before deploy
+5. Recommended follow-up after deploy
+
+## RULE
+If any Critical issue exists, deployment status must be FAIL.

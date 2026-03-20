@@ -1,0 +1,66 @@
+---
+description: Database audit — schema, migrations, indexes, security, performance
+alwaysApply: false
+---
+
+# Database Audit
+
+Run this when asked: "audit database" or "run DB audit"
+
+---
+
+SECTION 1 — SCHEMA DESIGN
+- Tables named consistently?
+- Primary and foreign keys defined?
+- Correct data types?
+- NOT NULL where needed?
+- Timestamps on all relevant tables?
+
+SECTION 2 — MIGRATIONS
+- Migration ordering correct?
+- Destructive migrations have safeguards?
+- Schema in sync with migration history?
+- Manual DB changes outside migrations?
+
+SECTION 3 — INDEXES
+- Foreign keys indexed?
+- WHERE, ORDER BY, JOIN columns indexed?
+- Missing or redundant indexes?
+
+SECTION 4 — QUERIES
+- N+1 patterns?
+- SELECT * used unnecessarily?
+- Missing LIMIT on large datasets?
+- Queries inside loops?
+- Transactions on multi-step writes?
+
+SECTION 5 — SECURITY
+- Raw SQL with user input?
+- Parameterized queries used?
+- DB credentials hardcoded?
+- Sensitive data stored as plain text?
+- Least privilege applied?
+
+SECTION 6 — PERFORMANCE
+- Connection pooling configured?
+- Pagination on large tables?
+- Tables that grow unbounded?
+
+SECTION 7 — RELIABILITY
+- Soft vs hard deletes consistent?
+- Cascade deletes safe?
+- Audit trail for critical events?
+
+---
+
+OUTPUT FORMAT
+
+For each issue:
+- Table / query / file affected
+- Problem
+- Severity: Critical / High / Medium / Low
+- Recommended fix
+
+End with:
+TOP 10 DB ISSUES ordered by severity
+SAFE MIGRATION PLAN — ordered execution

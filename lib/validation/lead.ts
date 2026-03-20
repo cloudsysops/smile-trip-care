@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const OptionalTrackingValueSchema = z.string().trim().min(1).max(150).optional();
+
 export const LeadCreateSchema = z.object({
   first_name: z.string().min(1).max(200),
   last_name: z.string().min(1).max(200),
@@ -8,8 +10,22 @@ export const LeadCreateSchema = z.object({
   country: z.string().max(100).optional(),
   package_slug: z.string().max(100).optional(),
   message: z.string().max(2000).optional(),
-  /** Honeypot: if filled, treat as bot. */
-  company_website: z.string().max(0).optional(),
+  utm_source: OptionalTrackingValueSchema,
+  utm_medium: OptionalTrackingValueSchema,
+  utm_campaign: OptionalTrackingValueSchema,
+  utm_term: OptionalTrackingValueSchema,
+  utm_content: OptionalTrackingValueSchema,
+  landing_path: z.string().trim().min(1).max(1000).optional(),
+  referrer_url: z.union([z.string().url().max(2000), z.literal("")]).optional(),
+  specialist_ids: z.array(z.string().uuid()).optional().default([]),
+  experience_ids: z.array(z.string().uuid()).optional().default([]),
+  selected_specialties: z.array(z.string().min(1)).optional().default([]),
+  selected_experience_categories: z.array(z.string().min(1)).optional().default([]),
+  selected_experience_ids: z.array(z.string().uuid()).optional().default([]),
+  travel_companions: z.string().max(200).optional(),
+  budget_range: z.string().max(200).optional(),
+  /** Honeypot: allow values and silently drop bot-like submissions in handler. */
+  company_website: z.string().max(500).optional(),
 });
 
 export type LeadCreate = z.infer<typeof LeadCreateSchema>;
