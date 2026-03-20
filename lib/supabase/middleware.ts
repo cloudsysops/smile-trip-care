@@ -27,12 +27,11 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // Authenticated users hitting /login should go through callback for role-based redirect
+  // Authenticated users hitting /login redirect to dashboard
   if (pathname === "/login" && user) {
-    const callback = new URL("/auth/callback", request.url);
     const next = request.nextUrl.searchParams.get("next");
-    if (next) callback.searchParams.set("next", next);
-    return NextResponse.redirect(callback);
+    if (next) return NextResponse.redirect(new URL(next, request.url));
+    return NextResponse.redirect(new URL("/patient", request.url));
   }
 
   const loginUrl = new URL("/login", request.url);
