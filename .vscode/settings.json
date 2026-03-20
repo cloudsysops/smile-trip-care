@@ -52,6 +52,7 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
 
   "eslint.enable": true,
+  "eslint.run": "onSave",
   "eslint.validate": [
     "javascript",
     "javascriptreact",
@@ -79,7 +80,5 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-
-  "tailwindCSS.experimental.classRegex": []
+  }
 }
