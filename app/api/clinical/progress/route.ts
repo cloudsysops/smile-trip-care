@@ -14,6 +14,7 @@ import {
 } from "@/lib/clinical/progress";
 import { getOrderedStageKeys } from "@/lib/clinical/stages";
 import { jsonBadRequest, jsonError, jsonForbidden } from "@/lib/http/response";
+import { parseProgressCreateBody } from "@/lib/services/clinical/progress-policy.service";
 
 const STAGE_KEYS = getOrderedStageKeys();
 
@@ -50,14 +51,6 @@ export async function GET() {
   }
 }
 
-const createBodySchema = {
-  lead_id: (v: unknown): v is string => typeof v === "string" && v.length > 0,
-  stage_key: (v: unknown): v is string =>
-    typeof v === "string" && STAGE_KEYS.includes(v as (typeof STAGE_KEYS)[number]),
-  notes: (v: unknown) => v == null || typeof v === "string",
-  booking_id: (v: unknown) => v == null || typeof v === "string",
-};
-
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   try {
@@ -76,17 +69,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const lead_id = body.lead_id as unknown;
-    const stage_key = body.stage_key as unknown;
-    const notes = body.notes as unknown;
-    const booking_id = body.booking_id as unknown;
-
-    if (!createBodySchema.lead_id(lead_id) || !createBodySchema.stage_key(stage_key)) {
-      return jsonBadRequest("Missing or invalid lead_id or stage_key", requestId);
+    const parsedCreate = parseProgressCreateBody(body as Record<string, unknown>, STAGE_KEYS);
+    if (parsedCreate.error) {
+      return jsonBadRequest(parsedCreate.error, requestId);
     }
-    if (!createBodySchema.notes(notes) || !createBodySchema.booking_id(booking_id)) {
-      return jsonBadRequest("Invalid body", requestId);
-    }
+    const lead_id = parsedCreate.lead_id!;
+    const stage_key = parsedCreate.stage_key!;
+    const notes = parsedCreate.notes ?? null;
+    const booking_id = parsedCreate.booking_id ?? null;
 
     const patient_id = await resolvePatientIdFromLead(lead_id);
     if (!patient_id) {
@@ -105,9 +95,9 @@ export async function POST(request: Request) {
       patient_id,
       specialist_id: specialistId,
       lead_id,
-      booking_id: booking_id ?? null,
+      booking_id,
       stage_key,
-      notes: notes ?? null,
+      notes,
     });
     return NextResponse.json({ data: row }, { status: 201 });
   } catch (e) {

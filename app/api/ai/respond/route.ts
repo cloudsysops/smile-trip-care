@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
-import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { callSalesResponder } from "@/lib/ai/openai";
 import { LeadTriageOutputSchema } from "@/lib/ai/schemas";
 import { jsonBadRequest, jsonError, jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
+import { getLatestLeadAiRow, getLeadForResponder, saveLeadAiMessage } from "@/lib/services/ai/lead-ai-records.service";
 
 const BodySchema = z.object({
   lead_id: z.string().uuid(),
@@ -35,28 +35,12 @@ export async function POST(request: Request) {
       return jsonBadRequest("Invalid body", requestId);
     }
 
-    const supabase = getServerSupabase();
-    const { data: lead, error: leadError } = await supabase
-      .from("leads")
-      .select("id, first_name, last_name, email, phone, country, package_slug, message")
-      .eq("id", parsedBody.data.lead_id)
-      .single();
-
-    if (leadError || !lead) {
+    const lead = await getLeadForResponder(parsedBody.data.lead_id);
+    if (!lead) {
       return jsonError(404, "Lead not found", requestId);
     }
 
-    const { data: aiRows, error: aiError } = await supabase
-      .from("lead_ai")
-      .select("id, triage_json")
-      .eq("lead_id", parsedBody.data.lead_id)
-      .order("created_at", { ascending: false })
-      .limit(1);
-    if (aiError) {
-      log.error("Failed to load lead_ai row", { error: aiError.message });
-      return jsonInternalServerError(requestId);
-    }
-    const aiRow = aiRows?.[0];
+    const aiRow = await getLatestLeadAiRow(parsedBody.data.lead_id);
     const triageMaybe = LeadTriageOutputSchema.safeParse(aiRow?.triage_json);
 
     const ctaUrl = parsedBody.data.cta_url ?? `${new URL(request.url).origin}/assessment`;
@@ -86,31 +70,7 @@ export async function POST(request: Request) {
       },
     };
 
-    const now = new Date().toISOString();
-    const existingId = aiRow?.id as string | undefined;
-    if (existingId) {
-      const { error: updateError } = await supabase
-        .from("lead_ai")
-        .update({ messages_json: messagePayload, response_generated: true, updated_at: now })
-        .eq("id", existingId);
-      if (updateError) {
-        log.error("Failed to update messages_json", { error: updateError.message });
-        return jsonInternalServerError(requestId);
-      }
-    } else {
-      const { error: insertError } = await supabase
-        .from("lead_ai")
-        .insert({
-          lead_id: parsedBody.data.lead_id,
-          messages_json: messagePayload,
-          response_generated: true,
-          updated_at: now,
-        });
-      if (insertError) {
-        log.error("Failed to insert messages_json", { error: insertError.message });
-        return jsonInternalServerError(requestId);
-      }
-    }
+    await saveLeadAiMessage(parsedBody.data.lead_id, messagePayload);
 
     log.info("Lead response generated", { lead_id: parsedBody.data.lead_id, admin_user_id: adminUserId });
     return NextResponse.json({ reply: messagePayload, request_id: requestId });
