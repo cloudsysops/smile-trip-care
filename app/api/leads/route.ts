@@ -4,6 +4,7 @@ import { LeadCreateSchema } from "@/lib/validation/lead";
 import { createLogger } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { createLeadFromAssessment } from "@/lib/services/assessment.service";
+import { sanitizeTextInput } from "@/lib/security/sanitize";
 
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -17,7 +18,27 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    const parsed = LeadCreateSchema.safeParse(body);
+    const sanitizedBody = {
+      ...body,
+      first_name: sanitizeTextInput(body.first_name, 200),
+      last_name: sanitizeTextInput(body.last_name, 200),
+      email: sanitizeTextInput(body.email, 320),
+      phone: sanitizeTextInput(body.phone, 50),
+      country: sanitizeTextInput(body.country, 100),
+      package_slug: sanitizeTextInput(body.package_slug, 100),
+      message: sanitizeTextInput(body.message, 2000),
+      landing_path: sanitizeTextInput(body.landing_path, 1000),
+      referrer_url: sanitizeTextInput(body.referrer_url, 2000),
+      travel_companions: sanitizeTextInput(body.travel_companions, 200),
+      budget_range: sanitizeTextInput(body.budget_range, 200),
+      company_website: sanitizeTextInput(body.company_website, 500),
+      utm_source: sanitizeTextInput(body.utm_source, 150),
+      utm_medium: sanitizeTextInput(body.utm_medium, 150),
+      utm_campaign: sanitizeTextInput(body.utm_campaign, 150),
+      utm_term: sanitizeTextInput(body.utm_term, 150),
+      utm_content: sanitizeTextInput(body.utm_content, 150),
+    };
+    const parsed = LeadCreateSchema.safeParse(sanitizedBody);
     if (!parsed.success) {
       log.warn("Lead validation failed", { errors: parsed.error.flatten() });
       return NextResponse.json(

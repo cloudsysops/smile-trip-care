@@ -4,6 +4,7 @@ import { getCurrentProfile } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { submitFeedback, type FeedbackCategory, type FeedbackSentiment } from "@/lib/services/feedback.service";
 import { jsonBadRequest, jsonError } from "@/lib/http/response";
+import { sanitizeTextInput } from "@/lib/security/sanitize";
 
 const FeedbackBodySchema = z.object({
   page: z.string().trim().min(1).max(200),
@@ -19,7 +20,19 @@ export async function POST(request: Request) {
   const log = createLogger(requestId);
 
   const raw = await request.json().catch(() => null);
-  const parsed = FeedbackBodySchema.safeParse(raw);
+  const sanitizedRaw =
+    raw && typeof raw === "object" && !Array.isArray(raw)
+      ? {
+          ...raw,
+          page: sanitizeTextInput((raw as Record<string, unknown>).page, 200),
+          category: sanitizeTextInput((raw as Record<string, unknown>).category, 50),
+          sentiment: sanitizeTextInput((raw as Record<string, unknown>).sentiment, 50),
+          message: sanitizeTextInput((raw as Record<string, unknown>).message, 2000),
+          email: sanitizeTextInput((raw as Record<string, unknown>).email, 320),
+          screenshot_url: sanitizeTextInput((raw as Record<string, unknown>).screenshot_url, 2000),
+        }
+      : raw;
+  const parsed = FeedbackBodySchema.safeParse(sanitizedRaw);
   if (!parsed.success) {
     log.warn("beta_feedback: invalid body", { issues: parsed.error.issues });
     return jsonBadRequest("Invalid feedback payload", requestId);
