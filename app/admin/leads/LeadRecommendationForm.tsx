@@ -21,18 +21,22 @@ export default function LeadRecommendationForm({
   const [slug, setSlug] = useState(currentRecommendedSlug ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    setSuccess(null);
     try {
       await patchLeadById(
         leadId,
         { recommended_package_slug: slug.trim() || null },
         "Failed to save recommendation",
       );
-      router.refresh();
+      setSuccess("Recommendation saved.");
+      // Allow the user to see the success message before the server re-renders.
+      setTimeout(() => router.refresh(), 750);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save recommendation");
     } finally {
@@ -70,6 +74,11 @@ export default function LeadRecommendationForm({
         </button>
       </div>
       {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+      {success && (
+        <p role="status" className="mt-2 text-xs text-emerald-400">
+          {success}
+        </p>
+      )}
       {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
     </form>
   );

@@ -40,6 +40,7 @@ export default function LeadFollowUpForm({
   const [followUpNotes, setFollowUpNotes] = useState(currentFollowUpNotes ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const hasFollowUpScheduled = useMemo(() => nextFollowUpAt.trim().length > 0, [nextFollowUpAt]);
 
@@ -47,13 +48,16 @@ export default function LeadFollowUpForm({
     e.preventDefault();
     setSaving(true);
     setError(null);
+    setSuccess(null);
     try {
       await patchLeadById(leadId, {
         last_contacted_at: fromInputValue(lastContactedAt) ?? null,
         next_follow_up_at: fromInputValue(nextFollowUpAt),
         follow_up_notes: followUpNotes.trim() ? followUpNotes.trim() : null,
       });
-      router.refresh();
+      setSuccess("Follow-up saved.");
+      // Allow the user to see the success message before the server re-renders.
+      setTimeout(() => router.refresh(), 750);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save follow-up");
     } finally {
@@ -64,6 +68,7 @@ export default function LeadFollowUpForm({
   async function markContactedAndSchedule() {
     setSaving(true);
     setError(null);
+    setSuccess(null);
     try {
       const now = new Date();
       const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -75,7 +80,9 @@ export default function LeadFollowUpForm({
         payload.status = "contacted";
       }
       await patchLeadById(leadId, payload);
-      router.refresh();
+      setSuccess("Contacted and follow-up scheduled.");
+      // Allow the user to see the success message before the server re-renders.
+      setTimeout(() => router.refresh(), 750);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update lead");
     } finally {
@@ -143,6 +150,11 @@ export default function LeadFollowUpForm({
       </div>
 
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {success && (
+        <p role="status" className="mt-2 text-xs text-emerald-400">
+          {success}
+        </p>
+      )}
       {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
 
       <button

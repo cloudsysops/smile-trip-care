@@ -14,14 +14,18 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
   const [status, setStatus] = useState(currentStatus);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    setSuccess(null);
     try {
       await patchLeadById(leadId, { status }, "Failed to update status");
-      router.refresh();
+      setSuccess("Status updated.");
+      // Allow the user to see the success message before the server re-renders.
+      setTimeout(() => router.refresh(), 750);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update status");
     } finally {
@@ -56,6 +60,11 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
         </button>
       </div>
       {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+      {success && (
+        <p role="status" className="mt-2 text-xs text-emerald-400">
+          {success}
+        </p>
+      )}
       {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
     </form>
   );
