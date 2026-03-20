@@ -146,7 +146,9 @@ describe("POST /api/stripe/webhook", () => {
         return {
           update: () => ({
             eq: () => ({
-              neq: async () => ({ error: null }),
+              neq: () => ({
+                select: () => Promise.resolve({ data: [], error: null }),
+              }),
             }),
           }),
         };
