@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { patchLeadById } from "./leadFormApi";
 
-type Props = {
+type Props = Readonly<{
   leadId: string;
   currentStatus: string;
   currentLastContactedAt?: string | null;
   currentNextFollowUpAt?: string | null;
   currentFollowUpNotes?: string | null;
-};
+}>;
 
 function toInputValue(iso?: string | null): string {
   if (!iso) return "";
@@ -42,24 +43,12 @@ export default function LeadFollowUpForm({
 
   const hasFollowUpScheduled = useMemo(() => nextFollowUpAt.trim().length > 0, [nextFollowUpAt]);
 
-  async function patchLead(payload: Record<string, unknown>) {
-    const response = await fetch(`/api/admin/leads/${leadId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new Error((data.error as string) || "Update failed");
-    }
-  }
-
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setError(null);
     try {
-      await patchLead({
+      await patchLeadById(leadId, {
         last_contacted_at: fromInputValue(lastContactedAt) ?? null,
         next_follow_up_at: fromInputValue(nextFollowUpAt),
         follow_up_notes: followUpNotes.trim() ? followUpNotes.trim() : null,
@@ -85,7 +74,7 @@ export default function LeadFollowUpForm({
       if (currentStatus === "new") {
         payload.status = "contacted";
       }
-      await patchLead(payload);
+      await patchLeadById(leadId, payload);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update lead");

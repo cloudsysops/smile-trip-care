@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { patchLeadById } from "./leadFormApi";
 
 type PackageOption = { id: string; slug: string; name: string };
 
@@ -19,19 +20,24 @@ export default function LeadRecommendationForm({
   const router = useRouter();
   const [slug, setSlug] = useState(currentRecommendedSlug ?? "");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch(`/api/admin/leads/${leadId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        recommended_package_slug: slug.trim() || null,
-      }),
-    });
-    setSaving(false);
-    if (res.ok) router.refresh();
+    setError(null);
+    try {
+      await patchLeadById(
+        leadId,
+        { recommended_package_slug: slug.trim() || null },
+        "Failed to save recommendation",
+      );
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save recommendation");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -63,6 +69,7 @@ export default function LeadRecommendationForm({
           {saving ? "Saving…" : "Save recommendation"}
         </button>
       </div>
+      {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
       {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
     </form>
   );

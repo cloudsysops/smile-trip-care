@@ -2,27 +2,31 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { patchLeadById } from "./leadFormApi";
 
 const STATUSES = ["new", "contacted", "qualified", "deposit_paid", "completed", "cancelled"] as const;
 
-type Props = { leadId: string; currentStatus: string };
+type Props = Readonly<{ leadId: string; currentStatus: string }>;
 
 export default function LeadStatusForm({ leadId, currentStatus }: Props) {
   const router = useRouter();
   const statusOptions = [...STATUSES];
   const [status, setStatus] = useState(currentStatus);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch(`/api/admin/leads/${leadId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    setSaving(false);
-    if (res.ok) router.refresh();
+    setError(null);
+    try {
+      await patchLeadById(leadId, { status }, "Failed to update status");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update status");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -33,6 +37,7 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
       )}
       <div className="mt-3 flex gap-2">
         <select
+          aria-label="Lead status"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           disabled={statusOptions.length === 0}
@@ -50,6 +55,7 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
           {saving ? "Saving…" : "Save"}
         </button>
       </div>
+      {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
       {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
     </form>
   );
