@@ -84,7 +84,7 @@ export default async function SpecialistDashboardPage() {
             </div>
           </DashboardSection>
           <DashboardSection title="Consultations">
-            <div className="overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/60">
+            <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/60">
               {consultations.length === 0 ? (
                 <EmptyState
                   title="No consultation requests yet"

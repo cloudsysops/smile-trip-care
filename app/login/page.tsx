@@ -104,7 +104,7 @@ function LoginForm() {
           <Link href="/" className="text-lg font-semibold text-white hover:text-zinc-200">
             {branding.productName}
           </Link>
-          <Link href="/" className="text-sm font-medium text-zinc-400 hover:text-white">
+          <Link href="/" className="inline-flex min-h-[44px] items-center text-sm font-medium text-zinc-400 hover:text-white">
             ← Back to home
           </Link>
         </div>
@@ -131,7 +131,7 @@ function LoginForm() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={oauthLoading}
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800/50 py-3 text-sm font-medium text-white hover:bg-zinc-800/80 disabled:opacity-60"
+                className="w-full min-h-[44px] rounded-xl border border-zinc-700 bg-zinc-800/50 py-3 text-sm font-medium text-white hover:bg-zinc-800/80 disabled:opacity-60"
                 aria-label="Continue with Google"
               >
                 {oauthLoading ? "Redirecting to Google…" : "Continue with Google"}
@@ -182,7 +182,7 @@ function LoginForm() {
                 {loading ? "Signing in…" : "Sign in"}
               </button>
             </form>
-            <p className="mt-5 text-center text-xs text-zinc-500">
+            <p className="mt-5 text-center text-sm text-zinc-500">
               Secure sign-in. Your data is protected.
             </p>
           </div>

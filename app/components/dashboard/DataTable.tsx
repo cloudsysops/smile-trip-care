@@ -25,14 +25,14 @@ export default function DataTable<T>({ columns, rows, emptyMessage, getRowHref }
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+    <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
       <table className="w-full text-left text-sm">
         <thead className="border-b border-zinc-200 bg-zinc-50">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.header}
-                className={column.className ?? "px-4 py-3.5 text-xs font-semibold uppercase tracking-wide text-zinc-500"}
+                className={column.className ?? "px-4 py-3.5 text-sm font-semibold uppercase tracking-wide text-zinc-500"}
               >
                 {column.header}
               </th>

@@ -259,7 +259,7 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
           >
             {status === "loading" ? "Sending…" : "Submit my evaluation"}
           </button>
-          <p className="mt-3 text-center text-xs text-zinc-500">We respond within 24 hours. No commitment.</p>
+          <p className="mt-3 text-center text-sm text-zinc-500">We respond within 24 hours. No commitment.</p>
         </div>
       </form>
       <FeedbackButton page="/assessment" />

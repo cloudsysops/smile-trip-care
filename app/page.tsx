@@ -131,10 +131,10 @@ export default async function Home() {
           <Link href="/" className="text-lg font-semibold text-zinc-100 hover:text-white">{branding.productName}</Link>
           <nav className="flex flex-wrap items-center gap-2 sm:gap-3">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Link href="/login" className="text-sm font-medium text-zinc-300 hover:text-white">
+              <Link href="/login" className="inline-flex min-h-[44px] items-center px-2 text-sm font-medium text-zinc-300 hover:text-white">
                 Sign in
               </Link>
-              <Link href="/signup" className="text-sm font-medium text-zinc-300 hover:text-white">
+              <Link href="/signup" className="inline-flex min-h-[44px] items-center px-2 text-sm font-medium text-zinc-300 hover:text-white">
                 Sign up
               </Link>
             </div>

@@ -250,7 +250,7 @@ export default async function PatientDashboardPage() {
         </div>
         <div className="mt-8">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-400">Your assessments</h3>
-          <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-sm">
+          <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-sm">
             {leads.length === 0 ? (
               <div className="p-10 text-center">
                 <p className="text-zinc-300">No submissions yet.</p>
@@ -262,11 +262,11 @@ export default async function PatientDashboardPage() {
               <table className="min-w-full text-left text-sm">
                 <thead className="border-b border-zinc-800 bg-zinc-950/50">
                   <tr>
-                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Name</th>
-                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Status</th>
-                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Recommended package</th>
-                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Submitted</th>
-                    <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-zinc-400">Next action</th>
+                    <th className="px-4 py-3.5 text-left text-sm font-semibold uppercase tracking-wider text-zinc-400">Name</th>
+                    <th className="px-4 py-3.5 text-left text-sm font-semibold uppercase tracking-wider text-zinc-400">Status</th>
+                    <th className="px-4 py-3.5 text-left text-sm font-semibold uppercase tracking-wider text-zinc-400">Recommended package</th>
+                    <th className="px-4 py-3.5 text-left text-sm font-semibold uppercase tracking-wider text-zinc-400">Submitted</th>
+                    <th className="px-4 py-3.5 text-left text-sm font-semibold uppercase tracking-wider text-zinc-400">Next action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -310,7 +310,7 @@ export default async function PatientDashboardPage() {
             {bookings.length > 0 && (
               <div>
                 <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Booking status</h3>
-                <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-sm">
+                <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-sm">
                   <table className="min-w-full text-left text-sm">
                     <thead className="border-b border-zinc-800 bg-zinc-950/50">
                       <tr>
@@ -339,7 +339,7 @@ export default async function PatientDashboardPage() {
             {payments.length > 0 && (
               <div>
                 <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">Payment status</h3>
-                <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-sm">
+                <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-sm">
                   <table className="min-w-full text-left text-sm">
                     <thead className="border-b border-zinc-800 bg-zinc-950/50">
                       <tr>
