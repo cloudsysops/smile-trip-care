@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
-import { createLogger } from "@/lib/logger";
+import { aiJsonError, createAiRouteContext, ensureAiRouteAccess } from "@/lib/ai/admin-route";
 import { getAgentSystemPrompt } from "@/lib/ai/prompts";
 import { callAgent } from "@/lib/ai/openai";
 import { ItineraryOutputSchema, LeadTriageOutputSchema } from "@/lib/ai/schemas";
+import { getLatestLeadAiRow } from "@/lib/ai/storage";
 
 const BodySchema = z.object({
   lead_id: z.string().uuid(),
@@ -21,27 +21,17 @@ function inferCityFromLead(packageSlug: string | null | undefined): "Medellín" 
 }
 
 export async function POST(request: Request) {
-  const requestId = crypto.randomUUID();
-  const log = createLogger(requestId);
-
-  try {
-    await requireAdmin();
-  } catch {
-    return NextResponse.json({ error: "Forbidden", request_id: requestId }, { status: 403 });
-  }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json(
-      { error: "AI service not configured", request_id: requestId },
-      { status: 500 },
-    );
+  const { requestId, log } = createAiRouteContext();
+  const accessError = await ensureAiRouteAccess(requestId);
+  if (accessError) {
+    return accessError;
   }
 
   try {
     const body = await request.json().catch(() => ({}));
     const parsedBody = BodySchema.safeParse(body);
     if (!parsedBody.success) {
-      return NextResponse.json({ error: "Invalid body", request_id: requestId }, { status: 400 });
+      return aiJsonError(requestId, "Invalid body", 400);
     }
 
     const { lead_id, start_date, includes_tour } = parsedBody.data;
@@ -55,19 +45,18 @@ export async function POST(request: Request) {
       .single();
 
     if (leadError || !lead) {
-      return NextResponse.json({ error: "Lead not found", request_id: requestId }, { status: 404 });
+      return aiJsonError(requestId, "Lead not found", 404);
     }
 
-    const { data: aiRows, error: aiError } = await supabase
-      .from("lead_ai")
-      .select("triage_json")
-      .eq("lead_id", lead_id)
-      .order("created_at", { ascending: false })
-      .limit(1);
+    const { row: aiRow, error: aiError } = await getLatestLeadAiRow(
+      supabase,
+      lead_id,
+      "triage_json",
+    );
     if (aiError) {
-      log.error("Failed to load lead_ai triage", { error: aiError.message });
+      log.error("Failed to load lead_ai triage", { error: aiError });
     }
-    const triageMaybe = LeadTriageOutputSchema.safeParse(aiRows?.[0]?.triage_json);
+    const triageMaybe = LeadTriageOutputSchema.safeParse(aiRow?.triage_json);
     const inferredCity =
       inferCityFromLead(lead.package_slug) ??
       (triageMaybe.success ? triageMaybe.data.recommended_city : null) ??
@@ -104,10 +93,7 @@ export async function POST(request: Request) {
     const itineraryParsed = ItineraryOutputSchema.safeParse(itineraryRaw);
     if (!itineraryParsed.success) {
       log.warn("Itinerary schema validation failed", { issues: itineraryParsed.error.issues });
-      return NextResponse.json(
-        { error: "Invalid AI response format", request_id: requestId },
-        { status: 502 },
-      );
+      return aiJsonError(requestId, "Invalid AI response format", 502);
     }
 
     const itinerary = itineraryParsed.data;
@@ -128,7 +114,7 @@ export async function POST(request: Request) {
 
     if (insertError) {
       log.error("Failed to insert itinerary", { error: insertError.message });
-      return NextResponse.json({ error: "Failed to save itinerary", request_id: requestId }, { status: 500 });
+      return aiJsonError(requestId, "Failed to save itinerary", 500);
     }
 
     const now = new Date().toISOString();
@@ -164,6 +150,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ itinerary: created?.content_json ?? itinerary, request_id: requestId });
   } catch (err) {
     log.error("Itinerary route error", { err: String(err) });
-    return NextResponse.json({ error: "Server error", request_id: requestId }, { status: 500 });
+    return aiJsonError(requestId, "Server error", 500);
   }
 }
