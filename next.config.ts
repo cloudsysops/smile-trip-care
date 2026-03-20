@@ -12,6 +12,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  /** Prefer this app as tracing root when a parent directory has another lockfile (avoids mis-rooted builds). */
+  outputFileTracingRoot: process.cwd(),
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

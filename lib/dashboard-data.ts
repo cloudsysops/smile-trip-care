@@ -3,6 +3,42 @@
  */
 import { getServerSupabase } from "@/lib/supabase/server";
 
+export type ProviderOverviewMetrics = {
+  packages_count: number;
+  specialists_count: number;
+  bookings_count: number;
+  revenue_cents: number;
+};
+
+/** Aggregates for provider self-service overview (API + dashboard). */
+export async function getProviderOverviewMetrics(providerId: string): Promise<ProviderOverviewMetrics> {
+  const supabase = getServerSupabase();
+  const [pkgRes, specRes, bookRes] = await Promise.all([
+    supabase.from("packages").select("id", { count: "exact", head: true }).eq("provider_id", providerId),
+    supabase.from("specialists").select("id", { count: "exact", head: true }).eq("provider_id", providerId),
+    supabase.from("bookings").select("id", { count: "exact", head: true }).eq("provider_id", providerId),
+  ]);
+  const packages_count = pkgRes.count ?? 0;
+  const specialists_count = specRes.count ?? 0;
+  const bookings_count = bookRes.count ?? 0;
+
+  const { data: bookingRows } = await supabase.from("bookings").select("lead_id").eq("provider_id", providerId);
+  const leadIds = [...new Set((bookingRows ?? []).map((r) => r.lead_id as string).filter(Boolean))];
+  let revenue_cents = 0;
+  if (leadIds.length > 0) {
+    const { data: payRows } = await supabase
+      .from("payments")
+      .select("amount_cents")
+      .in("lead_id", leadIds)
+      .eq("status", "succeeded");
+    for (const row of payRows ?? []) {
+      const cents = row.amount_cents;
+      if (typeof cents === "number" && Number.isFinite(cents)) revenue_cents += cents;
+    }
+  }
+  return { packages_count, specialists_count, bookings_count, revenue_cents };
+}
+
 /** Provider dashboard: own provider, packages, specialists, experiences, bookings summary */
 export async function getProviderDashboardData(providerId: string) {
   const supabase = getServerSupabase();
