@@ -61,6 +61,9 @@ export async function POST(request: Request) {
       scheduled_at: scheduledAt,
       scheduled_date: payload.scheduled_date ?? null,
       scheduled_time: payload.scheduled_time ?? null,
+      requested_at: new Date().toISOString(),
+      case_priority: "normal",
+      specialist_coordinator_request: null,
       notes: payload.notes ?? null,
     });
     if (error) {

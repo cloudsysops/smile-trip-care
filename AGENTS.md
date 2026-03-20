@@ -1,6 +1,31 @@
-# Agentes — MedVoyage Smile
+# Agentes — MedVoyage Smile / SmileTripCare
 
 **Si eres un agente (IA o humano) trabajando en este repo, lee esto primero.**
+
+**Producto:** plataforma de turismo médico (dental en Colombia) — marca **SmileTripCare**.
+
+## Desarrollo con agentes IA (Cursor)
+
+1. **Reglas técnicas del repo:** lee el archivo **`.cursorrules`** en la raíz (stack, capas, Supabase, Stripe, Claude, tests, multi-rol).
+2. **Política de ejecución:** [.cursor/rules/controlled-execution-policy.mdc](.cursor/rules/controlled-execution-policy.mdc) — clasificar SAFE / MODERATE / HIGH-IMPACT antes de cambiar código sensible (auth, Stripe, migraciones, RLS).
+3. **Extensiones VS Code / Cursor:** lista en [`.vscode/extensions.json`](.vscode/extensions.json). Para instalar desde terminal (si tienes el CLI `code`):
+   ```bash
+   code --install-extension dbaeumer.vscode-eslint
+   code --install-extension esbenp.prettier-vscode
+   code --install-extension bradlc.vscode-tailwindcss
+   code --install-extension ms-vscode.vscode-typescript-next
+   code --install-extension eamodio.gitlens
+   code --install-extension usernamehw.errorlens
+   code --install-extension Supabase.vscode-supabase-extension
+   code --install-extension YoavBls.pretty-typescript-errors
+   code --install-extension formulahendry.auto-rename-tag
+   code --install-extension christian-kohler.path-intellisense
+   code --install-extension rangav.vscode-thunder-client
+   code --install-extension Gruntfuggly.todo-tree
+   ```
+   Si algún ID falla con `code` (p. ej. Pretty TypeScript Errors), instálala desde el panel **Extensions** buscando el nombre en Marketplace.
+4. **Respuestas HTTP de API:** preferir helpers en `lib/http/response.ts` y siempre incluir `request_id` en errores cuando aplique.
+5. **IA (Claude):** modelo por defecto `claude-sonnet-4-5` en `lib/ai/claude.ts`; usar `safeClaudeCall` / `generateStructuredResponse`, no duplicar llamadas directas al SDK fuera de `lib/ai/`.
 
 ## Objetivo
 

@@ -1,0 +1,59 @@
+# SmileTripCare — Cursor AI Rules
+
+## Project
+Medical tourism platform connecting international patients with Colombian dental specialists.
+Stack: Next.js 16, TypeScript, Supabase, Stripe, Claude AI, Tailwind CSS.
+
+## Architecture
+- app/ — Next.js app router pages and API routes
+- lib/ — Business logic, services, utilities
+- lib/services/ — Service layer (use this, not direct DB in routes)
+- lib/ai/ — Claude AI integration
+- lib/supabase/ — Supabase clients
+- supabase/migrations/ — DB migrations (always add new ones, never edit existing)
+
+## Code Rules
+- Always use TypeScript strict mode
+- Never use console.log — use createLogger(requestId) from lib/logger
+- All API routes must have: requestId, logging, error handling
+- All API errors must return: { ok: false, error: string, request_id: string }
+- Use lib/http/response.ts helpers for API responses
+- Never put business logic in API routes — use lib/services/
+- Always validate inputs with Zod schemas
+- Use existing auth helpers: requireAdmin(), requireSpecialist(), requirePatient()
+
+## Database Rules
+- Never edit existing migrations
+- New migrations go in supabase/migrations/ with next number prefix
+- Always use IF NOT EXISTS and ON CONFLICT DO NOTHING
+- Update supabase/migrations/MIGRATION_ORDER.md with every new migration
+
+## Git Rules
+- Follow controlled-execution-policy in .cursor/rules/
+- Classify changes before executing: SAFE / RISKY / NEEDS APPROVAL
+- Run npm run verify before every commit
+- Never commit directly to main without verify passing
+
+## AI Integration
+- Claude model: claude-sonnet-4-5 (never change this)
+- Always use safeClaudeCall() from lib/ai/claude.ts
+- Use generateStructuredResponse() for JSON outputs
+- Do not call the Anthropic SDK from new app routes or UI — keep all Claude usage in lib/ai/ (isolated health/connectivity checks are the only exception and must not be copied)
+
+## Testing
+- Tests in tests/ folder
+- Use Vitest
+- Mock Supabase with the existing mock pattern
+- Run: npm run test
+
+## Stripe
+- Never hardcode Stripe keys
+- Always use process.env.STRIPE_SECRET_KEY
+- Webhook signature verification is required
+- Test cards: 4242 4242 4242 4242
+
+## Multi-role System
+- Roles: admin, coordinator, patient, specialist, provider_manager, host
+- Use profile_roles table for multi-role users
+- Role switching via /api/auth/active-role
+- Always check role with appropriate requireX() helper
