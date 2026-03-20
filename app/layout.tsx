@@ -4,6 +4,7 @@ import "./globals.css";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { ThemeToggle } from "./components/ui/ThemeToggle";
+import { branding } from "@/lib/branding";
 
 const instrumentSerif = Instrument_Serif({
   weight: "400",
@@ -16,9 +17,8 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const metaTitle = "SmileTripCare | Medical Tourism & Dental Travel";
-const metaDescription =
-  "SmileTripCare connects international patients with trusted dental clinics in Colombia—coordinated end-to-end with curated specialists and guided travel care.";
+const metaTitle = `${branding.productName} | Medical Tourism & Dental Travel`;
+const metaDescription = `${branding.productName} connects international patients with trusted dental clinics in Colombia—coordinated end-to-end with curated specialists and guided travel care.`;
 
 const siteUrl = typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
   ? process.env.NEXT_PUBLIC_SITE_URL.trim()

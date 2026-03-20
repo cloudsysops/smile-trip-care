@@ -24,7 +24,7 @@ function parseFilters(params: Record<string, string | undefined>) {
 }
 
 export const metadata = {
-  title: "Packages | SmileTripCare",
+  title: `Packages | ${branding.productName}`,
   description: "Browse curated health, travel, and combo packages in Medellín and Manizales.",
 };
 

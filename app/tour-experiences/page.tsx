@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { branding } from "@/lib/branding";
 import { getPublishedExperiencesWithFilters } from "@/lib/experiences";
 import MarketplaceExperienceCard from "@/app/components/marketplace/MarketplaceExperienceCard";
 import ExperienceFiltersForm from "@/app/components/marketplace/ExperienceFiltersForm";
@@ -21,7 +22,7 @@ function parseFilters(params: Record<string, string | undefined>) {
 }
 
 export const metadata = {
-  title: "Tour Experiences | SmileTripCare",
+  title: `Tour Experiences | ${branding.productName}`,
   description: "Recovery and tour experiences in Medellín and Manizales.",
 };
 

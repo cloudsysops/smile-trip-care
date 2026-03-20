@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { branding } from "@/lib/branding";
 import { getPublishedPackagesWithFilters } from "@/lib/packages";
 import MarketplacePackageCard from "@/app/components/marketplace/MarketplacePackageCard";
 import PackageFiltersForm from "@/app/components/marketplace/PackageFiltersForm";
@@ -21,7 +22,7 @@ function parseFilters(params: Record<string, string | undefined>) {
 }
 
 export const metadata = {
-  title: "Health Packages | SmileTripCare",
+  title: `Health Packages | ${branding.productName}`,
   description: "Health treatment packages in Medellín and Manizales.",
 };
 
