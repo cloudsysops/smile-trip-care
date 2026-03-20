@@ -16,7 +16,7 @@ Use this checklist before promoting a release to production.
 
 ## 2) Database & storage
 
-- [ ] Supabase migrations applied (`0001` ... `0009`)
+- [ ] Supabase migrations applied (`0001` ... `0010`)
 - [ ] `packages` seed executed (if required for environment)
 - [ ] `assets` storage bucket exists
 - [ ] Storage permissions reviewed for signed URL workflow

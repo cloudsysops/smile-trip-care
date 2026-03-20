@@ -5,6 +5,7 @@ import { createLogger } from "@/lib/logger";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { enqueueDepositPaidAutomationJobs } from "@/lib/ai/automation";
 import { resolvePaymentFromCheckoutSession } from "@/lib/payments/reliability";
+import { timingSafeSecretCompare } from "@/lib/security/secret";
 
 export const runtime = "nodejs";
 
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
   }
 
   const provided = readProvidedSecret(request);
-  if (!provided || provided !== secret) {
+  if (!timingSafeSecretCompare(provided, secret)) {
     return NextResponse.json({ error: "Unauthorized", request_id: requestId }, { status: 401 });
   }
 

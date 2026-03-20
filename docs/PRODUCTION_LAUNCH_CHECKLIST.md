@@ -51,8 +51,9 @@ Operational checklist to launch safely on Vercel + Supabase + Stripe.
    - `supabase/migrations/0007_ai_automation_jobs.sql`
    - `supabase/migrations/0008_outbound_messages.sql`
    - `supabase/migrations/0009_payments_idempotency.sql`
+   - `supabase/migrations/0010_payment_reliability.sql`
 2. Validate RLS is enabled for:
-   - `profiles`, `packages`, `leads`, `payments`, `assets`, `itineraries`, `lead_ai`, `ai_automation_jobs`, `outbound_messages`
+   - `profiles`, `packages`, `leads`, `payments`, `assets`, `itineraries`, `lead_ai`, `ai_automation_jobs`, `outbound_messages`, `stripe_webhook_events`
 3. Validate policy behavior:
    - Public can read only published packages and approved+published assets.
    - Admin-only access for leads, payments, itineraries, lead_ai.

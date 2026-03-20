@@ -17,7 +17,7 @@ Checklist operativo para despliegues con GitHub + Vercel + Supabase + Stripe.
 - [ ] Deploy más reciente en estado `Ready`.
 
 ### Supabase
-- [ ] Migraciones aplicadas (`0001` → `0009` según `STATUS.md`).
+- [ ] Migraciones aplicadas (`0001` → `0010` según `STATUS.md`).
 - [ ] RLS habilitado y policies validadas.
 - [ ] Claves correctas en Vercel (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, públicas `NEXT_PUBLIC_*`).
 

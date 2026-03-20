@@ -1,5 +1,5 @@
--- M19: Payment reliability hardening (Stripe webhook dedupe + reconciliation support).
--- Run after 0008_outbound_messages.sql.
+-- M20: Payment reliability hardening (Stripe webhook dedupe + reconciliation support).
+-- Run after 0009_payments_idempotency.sql.
 
 create table if not exists public.stripe_webhook_events (
   id uuid primary key default gen_random_uuid(),
@@ -40,33 +40,20 @@ create index if not exists idx_stripe_webhook_events_received_at
 create index if not exists idx_stripe_webhook_events_event_type
   on public.stripe_webhook_events(event_type);
 
--- Keep one canonical payment row per checkout session.
--- If legacy duplicates exist, preserve newest row and detach old duplicates from session id.
-with ranked as (
-  select
-    id,
-    row_number() over (
-      partition by stripe_checkout_session_id
-      order by created_at desc, id desc
-    ) as rn
-  from public.payments
-  where stripe_checkout_session_id is not null
-)
-update public.payments p
-set
-  stripe_checkout_session_id = null,
-  updated_at = now()
-from ranked r
-where p.id = r.id
-  and r.rn > 1;
-
-create unique index if not exists uq_payments_stripe_checkout_session
-  on public.payments(stripe_checkout_session_id)
-  where stripe_checkout_session_id is not null;
-
 alter table public.stripe_webhook_events enable row level security;
 
-create policy "stripe_webhook_events_admin_all"
-  on public.stripe_webhook_events
-  for all
-  using (public.is_admin());
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'stripe_webhook_events'
+      and policyname = 'stripe_webhook_events_admin_all'
+  ) then
+    create policy "stripe_webhook_events_admin_all"
+      on public.stripe_webhook_events
+      for all
+      using (public.is_admin());
+  end if;
+end $$;
