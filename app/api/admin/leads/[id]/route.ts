@@ -36,7 +36,7 @@ export async function PATCH(request: Request, { params }: Props) {
   try {
     const parsedParams = RouteIdParamSchema.safeParse(await params);
     if (!parsedParams.success) {
-      return NextResponse.json({ error: "Invalid lead id" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "Invalid lead id", request_id: requestId }, { status: 400 });
     }
     const { id } = parsedParams.data;
     const body = await request.json().catch(() => ({}));
