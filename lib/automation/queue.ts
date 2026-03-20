@@ -42,6 +42,10 @@ export type AutomationJobRecord = {
   updated_at: string;
 };
 
+const JOB_SELECT =
+  "id, lead_id, trigger_type, job_type, status, attempts, max_attempts, run_after, locked_at, locked_by, payload_json, error_message, created_at, updated_at";
+const STALE_PROCESSING_LOCK_MS = 15 * 60 * 1000;
+
 type EnqueueInput = {
   leadId: string;
   triggerType: AutomationTriggerType;
@@ -133,11 +137,10 @@ export async function enqueueAutomationJobs(input: EnqueueInput): Promise<Automa
 export async function claimDueAutomationJobs(workerId: string, limit: number): Promise<AutomationJobRecord[]> {
   const supabase = getServerSupabase();
   const nowIso = new Date().toISOString();
+  const staleBeforeIso = new Date(Date.now() - STALE_PROCESSING_LOCK_MS).toISOString();
   const { data: dueRows, error: dueError } = await supabase
     .from("ai_automation_jobs")
-    .select(
-      "id, lead_id, trigger_type, job_type, status, attempts, max_attempts, run_after, locked_at, locked_by, payload_json, error_message, created_at, updated_at",
-    )
+    .select(JOB_SELECT)
     .in("status", ["pending", "retry_scheduled"])
     .lte("run_after", nowIso)
     .order("created_at", { ascending: true })
@@ -146,10 +149,29 @@ export async function claimDueAutomationJobs(workerId: string, limit: number): P
     throw new Error(`Failed to claim automation jobs: ${dueError.message}`);
   }
 
+  const due = (dueRows ?? []) as AutomationJobRecord[];
+  const remainingSlots = Math.max(0, limit - due.length);
+  let staleRows: AutomationJobRecord[] = [];
+  if (remainingSlots > 0) {
+    const { data, error } = await supabase
+      .from("ai_automation_jobs")
+      .select(JOB_SELECT)
+      .eq("status", "processing")
+      .not("locked_at", "is", null)
+      .lte("locked_at", staleBeforeIso)
+      .order("locked_at", { ascending: true })
+      .limit(remainingSlots);
+    if (error) {
+      throw new Error(`Failed to load stale automation jobs: ${error.message}`);
+    }
+    staleRows = (data ?? []) as AutomationJobRecord[];
+  }
+
+  const candidates = [...due, ...staleRows];
   const claimed: AutomationJobRecord[] = [];
-  for (const row of (dueRows ?? []) as AutomationJobRecord[]) {
+  for (const row of candidates) {
     const nextAttempts = row.attempts + 1;
-    const { data: claimedRow, error: claimError } = await supabase
+    const update = supabase
       .from("ai_automation_jobs")
       .update({
         status: "processing",
@@ -160,11 +182,12 @@ export async function claimDueAutomationJobs(workerId: string, limit: number): P
         error_message: null,
       })
       .eq("id", row.id)
-      .in("status", ["pending", "retry_scheduled"])
-      .eq("attempts", row.attempts)
-      .select(
-        "id, lead_id, trigger_type, job_type, status, attempts, max_attempts, run_after, locked_at, locked_by, payload_json, error_message, created_at, updated_at",
-      )
+      .eq("attempts", row.attempts);
+    const guardedUpdate = row.status === "processing"
+      ? update.eq("status", "processing").lte("locked_at", staleBeforeIso)
+      : update.in("status", ["pending", "retry_scheduled"]);
+    const { data: claimedRow, error: claimError } = await guardedUpdate
+      .select(JOB_SELECT)
       .maybeSingle();
     if (claimError) {
       throw new Error(`Failed to lock automation job ${row.id}: ${claimError.message}`);

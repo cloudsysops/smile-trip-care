@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { enqueueInactiveFollowupJobs } from "@/lib/ai/automation";
 import { createLogger } from "@/lib/logger";
 import { getServerConfigSafe } from "@/lib/config/server";
+import { timingSafeSecretCompare } from "@/lib/security/secret";
 
 export const runtime = "nodejs";
 
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   const provided = readProvidedSecret(request);
-  if (!provided || provided !== secret) {
+  if (!timingSafeSecretCompare(provided, secret)) {
     return NextResponse.json({ error: "Unauthorized", request_id: requestId }, { status: 401 });
   }
 

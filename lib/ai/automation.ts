@@ -372,7 +372,8 @@ export async function enqueueInactiveFollowupJobs(
   } = {},
 ): Promise<InactiveFollowupEnqueueResult> {
   const now = options.now ?? new Date();
-  const limit = options.limit ?? 200;
+  const maxScan = Math.max(1, Math.min(options.limit ?? 1000, 5000));
+  const pageSize = Math.min(200, maxScan);
   const result: InactiveFollowupEnqueueResult = {
     scanned: 0,
     enqueued_24h: 0,
@@ -380,45 +381,55 @@ export async function enqueueInactiveFollowupJobs(
   };
 
   const supabase = getServerSupabase();
-  const { data: leads, error } = await supabase
-    .from("leads")
-    .select("id, status, created_at, last_contacted_at")
-    .in("status", ACTIVE_FOLLOWUP_STATUSES)
-    .order("created_at", { ascending: true })
-    .limit(limit);
-  if (error) {
-    throw new Error(`Failed to list leads for inactive followup: ${error.message}`);
-  }
-
-  for (const lead of (leads ?? []) as Array<{
-    id: string;
-    created_at: string;
-    last_contacted_at: string | null;
-  }>) {
-    result.scanned += 1;
-    const referenceIso = lead.last_contacted_at ?? lead.created_at;
-    const reference = new Date(referenceIso).getTime();
-    if (Number.isNaN(reference)) continue;
-    const inactiveHours = (now.getTime() - reference) / MS_PER_HOUR;
-    if (inactiveHours < 24) continue;
-
-    if (inactiveHours >= 48) {
-      const jobs = await enqueueAutomationJobs({
-        leadId: lead.id,
-        triggerType: "lead_inactive_48h",
-        jobTypes: ["sales-responder"],
-        payload: { cta_url: options.ctaUrl ?? null },
-      });
-      result.enqueued_48h += jobs.length;
-    } else {
-      const jobs = await enqueueAutomationJobs({
-        leadId: lead.id,
-        triggerType: "lead_inactive_24h",
-        jobTypes: ["sales-responder"],
-        payload: { cta_url: options.ctaUrl ?? null },
-      });
-      result.enqueued_24h += jobs.length;
+  let offset = 0;
+  while (offset < maxScan) {
+    const batchSize = Math.min(pageSize, maxScan - offset);
+    const { data: leads, error } = await supabase
+      .from("leads")
+      .select("id, status, created_at, last_contacted_at")
+      .in("status", ACTIVE_FOLLOWUP_STATUSES)
+      .order("created_at", { ascending: true })
+      .range(offset, offset + batchSize - 1);
+    if (error) {
+      throw new Error(`Failed to list leads for inactive followup: ${error.message}`);
     }
+
+    const batch = (leads ?? []) as Array<{
+      id: string;
+      created_at: string;
+      last_contacted_at: string | null;
+    }>;
+    if (batch.length === 0) break;
+
+    for (const lead of batch) {
+      result.scanned += 1;
+      const referenceIso = lead.last_contacted_at ?? lead.created_at;
+      const reference = new Date(referenceIso).getTime();
+      if (Number.isNaN(reference)) continue;
+      const inactiveHours = (now.getTime() - reference) / MS_PER_HOUR;
+      if (inactiveHours < 24) continue;
+
+      if (inactiveHours >= 48) {
+        const jobs = await enqueueAutomationJobs({
+          leadId: lead.id,
+          triggerType: "lead_inactive_48h",
+          jobTypes: ["sales-responder"],
+          payload: { cta_url: options.ctaUrl ?? null },
+        });
+        result.enqueued_48h += jobs.length;
+      } else {
+        const jobs = await enqueueAutomationJobs({
+          leadId: lead.id,
+          triggerType: "lead_inactive_24h",
+          jobTypes: ["sales-responder"],
+          payload: { cta_url: options.ctaUrl ?? null },
+        });
+        result.enqueued_24h += jobs.length;
+      }
+    }
+
+    offset += batch.length;
+    if (batch.length < batchSize) break;
   }
   return result;
 }
