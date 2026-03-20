@@ -40,7 +40,11 @@ describe("admin API input validation", () => {
     );
 
     expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toEqual({ error: "Invalid lead id" });
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Invalid lead id",
+      request_id: expect.any(String),
+    });
     expect(fromMock).not.toHaveBeenCalled();
   });
 
@@ -51,7 +55,11 @@ describe("admin API input validation", () => {
     );
 
     expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toEqual({ error: "Invalid filters" });
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Invalid filters",
+      request_id: expect.any(String),
+    });
     expect(fromMock).not.toHaveBeenCalled();
   });
 

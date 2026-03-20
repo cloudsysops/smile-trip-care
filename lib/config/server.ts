@@ -7,6 +7,7 @@ const serverSchema = z.object({
   /** Direct Postgres URL for migrations, seeds, and optional server-side pg client. Supabase → Database → Connection string (URI). */
   DATABASE_URL: z.string().startsWith("postgres").optional(),
   STRIPE_SECRET_KEY: z.string().startsWith("sk_").optional(),
+  STRIPE_API_VERSION: z.string().min(1).optional(),
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
   OPENAI_API_KEY: z.string().startsWith("sk-").optional(),
   OPENAI_MODEL: z.string().min(1).optional(),
@@ -27,6 +28,7 @@ function parse(): z.SafeParseReturnType<unknown, ServerConfig> {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_API_VERSION: process.env.STRIPE_API_VERSION,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     OPENAI_MODEL: process.env.OPENAI_MODEL,

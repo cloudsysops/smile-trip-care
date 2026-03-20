@@ -2,14 +2,17 @@ import { NextResponse } from "next/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
+import { jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
 
 export async function GET() {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   }
   try {
     const supabase = getServerSupabase();
@@ -19,11 +22,12 @@ export async function GET() {
       .order("created_at", { ascending: false });
     if (error) {
       log.error("Failed to list leads", { error: error.message });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
+    log.info("Admin leads listed", { admin_user_id: adminUserId, count: data?.length ?? 0 });
     return NextResponse.json(data ?? []);
   } catch (err) {
     log.error("Admin leads GET endpoint failed", { err: String(err) });
-    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }

@@ -4,27 +4,30 @@ import { createLogger } from "@/lib/logger";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AssetUpdateSchema } from "@/lib/validation/asset";
 import { RouteIdParamSchema } from "@/lib/validation/common";
+import { jsonBadRequest, jsonError, jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: RouteContext) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   }
   try {
     const parsedParams = RouteIdParamSchema.safeParse(await params);
     if (!parsedParams.success) {
-      return NextResponse.json({ error: "Invalid asset id" }, { status: 400 });
+      return jsonBadRequest("Invalid asset id", requestId);
     }
     const { id } = parsedParams.data;
     const json = await request.json().catch(() => ({}));
     const parsed = AssetUpdateSchema.safeParse(json);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+      return jsonBadRequest("Invalid body", requestId);
     }
 
     const body = parsed.data;
@@ -41,7 +44,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     if (body.published !== undefined) updates.published = body.published;
 
     if (Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: "No updates provided" }, { status: 400 });
+      return jsonBadRequest("No updates provided", requestId);
     }
 
     updates.updated_at = new Date().toISOString();
@@ -57,31 +60,34 @@ export async function PATCH(request: Request, { params }: RouteContext) {
 
     if (error) {
       log.error("Failed to update asset", { id, error: error.message });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
     if (!data) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return jsonError(404, "Not found", requestId);
     }
 
+    log.info("Admin asset updated", { admin_user_id: adminUserId, asset_id: id });
     return NextResponse.json(data);
   } catch (err) {
     log.error("Asset PATCH endpoint failed", { err: String(err) });
-    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }
 
 export async function DELETE(_request: Request, { params }: RouteContext) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   }
   try {
     const parsedParams = RouteIdParamSchema.safeParse(await params);
     if (!parsedParams.success) {
-      return NextResponse.json({ error: "Invalid asset id" }, { status: 400 });
+      return jsonBadRequest("Invalid asset id", requestId);
     }
     const { id } = parsedParams.data;
     const supabase = getServerSupabase();
@@ -94,10 +100,10 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
 
     if (error) {
       log.error("Failed to lookup asset for delete", { id, error: error.message });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
     if (!asset) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return jsonError(404, "Not found", requestId);
     }
 
     const storagePath = asset.storage_path as string | null;
@@ -118,13 +124,14 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
 
     if (updateError) {
       log.error("Failed to soft delete asset", { id, error: updateError.message });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
 
+    log.info("Admin asset deleted", { admin_user_id: adminUserId, asset_id: id });
     return NextResponse.json({ ok: true });
   } catch (err) {
     log.error("Asset DELETE endpoint failed", { err: String(err) });
-    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }
 

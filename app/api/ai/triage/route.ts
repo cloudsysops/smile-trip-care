@@ -6,6 +6,7 @@ import { createLogger } from "@/lib/logger";
 import { getAgentSystemPrompt } from "@/lib/ai/prompts";
 import { callAgent } from "@/lib/ai/openai";
 import { LeadTriageOutputSchema } from "@/lib/ai/schemas";
+import { jsonBadRequest, jsonError, jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
 
 const BodySchema = z.object({
   lead_id: z.string().uuid(),
@@ -14,25 +15,24 @@ const BodySchema = z.object({
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
 
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden", request_id: requestId }, { status: 403 });
+    return jsonForbidden(requestId);
   }
 
   if (!process.env.OPENAI_API_KEY) {
-    return NextResponse.json(
-      { error: "AI service not configured", request_id: requestId },
-      { status: 500 },
-    );
+    return jsonInternalServerError(requestId);
   }
 
   try {
     const body = await request.json().catch(() => ({}));
     const parsedBody = BodySchema.safeParse(body);
     if (!parsedBody.success) {
-      return NextResponse.json({ error: "Invalid body", request_id: requestId }, { status: 400 });
+      return jsonBadRequest("Invalid body", requestId);
     }
 
     const supabase = getServerSupabase();
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       .single();
 
     if (leadError || !lead) {
-      return NextResponse.json({ error: "Lead not found", request_id: requestId }, { status: 404 });
+      return jsonError(404, "Lead not found", requestId);
     }
 
     const systemPrompt = await getAgentSystemPrompt("lead-triage");
@@ -69,10 +69,7 @@ export async function POST(request: Request) {
     const triageParsed = LeadTriageOutputSchema.safeParse(triageRaw);
     if (!triageParsed.success) {
       log.warn("Triage schema validation failed", { issues: triageParsed.error.issues });
-      return NextResponse.json(
-        { error: "Invalid AI response format", request_id: requestId },
-        { status: 502 },
-      );
+      return jsonError(502, "Invalid AI response format", requestId);
     }
 
     const triage = triageParsed.data;
@@ -85,7 +82,7 @@ export async function POST(request: Request) {
 
     if (existingError) {
       log.error("Failed to load lead_ai row", { error: existingError.message });
-      return NextResponse.json({ error: "Failed to save triage", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
 
     const existingId = existingRows?.[0]?.id as string | undefined;
@@ -97,7 +94,7 @@ export async function POST(request: Request) {
         .eq("id", existingId);
       if (updateError) {
         log.error("Failed to update triage", { error: updateError.message });
-        return NextResponse.json({ error: "Failed to save triage", request_id: requestId }, { status: 500 });
+        return jsonInternalServerError(requestId);
       }
     } else {
       const { error: insertError } = await supabase
@@ -110,14 +107,14 @@ export async function POST(request: Request) {
         });
       if (insertError) {
         log.error("Failed to insert triage", { error: insertError.message });
-        return NextResponse.json({ error: "Failed to save triage", request_id: requestId }, { status: 500 });
+        return jsonInternalServerError(requestId);
       }
     }
 
-    log.info("Lead triage generated", { lead_id: parsedBody.data.lead_id });
+    log.info("Lead triage generated", { lead_id: parsedBody.data.lead_id, admin_user_id: adminUserId });
     return NextResponse.json({ triage, request_id: requestId });
   } catch (err) {
     log.error("Triage route error", { err: String(err) });
-    return NextResponse.json({ error: "Server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }

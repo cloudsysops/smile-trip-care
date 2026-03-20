@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { AssetFilterSchema } from "@/lib/validation/asset";
+import { jsonBadRequest, jsonForbidden, jsonInternalServerError } from "@/lib/http/response";
 
 const BUCKET = "assets";
 const SIGNED_EXPIRY = 3600;
@@ -10,10 +11,12 @@ const SIGNED_EXPIRY = 3600;
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  let adminUserId = "";
   try {
-    await requireAdmin();
+    const { user } = await requireAdmin();
+    adminUserId = user.id;
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   }
 
   try {
@@ -30,7 +33,7 @@ export async function GET(request: Request) {
 
     const parsed = AssetFilterSchema.safeParse(params);
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid filters" }, { status: 400 });
+      return jsonBadRequest("Invalid filters", requestId);
     }
 
     const { category, location, approved, published, q, page, pageSize } = parsed.data;
@@ -62,7 +65,7 @@ export async function GET(request: Request) {
     const { data, error, count } = await query;
     if (error) {
       log.error("Failed to list assets", { error: error.message });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      return jsonInternalServerError(requestId);
     }
 
     const storage = supabase.storage.from(BUCKET);
@@ -80,6 +83,12 @@ export async function GET(request: Request) {
       }),
     );
 
+    log.info("Admin assets listed", {
+      admin_user_id: adminUserId,
+      count: items.length,
+      page,
+      page_size: pageSize,
+    });
     return NextResponse.json({
       items,
       count: count ?? 0,
@@ -88,7 +97,7 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     log.error("Assets list endpoint failed", { err: String(err) });
-    return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    return jsonInternalServerError(requestId);
   }
 }
 
