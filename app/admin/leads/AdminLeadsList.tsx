@@ -152,7 +152,7 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
       header: "Name",
       cell: (lead) => (
         <div className="flex flex-col">
-          <span className="font-medium text-zinc-100">
+          <span className="font-medium text-zinc-100 group-hover:underline">
             {lead.first_name} {lead.last_name}
           </span>
           <span className="text-xs text-zinc-400">

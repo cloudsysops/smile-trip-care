@@ -65,7 +65,7 @@ export default function AdminDataTable<T>({
                 key={rowKey}
                 className={
                   href
-                    ? "cursor-pointer border-b border-zinc-800 transition-colors hover:bg-zinc-800/40"
+                    ? "group cursor-pointer border-b border-zinc-800 transition-colors hover:bg-zinc-800/50 hover:ring-1 hover:ring-sky-500/20"
                     : "border-b border-zinc-800"
                 }
                 onClick={
