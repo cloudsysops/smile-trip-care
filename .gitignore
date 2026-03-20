@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# VS Code: share .vscode/ team settings; ignore local multi-root workspace files
+.vscode/*.code-workspace
+
 # dependencies
 /node_modules
 /.pnp
