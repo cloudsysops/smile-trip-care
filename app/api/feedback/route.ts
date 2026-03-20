@@ -5,6 +5,7 @@ import { createLogger } from "@/lib/logger";
 import { submitFeedback, type FeedbackCategory, type FeedbackSentiment } from "@/lib/services/feedback.service";
 import { jsonBadRequest, jsonError } from "@/lib/http/response";
 import { sanitizeTextInput } from "@/lib/security/sanitize";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const FeedbackBodySchema = z.object({
   page: z.string().trim().min(1).max(200),
@@ -18,6 +19,13 @@ const FeedbackBodySchema = z.object({
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
   const log = createLogger(requestId);
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    ?? request.headers.get("x-real-ip")
+    ?? "unknown";
+  if (!(await checkRateLimit(`feedback:${ip}`))) {
+    log.warn("feedback: rate limit exceeded", { ip });
+    return jsonError(429, "Too many requests. Please try again later.", requestId);
+  }
 
   const raw = await request.json().catch(() => null);
   const sanitizedRaw =
