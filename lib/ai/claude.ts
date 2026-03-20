@@ -27,7 +27,7 @@ export type ClaudeError = Readonly<{
   code?: string;
 }>;
 
-const DEFAULT_MODEL = "claude-3-sonnet-20240229";
+const DEFAULT_MODEL = "claude-sonnet-4-5";
 
 let anthropicClient: Anthropic | null = null;
 
