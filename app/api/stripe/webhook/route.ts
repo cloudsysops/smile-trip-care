@@ -82,6 +82,39 @@ export async function POST(request: Request) {
   const leadIdFromMetadata = metadataParsed.success ? metadataParsed.data.lead_id : null;
 
   const supabase = getServerSupabase();
+
+  // Persist webhook event for audit/observability (append-only), only for relevant checkout events.
+  try {
+    const eventType = event.type;
+    const eventId = event.id ?? null;
+    const receivedAt = new Date().toISOString();
+    const payloadJson = payload;
+    const baseStatus = "received";
+
+    const insert = await supabase
+      .from("stripe_webhook_events")
+      .insert({
+        stripe_event_id: eventId,
+        event_type: eventType,
+        payload_json: payloadJson,
+        received_at: receivedAt,
+        status: baseStatus,
+      });
+
+    if (insert.error) {
+      // If unique constraint or any insert failure occurs, log it but do not fail the webhook.
+      log.warn("Failed to persist stripe_webhook_event", {
+        error: insert.error.message,
+        stripe_event_id: eventId,
+        event_type: eventType,
+      });
+    }
+  } catch (persistErr) {
+    log.warn("Exception while persisting stripe_webhook_event", {
+      error: String(persistErr),
+    });
+  }
+
   const { data: paymentRows, error: paymentLookupError } = await supabase
     .from("payments")
     .select("id, lead_id, status")

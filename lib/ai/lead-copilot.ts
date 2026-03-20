@@ -1,5 +1,6 @@
 import { runChatJson } from "@/lib/ai/openai";
 import { LeadCopilotOutputSchema, type LeadCopilotOutput } from "@/lib/ai/schemas";
+import { branding } from "@/lib/branding";
 
 export type LeadCopilotInput = {
   first_name: string;
@@ -14,7 +15,7 @@ export type LeadCopilotInput = {
   budget_range?: string | null;
 };
 
-const SYSTEM_PROMPT = `You are a medical travel coordinator assistant for MedVoyage Smile (dental care in Colombia: Medellín and Manizales).
+const SYSTEM_PROMPT = `You are a medical travel coordinator assistant for ${branding.productName} (dental care in Colombia: Medellín and Manizales).
 
 Given a lead's form data, return a JSON object with exactly these keys (all strings except priority):
 - summary: 1-3 sentence plain-English summary of the lead (treatment interest, timeline, context). No fluff.
@@ -64,21 +65,21 @@ export async function generateLeadCopilot(input: LeadCopilotInput): Promise<Lead
   }
 }
 
-const FOLLOWUP_24H_PROMPT = `You are a medical travel coordinator for MedVoyage Smile (dental in Colombia).
+const FOLLOWUP_24H_PROMPT = `You are a medical travel coordinator for ${branding.productName} (dental in Colombia).
 
 Given lead data, return a JSON object with one key: "message" (string).
 Generate a short, friendly WhatsApp follow-up message for 24 hours after the lead submitted their assessment. Example tone:
 "Hi [first name], just checking in to see if you had time to review your smile plan. Our coordinator can answer any questions about treatment and travel."
 Use the lead's first name. Keep it to 2-3 sentences. No placeholders.`;
 
-const FOLLOWUP_3DAY_PROMPT = `You are a medical travel coordinator for MedVoyage Smile (dental in Colombia).
+const FOLLOWUP_3DAY_PROMPT = `You are a medical travel coordinator for ${branding.productName} (dental in Colombia).
 
 Given lead data, return a JSON object with one key: "message" (string).
 Generate a short, soft follow-up for 3 days after no response. Example tone:
 "If you're still considering treatment abroad, we can help you plan the timing and costs. Happy to walk you through the options."
 Use the lead's first name. Keep it to 2-3 sentences. No pressure, no placeholders.`;
 
-const FOLLOWUP_7DAY_PROMPT = `You are a medical travel coordinator for MedVoyage Smile (dental in Colombia).
+const FOLLOWUP_7DAY_PROMPT = `You are a medical travel coordinator for ${branding.productName} (dental in Colombia).
 
 Given lead data, return a JSON object with one key: "message" (string).
 Generate a short, final check-in for 7 days after no response. Example tone:
@@ -164,7 +165,7 @@ export function getLeadCopilotFallback(input: LeadCopilotInput): LeadCopilotOutp
     summary,
     priority: "medium",
     whatsapp_draft: `Hi ${name}, thanks for completing your smile assessment. Based on your interest in ${treatment}, our coordinators can help review options and estimated savings. Would you like to discuss your treatment plan on WhatsApp?`,
-    email_draft: `Hi ${name},\n\nThank you for completing your smile assessment. We've received your information and a coordinator will reach out to discuss your options and estimated savings.\n\nBest,\nMedVoyage Smile Team`,
+    email_draft: `Hi ${name},\n\nThank you for completing your smile assessment. We've received your information and a coordinator will reach out to discuss your options and estimated savings.\n\nBest,\n${branding.productName} Team`,
     email_subject: "Your smile plan – next steps",
   };
 }

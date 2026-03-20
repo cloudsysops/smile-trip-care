@@ -23,7 +23,7 @@ test.describe("Proposal page", () => {
 
     // Trust section
     await expect(page.locator("#trust-heading")).toBeVisible();
-    await expect(page.getByText(/why medvoyage|trust|clinic/i).first()).toBeVisible();
+    await expect(page.getByText(/why patients trust|SmileTripCare|trust|clinic/i).first()).toBeVisible();
 
     // CTA area: primary WhatsApp CTA is present (full CTA test in next spec)
     await expect(page.getByRole("link", { name: /talk to a dental|whatsapp|coordinator/i }).first()).toBeVisible();

@@ -1,21 +1,40 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  /* Default palette: light (overridden when .dark is present on <html>) */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #020617;
+  --card: #f8fafc;
+  --card-border: #e2e8f0;
+  --primary: #0ea5e9;
+  --text-primary: #020617;
+  --text-secondary: #64748b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-border: var(--card-border);
+  --color-primary: var(--primary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-instrument-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer theme {
+  .dark {
+    /* Dark palette (preferred default via <html class="dark">) */
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --card: #1e293b;
+    --card-border: #334155;
+    --primary: #38bdf8;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
   }
 }
 

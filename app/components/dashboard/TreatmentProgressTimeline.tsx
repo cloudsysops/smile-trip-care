@@ -24,21 +24,21 @@ export default function TreatmentProgressTimeline({ items, emptyMessage = "No pr
 
   if (sorted.length === 0) {
     return (
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
           Treatment progress
         </h3>
-        <p className="mt-4 text-sm text-zinc-500">{emptyMessage}</p>
+        <p className="mt-4 text-sm text-zinc-400">{emptyMessage}</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
         Treatment progress
       </h3>
-      <p className="mt-1 text-sm text-zinc-600">Updates from your care team</p>
+      <p className="mt-1 text-sm text-zinc-400">Updates from your care team</p>
       <ol className="mt-6 space-y-0" role="list">
         {sorted.map((item, index) => {
           const isLast = index === sorted.length - 1;
@@ -46,7 +46,7 @@ export default function TreatmentProgressTimeline({ items, emptyMessage = "No pr
             <li key={item.id} className="relative flex gap-4 pb-8 last:pb-0">
               {!isLast && (
                 <span
-                  className="absolute left-[11px] top-6 -bottom-2 w-0.5 bg-zinc-200"
+                  className="absolute left-[11px] top-6 -bottom-2 w-0.5 bg-zinc-800"
                   aria-hidden
                 />
               )}
@@ -69,7 +69,7 @@ export default function TreatmentProgressTimeline({ items, emptyMessage = "No pr
                   </span>
                 </div>
                 {item.notes?.trim() ? (
-                  <p className="mt-2 text-sm text-zinc-700">{item.notes}</p>
+                  <p className="mt-2 text-sm text-zinc-300">{item.notes}</p>
                 ) : null}
               </div>
             </li>

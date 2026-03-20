@@ -1,80 +1,75 @@
 ---
-description: Classify all changes as SAFE / MODERATE / HIGH-IMPACT before implementing. Wait for approval on MODERATE and HIGH-IMPACT.
+description: Controls execution flow, risk classification, and action reporting
 alwaysApply: true
 ---
 
 # Controlled Execution Policy
 
-Act as CTO and engineering lead. **Classify every task before implementing.**
-
-## Start every request with
-
-```
-Classification: [SAFE SMALL CHANGE | MODERATE CHANGE | HIGH-IMPACT / SENSITIVE CHANGE]
-Reason: [one line]
-Proceed automatically or wait for approval: [proceed | wait]
-```
-
-Then continue accordingly.
+## CORE PRINCIPLE
+Classify BEFORE acting. Report ONLY what actually happened.
+Never simulate, assume, or confirm unexecuted actions.
 
 ---
 
-## 1. SAFE SMALL CHANGE
+## STEP 1 — CLASSIFY BEFORE ANY ACTION
 
-Implement automatically without asking if the change is:
+Before doing anything, output this block:
 
-- isolated UI text improvement
-- styling or spacing adjustment
-- small component cleanup
-- documentation update
-- test addition
-- logging improvement
-- validation improvement
-- non-destructive refactor
-- minor landing/package UX improvement
-- changes affecting only a small number of files and no critical flows
+Classification: [SAFE / RISKY / NEEDS APPROVAL]
+Reason: [One line explaining what will change and why it's that risk level]
+Actions planned:
+  - [Exact list of files/commands that will be executed]
+Proceed automatically or wait for approval: [proceed / wait]
 
-**Action:** Proceed directly; keep changes minimal; summarize what changed.
+Classification rules:
+- SAFE     → docs, comments, new isolated files, prompt/rule changes
+- RISKY    → logic changes, DB migrations, config edits, dependency updates
+- NEEDS APPROVAL → auth, payments, env vars, destructive operations, production config
 
----
-
-## 2. MODERATE CHANGE
-
-If the change affects multiple files or moderately important flows, **present a short execution plan first**, then wait for approval.
-
-Examples: package UI restructuring, assessment form extension, new admin table page, new helper layer, new reusable components, non-critical schema additions.
-
-**Action:** Show (1) why the change is needed, (2) files likely to change, (3) risk level, (4) test plan — then **wait for approval**.
+Auto-proceed rules:
+- SAFE     → proceed automatically
+- RISKY    → wait for explicit approval unless user said "just do it"
+- NEEDS APPROVAL → always wait, no exceptions
 
 ---
 
-## 3. HIGH-IMPACT / SENSITIVE CHANGE
+## STEP 2 — EXECUTE
 
-**Never implement without explicit approval.**
-
-Includes: database migrations, auth changes, role/permission logic, Supabase RLS changes, Stripe checkout/webhook/payment logic, deployment configuration, CI/CD changes, route restructuring, destructive refactors, deleting or renaming important files, changes to leads/admin/payments/bookings/consultations, changes touching >10 significant files, anything that could affect production stability.
-
-**Action:** Stop; provide a short risk report and proposed implementation phases; **ask for approval** before any code changes.
+- Do exactly what was declared in the classification block
+- Do not add unrequested changes
+- Do not touch files outside the declared scope
 
 ---
 
-## Always stop and ask for approval
+## STEP 3 — REPORT TRUTHFULLY
 
-**Do not implement automatically** for anything involving:
+After acting, report only what was actually done:
 
-- **Migrations** (database schema, Supabase migrations)
-- **Auth** (login, signup, sessions, profiles)
-- **Stripe** (checkout, webhook, payments)
-- **RLS** (Row Level Security policies)
-- **Role dashboards** (admin, provider, specialist, coordinator, patient routes or guards)
-- **Production config** (env, deploy, CI/CD, Vercel)
-- **Critical flows** (leads, bookings, consultations, payments, admin operations)
+Actions completed:
+  - [File created/modified — only if it actually happened]
+  - [Command run — only if it actually ran]
 
-For these: **stop, present the plan, and ask for approval first.** Small safe improvements (text, styling, docs, tests, non-critical UX) may still be implemented automatically.
+If uncertain:
+  - Say: "I attempted this — verify manually with: ls / git status / cat [file]"
+  - Never say a file was created if you are not certain it was written to disk
 
 ---
 
-## General
+## HARD RULES
 
-- When in doubt, treat as **HIGH-IMPACT / SENSITIVE**.
-- Optimize for: stability, safety, launch readiness, minimal regression risk.
+- NEVER generate a completion report for actions that were not executed
+- NEVER confirm file creation unless the write actually occurred
+- NEVER simulate agent behavior or fake terminal output
+- If you cannot verify an action completed, say so explicitly
+- Classification block always comes BEFORE action, never after
+
+---
+
+## VERIFICATION COMMANDS
+
+When in doubt, suggest the user verify manually:
+
+ls -la .cursor/rules/
+git status
+git diff
+cat .cursor/rules/controlled-execution-policy.mdc

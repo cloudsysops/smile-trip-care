@@ -1,0 +1,65 @@
+---
+description: API audit — design, validation, auth, security, performance
+alwaysApply: false
+---
+
+# API Audit
+
+Run this when asked: "audit APIs" or "run API audit"
+
+---
+
+SECTION 1 — STRUCTURE & DESIGN
+- Routes organized logically?
+- REST conventions followed?
+- Consistent versioning?
+- Endpoints doing one thing?
+
+SECTION 2 — REQUEST HANDLING
+- Input validation on every endpoint?
+- Required fields enforced?
+- Type checking on params, body, query?
+- Edge cases handled?
+
+SECTION 3 — RESPONSE CONSISTENCY
+- Consistent response shape?
+- Correct HTTP status codes?
+- Error responses structured and safe?
+- No raw stack traces exposed?
+
+SECTION 4 — AUTHENTICATION & AUTHORIZATION
+- Protected routes actually protected?
+- JWT/session validation consistent?
+- Role-based access enforced?
+- Token expiration handled?
+
+SECTION 5 — SECURITY
+- Rate limiting in place?
+- CORS configured correctly?
+- No sensitive data in responses?
+- Injection risks?
+- Helmet or equivalent used?
+
+SECTION 6 — PERFORMANCE
+- Pagination on list endpoints?
+- Heavy operations async?
+- N+1 patterns?
+- Caching where needed?
+
+SECTION 7 — ERROR HANDLING
+- Global error handler?
+- Async errors caught?
+- Errors logged with context?
+
+---
+
+OUTPUT FORMAT
+
+For each issue:
+- Endpoint affected (method + path)
+- Problem
+- Severity: Critical / High / Medium / Low
+- Recommended fix
+
+End with:
+TOP 10 API ISSUES ordered by severity

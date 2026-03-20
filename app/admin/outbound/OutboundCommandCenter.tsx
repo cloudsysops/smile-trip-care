@@ -51,19 +51,19 @@ async function safeJson(res: Response) {
 function statusBadgeClass(status: string): string {
   switch (status) {
     case "approved":
-      return "bg-blue-100 text-blue-700";
+      return "bg-blue-500/10 text-blue-300";
     case "queued":
-      return "bg-indigo-100 text-indigo-700";
+      return "bg-indigo-500/10 text-indigo-300";
     case "failed":
-      return "bg-red-100 text-red-700";
+      return "bg-red-500/10 text-red-300";
     case "sent":
-      return "bg-emerald-100 text-emerald-700";
+      return "bg-emerald-500/10 text-emerald-300";
     case "delivered":
-      return "bg-green-100 text-green-700";
+      return "bg-green-500/10 text-green-300";
     case "replied":
-      return "bg-teal-100 text-teal-700";
+      return "bg-teal-500/10 text-teal-300";
     default:
-      return "bg-zinc-100 text-zinc-700";
+      return "bg-zinc-700/20 text-zinc-300";
   }
 }
 
@@ -142,42 +142,46 @@ export default function OutboundCommandCenter() {
   }
 
   if (loading) {
-    return <p className="text-sm text-zinc-600">Loading outbound command center…</p>;
+    return <p className="text-sm text-zinc-400">Loading outbound command center…</p>;
   }
 
   return (
     <div className="space-y-6">
-      {error && <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && (
+        <p className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          {error}
+        </p>
+      )}
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-xs text-zinc-500">Actionable queue</p>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <p className="text-xs text-zinc-400">Actionable queue</p>
           <p className="mt-1 text-2xl font-semibold">{metrics?.metrics.actionable_queue_count ?? 0}</p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-xs text-zinc-500">SLA risks</p>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <p className="text-xs text-zinc-400">SLA risks</p>
           <p className="mt-1 text-2xl font-semibold">{metrics?.metrics.sla_risk_count ?? 0}</p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-xs text-zinc-500">Messages (24h)</p>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <p className="text-xs text-zinc-400">Messages (24h)</p>
           <p className="mt-1 text-2xl font-semibold">
             {Object.values(metrics?.metrics.status_last_24h ?? {}).reduce((acc, value) => acc + value, 0)}
           </p>
         </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-xs text-zinc-500">Total outbound</p>
+        <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
+          <p className="text-xs text-zinc-400">Total outbound</p>
           <p className="mt-1 text-2xl font-semibold">{metrics?.metrics.total_outbound_messages ?? 0}</p>
         </div>
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-4">
+      <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
         <h2 className="text-sm font-semibold">Top statuses</h2>
         {topStatuses.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-500">No outbound data yet.</p>
+          <p className="mt-2 text-sm text-zinc-400">No outbound data yet.</p>
         ) : (
           <ul className="mt-2 grid gap-2 sm:grid-cols-2">
             {topStatuses.map(([status, count]) => (
-              <li key={status} className="flex items-center justify-between rounded border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm">
+              <li key={status} className="flex items-center justify-between rounded border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-sm">
                 <span>{status}</span>
                 <span className="font-medium">{count}</span>
               </li>
@@ -186,15 +190,15 @@ export default function OutboundCommandCenter() {
         )}
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-4">
+      <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
         <h2 className="text-sm font-semibold">SLA risk leads</h2>
         {metrics && metrics.sla_risks.length > 0 ? (
           <ul className="mt-2 space-y-2">
             {metrics.sla_risks.map((lead) => (
-              <li key={lead.lead_id} className="flex flex-wrap items-center justify-between gap-2 rounded border border-zinc-100 px-3 py-2 text-sm">
+              <li key={lead.lead_id} className="flex flex-wrap items-center justify-between gap-2 rounded border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-sm">
                 <div>
                   <p className="font-medium">{lead.name}</p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-zinc-400">
                     {lead.email} · {lead.status} · {lead.hours_without_contact}h without contact
                   </p>
                 </div>
@@ -205,20 +209,20 @@ export default function OutboundCommandCenter() {
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-400">
             No SLA risk leads above {metrics?.metrics.sla_risk_threshold_hours ?? 6}h right now.
           </p>
         )}
       </section>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-4">
+      <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
         <h2 className="text-sm font-semibold">Action queue</h2>
         {queue.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-500">No approved/queued/failed items pending action.</p>
+          <p className="mt-2 text-sm text-zinc-400">No approved/queued/failed items pending action.</p>
         ) : (
           <ul className="mt-2 space-y-2">
             {queue.map((item) => (
-              <li key={item.id} className="rounded border border-zinc-100 p-3 text-sm">
+              <li key={item.id} className="rounded border border-zinc-800 bg-zinc-900/40 p-3 text-sm">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                   <p className="font-medium">
                     {item.leads.first_name} {item.leads.last_name} · {item.channel}
@@ -227,9 +231,9 @@ export default function OutboundCommandCenter() {
                     {item.status}
                   </span>
                 </div>
-                {item.subject && <p className="mb-1 text-xs text-zinc-600">Subject: {item.subject}</p>}
-                <p className="line-clamp-2 text-xs text-zinc-700">{item.body_text}</p>
-                <p className="mt-1 text-xs text-zinc-500">
+                {item.subject && <p className="mb-1 text-xs text-zinc-400">Subject: {item.subject}</p>}
+                <p className="line-clamp-2 text-xs text-zinc-300">{item.body_text}</p>
+                <p className="mt-1 text-xs text-zinc-400">
                   Attempts {item.attempts}/{item.max_attempts} · Scheduled {new Date(item.scheduled_for).toLocaleString()}
                 </p>
                 {item.failure_reason && <p className="mt-1 text-xs text-red-600">Failure: {item.failure_reason}</p>}
@@ -239,7 +243,7 @@ export default function OutboundCommandCenter() {
                       type="button"
                       disabled={updating === item.id}
                       onClick={() => updateMessageStatus(item.id, "queued")}
-                      className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50"
+                      className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 disabled:opacity-50 text-zinc-200"
                     >
                       Queue
                     </button>
@@ -249,7 +253,7 @@ export default function OutboundCommandCenter() {
                       type="button"
                       disabled={updating === item.id}
                       onClick={() => updateMessageStatus(item.id, "sent")}
-                      className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50"
+                      className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 disabled:opacity-50 text-zinc-200"
                     >
                       Mark sent
                     </button>
@@ -259,7 +263,7 @@ export default function OutboundCommandCenter() {
                       type="button"
                       disabled={updating === item.id}
                       onClick={() => updateMessageStatus(item.id, "failed")}
-                      className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50"
+                      className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 disabled:opacity-50 text-zinc-200"
                     >
                       Mark failed
                     </button>
@@ -270,7 +274,7 @@ export default function OutboundCommandCenter() {
                         type="button"
                         disabled={updating === item.id}
                         onClick={() => updateMessageStatus(item.id, "delivered")}
-                        className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50"
+                      className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 disabled:opacity-50 text-zinc-200"
                       >
                         Mark delivered
                       </button>
@@ -278,13 +282,16 @@ export default function OutboundCommandCenter() {
                         type="button"
                         disabled={updating === item.id}
                         onClick={() => updateMessageStatus(item.id, "replied")}
-                        className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50"
+                        className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 disabled:opacity-50 text-zinc-200"
                       >
                         Mark replied
                       </button>
                     </>
                   )}
-                  <Link href={`/admin/leads/${item.lead_id}`} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">
+                  <Link
+                    href={`/admin/leads/${item.lead_id}`}
+                    className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40"
+                  >
                     Open lead
                   </Link>
                 </div>

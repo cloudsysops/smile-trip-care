@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, getRedirectPathForRole, type ProfileRole } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
+import { getProfileRoles, resolveActiveRole } from "@/lib/services/roles.service";
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID();
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
   const supabase = getServerSupabase();
   const { data: existing, error: selectError } = await supabase
     .from("profiles")
-    .select("id, role, is_active")
+    .select("id, role, active_role, is_active")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -81,6 +82,7 @@ export async function GET(request: NextRequest) {
   }
 
   let role: ProfileRole = (existing?.role as ProfileRole) ?? "patient";
+  const activeRoleFromProfile = (existing?.active_role as ProfileRole | null) ?? null;
 
   if (!existing) {
     const { error: insertError } = await supabase.from("profiles").insert({
@@ -109,10 +111,13 @@ export async function GET(request: NextRequest) {
   }
 
   // 3. Redirect using role-based path, honoring `next` when present
-  const defaultPath = getRedirectPathForRole(role);
+  const roleRows = await getProfileRoles(user.id);
+  const availableRoles = roleRows.map((r) => r.role);
+  const effectiveRole = resolveActiveRole(role, activeRoleFromProfile, availableRoles);
+  const defaultPath = getRedirectPathForRole(effectiveRole);
   const targetPath = next || defaultPath || "/patient";
   const targetUrl = new URL(targetPath, url.origin);
-  log.info("auth/callback: redirect", { role, targetPath });
+  log.info("auth/callback: redirect", { role, activeRole: activeRoleFromProfile, effectiveRole, targetPath });
 
   const response = NextResponse.redirect(targetUrl);
   cookiesToSet.forEach(({ name, value, options }) => {

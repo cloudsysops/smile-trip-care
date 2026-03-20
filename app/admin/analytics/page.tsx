@@ -95,31 +95,31 @@ export default async function AdminAnalyticsPage() {
       >
         <DashboardSection>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-500">Total leads</p>
-              <p className="mt-1 text-2xl font-semibold">{metrics.totalLeads}</p>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+              <p className="text-sm font-medium text-zinc-400">Total leads</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-100">{metrics.totalLeads}</p>
             </div>
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-500">Leads today</p>
-              <p className="mt-1 text-2xl font-semibold">{metrics.leadsToday}</p>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+              <p className="text-sm font-medium text-zinc-400">Leads today</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-100">{metrics.leadsToday}</p>
             </div>
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-500">Leads this week</p>
-              <p className="mt-1 text-2xl font-semibold">{metrics.leadsThisWeek}</p>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+              <p className="text-sm font-medium text-zinc-400">Leads this week</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-100">{metrics.leadsThisWeek}</p>
             </div>
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-500">High priority leads</p>
-              <p className="mt-1 text-2xl font-semibold">{metrics.highPriorityLeads}</p>
-              <p className="mt-1 text-xs text-zinc-500">Has package or budget</p>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+              <p className="text-sm font-medium text-zinc-400">High priority leads</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-100">{metrics.highPriorityLeads}</p>
+              <p className="mt-1 text-xs text-zinc-400">Has package or budget</p>
             </div>
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-500">Packages requested</p>
-              <p className="mt-1 text-2xl font-semibold">{metrics.packagesRequested}</p>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+              <p className="text-sm font-medium text-zinc-400">Packages requested</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-100">{metrics.packagesRequested}</p>
             </div>
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm font-medium text-zinc-500">Assessment → package interest</p>
-              <p className="mt-1 text-2xl font-semibold">{metrics.assessmentCompletionRate}%</p>
-              <p className="mt-1 text-xs text-zinc-500">Leads with a package selected</p>
+            <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
+              <p className="text-sm font-medium text-zinc-400">Assessment → package interest</p>
+              <p className="mt-1 text-2xl font-semibold text-zinc-100">{metrics.assessmentCompletionRate}%</p>
+              <p className="mt-1 text-xs text-zinc-400">Leads with a package selected</p>
             </div>
           </div>
         </DashboardSection>
@@ -129,7 +129,7 @@ export default async function AdminAnalyticsPage() {
         </DashboardSection>
 
         <DashboardSection className="pt-2">
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-zinc-400">
             <Link href="/admin/leads" className="underline hover:no-underline">
               View leads
             </Link>

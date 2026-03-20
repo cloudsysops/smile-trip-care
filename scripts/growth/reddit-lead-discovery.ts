@@ -53,7 +53,7 @@ type RedditListingChild = {
   };
 };
 
-const USER_AGENT = "MedVoyageSmile-Growth/1.0 (Lead discovery; contact for questions)";
+const USER_AGENT = "SmileTripCare-Growth/1.0 (Lead discovery; contact for questions)";
 
 function matchesKeywords(text: string): boolean {
   const lower = text.toLowerCase();

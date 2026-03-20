@@ -124,7 +124,7 @@ describe("POST /api/stripe/checkout", () => {
         return {
           select: () => ({
             eq: () => ({
-              maybeSingle: async () => ({ data: { name: "MedVoyage Smile Medellín", deposit_cents: 75000 }, error: null }),
+              maybeSingle: async () => ({ data: { name: "SmileTripCare Medellín", deposit_cents: 75000 }, error: null }),
             }),
           }),
         };

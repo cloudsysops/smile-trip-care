@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
-import StatCard from "@/app/components/dashboard/StatCard";
+import AdminStatCard from "@/app/admin/_components/AdminStatCard";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
+import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
+import AuthDashboardHeader from "@/app/components/dashboard/AuthDashboardHeader";
 
 function startOfTodayUTC(): string {
   const d = new Date();
@@ -75,38 +76,23 @@ export default async function AdminOverviewPage() {
   }).format(incomeCents / 100);
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/admin/overview" className="text-sm font-medium text-zinc-900 underline">
-              Overview
-            </Link>
-            <Link href="/admin/leads" className="text-sm text-zinc-600 hover:underline">
-              Leads
-            </Link>
-            <Link href="/admin/providers" className="text-sm text-zinc-600 hover:underline">
-              Providers
-            </Link>
-            <Link href="/admin/specialists" className="text-sm text-zinc-600 hover:underline">
-              Specialists
-            </Link>
-            <Link href="/admin/experiences" className="text-sm text-zinc-600 hover:underline">
-              Experiences
-            </Link>
-            <Link href="/admin/bookings" className="text-sm text-zinc-600 hover:underline">
-              Bookings
-            </Link>
-            <Link href="/admin/consultations" className="text-sm text-zinc-600 hover:underline">
-              Consultations
-            </Link>
-            <Link href="/admin/assets" className="text-sm text-zinc-600 hover:underline">
-              Assets
-            </Link>
-          </nav>
-          <h1 className="text-xl font-semibold">Admin</h1>
-        </div>
-      </header>
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+      <AuthDashboardHeader
+        title="Admin"
+        homeHref="/"
+        homeLabel="Home"
+        maxWidth="max-w-4xl"
+        navItems={[
+          { href: "/admin/overview", label: "Overview", active: true },
+          { href: "/admin/leads", label: "Leads" },
+          { href: "/admin/providers", label: "Providers" },
+          { href: "/admin/specialists", label: "Specialists" },
+          { href: "/admin/experiences", label: "Experiences" },
+          { href: "/admin/bookings", label: "Bookings" },
+          { href: "/admin/consultations", label: "Consultations" },
+          { href: "/admin/assets", label: "Assets" },
+        ]}
+      />
       <main className="mx-auto max-w-4xl px-6 py-8">
         <DashboardLayout
           title="Overview"
@@ -114,17 +100,17 @@ export default async function AdminOverviewPage() {
         >
           <DashboardSection>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <StatCard
+              <AdminStatCard
                 label="Leads hoy"
                 value={leadsToday}
                 href="/admin/leads"
               />
-              <StatCard
+              <AdminStatCard
                 label="Leads esta semana"
                 value={leadsWeek}
                 href="/admin/leads"
               />
-              <StatCard
+              <AdminStatCard
                 label="Pendientes de aprobación"
                 value={pendingApproval}
                 helper={
@@ -133,11 +119,11 @@ export default async function AdminOverviewPage() {
                   </>
                 }
               />
-              <StatCard
+              <AdminStatCard
                 label="Reservas con depósito"
                 value={bookingsDeposit}
               />
-              <StatCard
+              <AdminStatCard
                 label="Ingresos del mes"
                 value={incomeFormatted}
               />
@@ -145,6 +131,7 @@ export default async function AdminOverviewPage() {
           </DashboardSection>
         </DashboardLayout>
       </main>
+      <FeedbackButton page="/admin/overview" />
     </div>
   );
 }

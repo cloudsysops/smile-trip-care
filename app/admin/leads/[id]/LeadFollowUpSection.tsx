@@ -59,14 +59,16 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
   const hasPhone = leadPhone && phoneDigits(leadPhone).length >= 10;
 
   return (
-    <section className="rounded-lg border border-zinc-200 bg-white p-6">
-      <h2 className="text-sm font-semibold text-zinc-900">Follow-ups</h2>
-      <p className="mt-1 text-xs text-zinc-500">
+    <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+      <h2 className="text-sm font-semibold text-zinc-100">Follow-ups</h2>
+      <p className="mt-1 text-xs text-zinc-400">
         Generate 24h, 3-day, and 7-day follow-up message drafts. Copy or open in WhatsApp.
       </p>
 
       {error && (
-        <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">{error}</p>
+        <p className="mt-3 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          {error}
+        </p>
       )}
 
       <div className="mt-4 space-y-4">
@@ -74,9 +76,9 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
           const text = messages[type];
           const isLoading = loading === type;
           return (
-            <div key={type} className="rounded-md border border-zinc-100 bg-zinc-50/50 p-4">
+            <div key={type} className="rounded-md border border-zinc-800 bg-zinc-900/40 p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium text-zinc-700">{LABELS[type]}</span>
+                <span className="text-sm font-medium text-zinc-200">{LABELS[type]}</span>
                 {!text && !isLoading && (
                   <button
                     type="button"
@@ -87,17 +89,17 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
                   </button>
                 )}
                 {isLoading && (
-                  <span className="text-xs text-zinc-500">Generating…</span>
+                  <span className="text-xs text-zinc-400">Generating…</span>
                 )}
               </div>
               {text && (
                 <>
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-800">{text}</p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-100">{text}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={() => copyToClipboard(text, type)}
-                      className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50"
+                      className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800/40"
                     >
                       {copied === type ? "Copied" : "Copy"}
                     </button>
@@ -106,7 +108,7 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
                         href={`https://wa.me/${phoneDigits(leadPhone)}?text=${encodeURIComponent(text)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50"
+                        className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800/40"
                       >
                         Open WhatsApp
                       </a>

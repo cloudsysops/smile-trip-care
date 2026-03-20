@@ -1,6 +1,8 @@
 "use client";
 
-const DEFAULT_MESSAGE = "Hi, I'm interested in the MedVoyage Smile program.";
+import { branding } from "@/lib/branding";
+
+const DEFAULT_MESSAGE = `Hi, I'm interested in the ${branding.productName} program.`;
 /** Default when NEXT_PUBLIC_WHATSAPP_NUMBER is not set. Use env in production. */
 const FALLBACK_NUMBER = "14014427003";
 

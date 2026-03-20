@@ -26,11 +26,11 @@ export default function PatientNextStepCard({ latest }: Props) {
 
   if (!latest) {
     return (
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
           Next step
         </h3>
-        <p className="mt-2 text-sm text-zinc-600">
+        <p className="mt-2 text-sm text-zinc-400">
           Your care team will update your progress here after your assessment is reviewed.
         </p>
       </section>
@@ -38,8 +38,8 @@ export default function PatientNextStepCard({ latest }: Props) {
   }
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
         Current stage
       </h3>
       <div className="mt-2">
@@ -49,17 +49,17 @@ export default function PatientNextStepCard({ latest }: Props) {
         />
       </div>
       {latest.notes?.trim() ? (
-        <p className="mt-3 text-sm text-zinc-700">{latest.notes}</p>
+        <p className="mt-3 text-sm text-zinc-300">{latest.notes}</p>
       ) : null}
       {nextLabel ? (
         <>
           <h4 className="mt-4 text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Next step
           </h4>
-          <p className="mt-1 text-sm font-medium text-zinc-900">{nextLabel}</p>
+          <p className="mt-1 text-sm font-medium text-zinc-100">{nextLabel}</p>
         </>
       ) : (
-        <p className="mt-4 text-sm font-medium text-emerald-700">
+        <p className="mt-4 text-sm font-medium text-emerald-300">
           You&apos;re at the final stage. Your care team will confirm next steps.
         </p>
       )}

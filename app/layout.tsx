@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import WhatsAppFloat from "./components/WhatsAppFloat";
+import { ThemeProvider } from "./components/ThemeProvider";
+import { ThemeToggle } from "./components/ui/ThemeToggle";
 
 const instrumentSerif = Instrument_Serif({
   weight: "400",
@@ -14,9 +16,9 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const metaTitle = "MedVoyage Smile — Premium Dental Tourism Platform";
+const metaTitle = "SmileTripCare | Medical Tourism & Dental Travel";
 const metaDescription =
-  "MedVoyage Smile connects international patients with verified dental clinics in Colombia, offering concierge medical tourism and savings up to 70%.";
+  "SmileTripCare connects international patients with trusted dental clinics in Colombia—coordinated end-to-end with curated specialists and guided travel care.";
 
 const siteUrl = typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
   ? process.env.NEXT_PUBLIC_SITE_URL.trim()
@@ -38,13 +40,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${instrumentSerif.variable} ${inter.variable} font-sans antialiased`}
       >
-        {children}
-        <WhatsAppFloat />
+        <ThemeProvider>
+          <div className="relative min-h-screen bg-(--color-background) text-(--color-foreground)">
+            {/* Global theme toggle, fixed at the top-right on all pages */}
+            <div className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-end px-4 pt-4">
+              <div className="pointer-events-auto">
+                <ThemeToggle />
+              </div>
+            </div>
+            {children}
+            <WhatsAppFloat />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

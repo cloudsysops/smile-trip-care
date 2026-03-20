@@ -54,3 +54,4 @@ supabase/.temp/
 
 # growth engine output
 /data/reddit-leads.json
+setup-secrets.sh
