@@ -1,0 +1,42 @@
+"use client";
+
+import Link from "next/link";
+
+type Props = Readonly<{
+  error: Error & { digest?: string };
+  reset: () => void;
+}>;
+
+export default function CoordinatorError({ error, reset }: Props) {
+  return (
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+      <main className="mx-auto flex max-w-xl flex-col items-center justify-center px-4 py-14 text-center">
+        <h1 className="text-xl font-semibold">Something went wrong</h1>
+        <p className="mt-2 text-sm text-zinc-600">We couldn&apos;t load the coordinator dashboard.</p>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={reset}
+            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+          >
+            Try again
+          </button>
+          <Link
+            href="/login?next=/coordinator"
+            className="rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-100"
+          >
+            Go to login
+          </Link>
+        </div>
+
+        {process.env.NODE_ENV !== "production" ? (
+          <pre className="mt-6 w-full overflow-auto rounded-lg border border-zinc-200 bg-white p-3 text-left text-xs text-zinc-700">
+            {error.message}
+          </pre>
+        ) : null}
+      </main>
+    </div>
+  );
+}
+
