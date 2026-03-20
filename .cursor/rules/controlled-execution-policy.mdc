@@ -1,0 +1,75 @@
+---
+description: Controls execution flow, risk classification, and action reporting
+alwaysApply: true
+---
+
+# Controlled Execution Policy
+
+## CORE PRINCIPLE
+Classify BEFORE acting. Report ONLY what actually happened.
+Never simulate, assume, or confirm unexecuted actions.
+
+---
+
+## STEP 1 — CLASSIFY BEFORE ANY ACTION
+
+Before doing anything, output this block:
+
+Classification: [SAFE / RISKY / NEEDS APPROVAL]
+Reason: [One line explaining what will change and why it's that risk level]
+Actions planned:
+  - [Exact list of files/commands that will be executed]
+Proceed automatically or wait for approval: [proceed / wait]
+
+Classification rules:
+- SAFE     → docs, comments, new isolated files, prompt/rule changes
+- RISKY    → logic changes, DB migrations, config edits, dependency updates
+- NEEDS APPROVAL → auth, payments, env vars, destructive operations, production config
+
+Auto-proceed rules:
+- SAFE     → proceed automatically
+- RISKY    → wait for explicit approval unless user said "just do it"
+- NEEDS APPROVAL → always wait, no exceptions
+
+---
+
+## STEP 2 — EXECUTE
+
+- Do exactly what was declared in the classification block
+- Do not add unrequested changes
+- Do not touch files outside the declared scope
+
+---
+
+## STEP 3 — REPORT TRUTHFULLY
+
+After acting, report only what was actually done:
+
+Actions completed:
+  - [File created/modified — only if it actually happened]
+  - [Command run — only if it actually ran]
+
+If uncertain:
+  - Say: "I attempted this — verify manually with: ls / git status / cat [file]"
+  - Never say a file was created if you are not certain it was written to disk
+
+---
+
+## HARD RULES
+
+- NEVER generate a completion report for actions that were not executed
+- NEVER confirm file creation unless the write actually occurred
+- NEVER simulate agent behavior or fake terminal output
+- If you cannot verify an action completed, say so explicitly
+- Classification block always comes BEFORE action, never after
+
+---
+
+## VERIFICATION COMMANDS
+
+When in doubt, suggest the user verify manually:
+
+ls -la .cursor/rules/
+git status
+git diff
+cat .cursor/rules/controlled-execution-policy.mdc

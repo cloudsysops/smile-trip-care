@@ -1,4 +1,4 @@
-# Smile Transformation — Module Status
+# MedVoyage Smile — Module Status
 
 ## Startup Sprint Tracker
 
@@ -6,7 +6,7 @@
 |-------|--------|--------------------|
 | **M8** Assets Manager + hardening | ✅ Done | CI green (`lint` + `build`), health endpoints, unified migration, admin assets fixes |
 | **M9** AI Workers (triage/reply/itinerary) | ✅ Done | Endpoints + admin UI connected, outputs persisted and visible in lead detail |
-| **Deploy** (Vercel + Stripe + Supabase) | ⏳ Pending | Prod env configured, webhook verified, smoke tests in production |
+| **Deploy** (Vercel + Stripe + Supabase) | 🔶 Casi listo | **Un solo proyecto Vercel (dev canónico)**: `smile-transformation-platform-dev` → URL: https://smile-transformation-platform-dev.vercel.app (rama `main`). Env + webhook configurados; smoke OK. No usar `transformation-platform-dev.vercel.app` para QA (proyecto antiguo). [docs/VERCEL_UN_SOLO_PROYECTO.md](docs/VERCEL_UN_SOLO_PROYECTO.md). Checklist: [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md). |
 
 ---
 
@@ -33,23 +33,29 @@
 | **M17** Outbound command center | ✅ Done | Admin outbound dashboard with actionable queue and SLA-risk metrics to prioritize follow-up actions |
 | **M18** Outbound dispatch worker | ✅ Done | Secret-protected outbound worker sends queued messages via providers, retries with backoff, and marks permanent failures |
 | **M19** Launch reliability guardrails | ✅ Done | Stripe paid-state validation, payments idempotency constraints, stale AI lock recovery, and automation status visibility |
-| **M20** Payment reliability & reconciliation | ✅ Done | Stripe webhook event ledger + idempotent replay handling, pending-payment reconcile cron, and admin payment reliability metrics |
+| **Marketplace foundation** | ✅ Done | 0007: providers, packages type/price/provider_id, experiences provider_id. 0008: specialists.provider_id, leads.package_id, bookings. Lead API crea booking; webhook actualiza booking. |
+| **Curated network** | ✅ Done | 0009: providers (invited_by, approved_by, approval_status), specialists (recommended_by, approval_status). [DATA_MODEL](docs/DATA_MODEL.md), [CURATED_NETWORK_FOUNDATION](docs/CURATED_NETWORK_FOUNDATION.md). |
+| **Curated network enterprise (0010)** | ✅ Done | Migration 0010: providers, packages, specialists, experiences, package_experiences, package_specialists, consultations, bookings. RLS published+approved. [CURATED_NETWORK_WORKFLOW](docs/CURATED_NETWORK_WORKFLOW.md). |
+| **Admin Overview** | ✅ Done | `/admin` → `/admin/overview`. KPIs, navegación Leads/Assets. [DASHBOARDS_POR_ROL](docs/DASHBOARDS_POR_ROL.md). |
+| **Auth + role dashboards (0011)** | ✅ Done | Migration 0011: profiles (role, provider_id, specialist_id). Login `/login`, dashboards `/provider`, `/specialist`, `/coordinator`, `/patient`. [AUTH_AND_ROLES](docs/AUTH_AND_ROLES.md), [DASHBOARD_ROLES](docs/DASHBOARD_ROLES.md). |
+| **Auditoría buenas prácticas** | ✅ Hecho (2026-03) | [AUDITORIA_RESULTADO](docs/AUDITORIA_RESULTADO.md). [TAREAS_AUDITORIA](docs/TAREAS_AUDITORIA_BUENAS_PRACTICAS.md). |
+| **Production readiness + role dashboards + sales flow** | ✅ Done | Auth + roles (profiles); /login, optional /signup (patient); role redirects; role guards; dashboards /patient, /provider, /specialist, /coordinator, /admin; lead **recommended package** (thank-you, admin override, patient dashboard); patient **Pay deposit** (Stripe checkout for own lead); migration 0020. [AUTH_AND_ROLES](docs/AUTH_AND_ROLES.md), [DASHBOARD_ROLES](docs/DASHBOARD_ROLES.md), [TEST_FIRST_SALE](docs/TEST_FIRST_SALE.md). |
 
 ## Run after migration
-```bash
-# In Supabase SQL editor, run:
-# 1. supabase/migrations/0001_init.sql
-# 2. supabase/migrations/0002_assets_extended_unified.sql
-# 3. supabase/migrations/0003_m9_ai_admin_connected.sql
-# 4. supabase/migrations/0004_leads_attribution.sql
-# 5. supabase/migrations/0005_leads_follow_up_queue.sql
-# 6. supabase/migrations/0006_ai_automation_foundation.sql
-# 7. supabase/migrations/0007_ai_automation_jobs.sql
-# 8. supabase/migrations/0008_outbound_messages.sql
-# 9. supabase/migrations/0009_payments_idempotency.sql
-# 10. supabase/migrations/0010_payment_reliability.sql
-# 11. scripts/seed_packages.sql
-```
+Aplicar migraciones en orden lexicográfico **0001 → 0018**. Desde repo (con Supabase enlazado): `npm run db:migrate`. Lista completa: [supabase/migrations/MIGRATION_ORDER.md](supabase/migrations/MIGRATION_ORDER.md). Luego opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`.
+
+## Rutas principales
+- **Público:** `/`, `/assessment`, `/packages`, `/health-packages`, `/tour-experiences`, `/packages/[slug]`, `/thank-you`, `/legal`, `/login`, `/signin`.
+- **Admin:** `/admin` (redirect a overview), `/admin/overview`, `/admin/leads`, `/admin/leads/[id]`, `/admin/providers`, `/admin/specialists`, `/admin/experiences`, `/admin/bookings`, `/admin/consultations`, `/admin/assets`, `/admin/login`, `/admin/status`.
+- **Por rol:** `/provider`, `/specialist`, `/coordinator`, `/patient` (requieren login y rol correspondiente).
 
 ## Env
-Copy `.env.example` to `.env.local` and set Supabase (and Stripe when M7 is added).
+Copy `.env.example` to `.env.local` and set Supabase (and Stripe when M7 is added). Ver [docs/ENV_Y_STRIPE.md](docs/ENV_Y_STRIPE.md).
+
+### Hosts canónicos
+
+- Local: `http://localhost:3000`
+- Dev (Vercel): `https://smile-transformation-platform-dev.vercel.app` (`smile-transformation-platform-dev`, rama `main`)
+- Prod: dominio final (ej. `https://medvoyagesmile.com`) conectado a Vercel cuando se haga el lanzamiento
+
+No usar `https://transformation-platform-dev.vercel.app` para pruebas: es un proyecto antiguo / no alineado con este repo.

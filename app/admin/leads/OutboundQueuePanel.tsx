@@ -47,23 +47,23 @@ type Props = {
 function statusBadgeClass(status: OutboundStatus): string {
   switch (status) {
     case "draft":
-      return "bg-zinc-100 text-zinc-700";
+      return "bg-zinc-700/20 text-zinc-300";
     case "approved":
-      return "bg-blue-100 text-blue-700";
+      return "bg-blue-500/10 text-blue-300";
     case "queued":
-      return "bg-indigo-100 text-indigo-700";
+      return "bg-indigo-500/10 text-indigo-300";
     case "sent":
-      return "bg-emerald-100 text-emerald-700";
+      return "bg-emerald-500/10 text-emerald-300";
     case "delivered":
-      return "bg-green-100 text-green-700";
+      return "bg-green-500/10 text-green-300";
     case "replied":
-      return "bg-teal-100 text-teal-700";
+      return "bg-teal-500/10 text-teal-300";
     case "failed":
-      return "bg-red-100 text-red-700";
+      return "bg-red-500/10 text-red-300";
     case "cancelled":
-      return "bg-zinc-200 text-zinc-700";
+      return "bg-zinc-700/20 text-zinc-300";
     default:
-      return "bg-zinc-100 text-zinc-700";
+      return "bg-zinc-700/20 text-zinc-300";
   }
 }
 
@@ -133,22 +133,22 @@ export default function OutboundQueuePanel({ leadId, initialRows, latestAiDraft 
   }
 
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 bg-white p-6">
+    <section className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-semibold">Outbound conversion queue</h2>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-zinc-400">
           Total: {stats.total} · Drafts: {stats.drafts} · Sent: {stats.sentLike} · Failed: {stats.failed}
         </p>
       </div>
 
       {error && (
-        <p className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
           {error}
         </p>
       )}
 
       {latestAiDraft && (
-        <div className="rounded border border-zinc-200 p-4">
+        <div className="rounded border border-zinc-800 bg-zinc-900/40 p-4">
           <p className="text-sm font-medium">Create from latest AI draft</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button
@@ -176,7 +176,7 @@ export default function OutboundQueuePanel({ leadId, initialRows, latestAiDraft 
                   body_text: latestAiDraft.email_body,
                 })
               }
-              className="rounded border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800/40 disabled:opacity-50"
             >
               Queue Email draft
             </button>
@@ -184,36 +184,36 @@ export default function OutboundQueuePanel({ leadId, initialRows, latestAiDraft 
         </div>
       )}
 
-      <div className="rounded border border-zinc-200 p-4">
+      <div className="rounded border border-zinc-800 bg-zinc-900/40 p-4">
         <p className="text-sm font-medium">Create manual outbound draft</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
-          <label className="text-xs text-zinc-600">
+          <label className="text-xs text-zinc-300">
             Channel
             <select
               value={channel}
               onChange={(event) => setChannel(event.target.value as OutboundChannel)}
-              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100"
             >
               <option value="whatsapp">WhatsApp</option>
               <option value="email">Email</option>
             </select>
           </label>
-          <label className="text-xs text-zinc-600">
+          <label className="text-xs text-zinc-300">
             Subject (email only)
             <input
               value={subject}
               onChange={(event) => setSubject(event.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100"
             />
           </label>
         </div>
-        <label className="mt-2 block text-xs text-zinc-600">
+        <label className="mt-2 block text-xs text-zinc-300">
           Message
           <textarea
             value={bodyText}
             onChange={(event) => setBodyText(event.target.value)}
             rows={4}
-            className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+            className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100 placeholder-zinc-500"
           />
         </label>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -246,7 +246,7 @@ export default function OutboundQueuePanel({ leadId, initialRows, latestAiDraft 
               });
               setBodyText("");
             }}
-            className="rounded border border-zinc-300 px-3 py-2 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50"
+            className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-800/40 disabled:opacity-50"
           >
             Save + approve
           </button>
@@ -255,10 +255,10 @@ export default function OutboundQueuePanel({ leadId, initialRows, latestAiDraft 
 
       <div className="space-y-2">
         {rows.length === 0 ? (
-          <p className="text-sm text-zinc-500">No outbound messages queued yet.</p>
+          <p className="text-sm text-zinc-400">No outbound messages queued yet.</p>
         ) : (
           rows.map((row) => (
-            <div key={row.id} className="rounded border border-zinc-200 p-3 text-sm">
+            <div key={row.id} className="rounded border border-zinc-800 bg-zinc-900/40 p-3 text-sm">
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <p className="font-medium">
                   {row.channel === "email" ? "Email" : "WhatsApp"} · {row.source === "ai_draft" ? "AI draft" : "Manual"}
@@ -267,42 +267,42 @@ export default function OutboundQueuePanel({ leadId, initialRows, latestAiDraft 
                   {row.status}
                 </span>
               </div>
-              {row.subject && <p className="mb-1 text-xs text-zinc-600">Subject: {row.subject}</p>}
-              <p className="whitespace-pre-wrap rounded bg-zinc-50 p-2 text-xs">{row.body_text}</p>
+              {row.subject && <p className="mb-1 text-xs text-zinc-400">Subject: {row.subject}</p>}
+              <p className="whitespace-pre-wrap rounded bg-zinc-900/40 p-2 text-xs text-zinc-200">{row.body_text}</p>
               {row.failure_reason && <p className="mt-2 text-xs text-red-600">Failure: {row.failure_reason}</p>}
-              <p className="mt-2 text-xs text-zinc-500">
+              <p className="mt-2 text-xs text-zinc-400">
                 Attempts {row.attempts}/{row.max_attempts} · Created {new Date(row.created_at).toLocaleString()}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {row.status === "draft" && (
                   <>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "approved")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Approve</button>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "cancelled")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Cancel</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "approved")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Approve</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "cancelled")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Cancel</button>
                   </>
                 )}
                 {row.status === "approved" && (
                   <>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "queued")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Queue send</button>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "sent")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Mark sent</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "queued")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Queue send</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "sent")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Mark sent</button>
                   </>
                 )}
                 {row.status === "queued" && (
                   <>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "sent")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Mark sent</button>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "failed")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Mark failed</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "sent")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Mark sent</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "failed")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Mark failed</button>
                   </>
                 )}
                 {(row.status === "sent" || row.status === "delivered") && (
                   <>
                     {row.status === "sent" && (
-                      <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "delivered")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Mark delivered</button>
+                      <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "delivered")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Mark delivered</button>
                     )}
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "replied")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Mark replied</button>
-                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "failed")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Mark failed</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "replied")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Mark replied</button>
+                    <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "failed")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Mark failed</button>
                   </>
                 )}
                 {row.status === "failed" && (
-                  <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "queued")} className="rounded border border-zinc-300 px-2 py-1 text-xs hover:bg-zinc-50">Retry</button>
+                  <button type="button" disabled={loading} onClick={() => transitionStatus(row.id, "queued")} className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs hover:bg-zinc-800/40 text-zinc-200">Retry</button>
                 )}
               </div>
             </div>

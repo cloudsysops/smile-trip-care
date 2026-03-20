@@ -1,0 +1,33 @@
+---
+description: Obligación de commit y sincronización con remoto para no dejar el repo en desorden.
+alwaysApply: true
+---
+
+# Git: commit y sincronización obligatorios
+
+Cuando trabajes en este repo como agente:
+
+## 1. Antes de empezar (al conectar o iniciar sesión)
+
+- **Sincronizar con el remoto:** ejecutar `git fetch origin` y, si aplica, `git pull origin <rama-actual>` (o `git stash` + `git pull` + `git stash pop`) para no trabajar sobre una base desactualizada.
+- Si hay cambios locales sin commitear, decidir: **commitear** (si el trabajo está listo) o **stash** (si son cambios de prueba) antes de pull.
+
+## 2. Al terminar trabajo que modifica código o docs
+
+- **Incluir en commit** los archivos que hayas cambiado: `git add <archivos>` o `git add -A` (evitando incluir `.env*.local`, `node_modules`, `supabase/.temp`, etc.).
+- **Hacer commit** con mensaje claro: por ejemplo `feat: descripción` o `fix: descripción`. No dejar el repo con cambios sin commitear al cerrar la sesión.
+- **Subir a la rama actual:** `git push origin <rama>` (por ejemplo `main` o `production-hardening`).
+
+## 3. Flujo recomendado para merge a main
+
+- Trabajar en una rama (p. ej. `production-hardening` o feature).
+- Antes de merge a `main`: `git checkout main`, `git pull origin main`, luego `git merge <tu-rama>`.
+- Si hay conflictos: resolver, `git add` los resueltos, y `git commit` para concluir el merge.
+- Después: `git push origin main`.
+
+## 4. No dejar
+
+- Cambios sin commitear que otro agente o persona vaya a perder.
+- `main` (o la rama de deploy) desincronizada del remoto sin push después de un merge.
+
+Resumen: **al cerrar o entregar trabajo, el repo debe quedar con commit hecho y, si corresponde, push al remoto.**

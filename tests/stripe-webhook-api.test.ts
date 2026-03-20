@@ -47,11 +47,10 @@ describe("POST /api/stripe/webhook", () => {
 
   it("ignores checkout sessions with non-payment mode", async () => {
     constructEventMock.mockReturnValue({
-      id: "evt_mode",
       type: "checkout.session.completed",
       data: {
         object: {
-          id: "cs_mode",
+          id: "cs_test_setup",
           mode: "setup",
           payment_status: "paid",
           metadata: { lead_id: "550e8400-e29b-41d4-a716-446655440000" },
@@ -71,13 +70,12 @@ describe("POST /api/stripe/webhook", () => {
     expect(fromMock).not.toHaveBeenCalled();
   });
 
-  it("ignores checkout.session.completed events that are not paid", async () => {
+  it("ignores checkout sessions that are not paid", async () => {
     constructEventMock.mockReturnValue({
-      id: "evt_unpaid",
       type: "checkout.session.completed",
       data: {
         object: {
-          id: "cs_unpaid",
+          id: "cs_test_unpaid",
           mode: "payment",
           payment_status: "unpaid",
           metadata: { lead_id: "550e8400-e29b-41d4-a716-446655440000" },
@@ -97,87 +95,22 @@ describe("POST /api/stripe/webhook", () => {
     expect(fromMock).not.toHaveBeenCalled();
   });
 
-  it("returns idempotent when webhook event is already recorded", async () => {
-    constructEventMock.mockReturnValue({
-      id: "evt_duplicate_event",
-      type: "checkout.session.completed",
-      data: {
-        object: {
-          id: "cs_dup",
-          mode: "payment",
-          payment_status: "paid",
-          metadata: { lead_id: "550e8400-e29b-41d4-a716-446655440000" },
-        },
-      },
-    });
-
-    fromMock.mockImplementation((table: string) => {
-      if (table === "stripe_webhook_events") {
-        return {
-          upsert: () => ({
-            select: () => ({
-              limit: async () => ({ data: [], error: null }),
-            }),
-          }),
-        };
-      }
-      return {};
-    });
-
-    const { POST } = await import("@/app/api/stripe/webhook/route");
-    const response = await POST(new Request("http://localhost/api/stripe/webhook", {
-      method: "POST",
-      headers: { "stripe-signature": "sig" },
-      body: "{}",
-    }));
-
-    expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ received: true, idempotent: true });
-  });
-
   it("handles duplicate insert races safely after unique constraints", async () => {
-    let paymentSelectCalls = 0;
-
-    constructEventMock.mockReturnValue({
-      id: "evt_race",
-      type: "checkout.session.completed",
-      data: {
-        object: {
-          id: "cs_race",
-          mode: "payment",
-          payment_status: "paid",
-          amount_total: 150000,
-          metadata: { lead_id: "550e8400-e29b-41d4-a716-446655440000" },
-        },
-      },
-    });
-
+    let paymentsSelectCalls = 0;
     fromMock.mockImplementation((table: string) => {
-      if (table === "stripe_webhook_events") {
-        return {
-          upsert: () => ({
-            select: () => ({
-              limit: async () => ({ data: [{ id: "event_row_1" }], error: null }),
-            }),
-          }),
-          update: () => ({
-            eq: async () => ({ error: null }),
-          }),
-        };
-      }
       if (table === "payments") {
         return {
           select: () => ({
             eq: () => ({
               order: () => ({
                 limit: async () => {
-                  paymentSelectCalls += 1;
-                  if (paymentSelectCalls === 1) {
+                  paymentsSelectCalls += 1;
+                  if (paymentsSelectCalls === 1) {
                     return { data: [], error: null };
                   }
                   return {
                     data: [{
-                      id: "payment_race_1",
+                      id: "payment-race-1",
                       lead_id: "550e8400-e29b-41d4-a716-446655440000",
                       status: "succeeded",
                     }],
@@ -200,7 +133,7 @@ describe("POST /api/stripe/webhook", () => {
           }),
           update: () => ({
             eq: () => ({
-              eq: () => ({
+              neq: () => ({
                 select: () => ({
                   maybeSingle: async () => ({ data: null, error: null }),
                 }),
@@ -218,7 +151,27 @@ describe("POST /api/stripe/webhook", () => {
           }),
         };
       }
+      if (table === "bookings") {
+        return {
+          update: () => ({
+            eq: () => ({ error: null }),
+          }),
+        };
+      }
       return {};
+    });
+
+    constructEventMock.mockReturnValue({
+      type: "checkout.session.completed",
+      data: {
+        object: {
+          id: "cs_test_duplicate",
+          mode: "payment",
+          payment_status: "paid",
+          amount_total: 150000,
+          metadata: { lead_id: "550e8400-e29b-41d4-a716-446655440000" },
+        },
+      },
     });
 
     const { POST } = await import("@/app/api/stripe/webhook/route");

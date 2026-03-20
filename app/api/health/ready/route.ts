@@ -21,26 +21,32 @@ export async function GET() {
   checks.supabase_config = hasSupabase ? "ok" : "missing";
   if (!hasSupabase) ready = false;
 
+  let errorDetail: string | undefined;
   if (hasSupabase) {
     try {
       const supabase = getServerSupabase();
       const { error } = await supabase.from("packages").select("id").limit(1).maybeSingle();
       checks.supabase_connect = error ? "error" : "ok";
-      if (error) ready = false;
-    } catch {
+      if (error) {
+        ready = false;
+        errorDetail = error.message;
+      }
+    } catch (err) {
       checks.supabase_connect = "error";
       ready = false;
+      errorDetail = err instanceof Error ? err.message : String(err);
     }
   } else {
     checks.supabase_connect = "missing";
   }
 
-  const body = {
+  const body: Record<string, unknown> = {
     ready,
     timestamp: new Date().toISOString(),
     request_id: requestId,
     checks,
   };
+  if (errorDetail && process.env.NODE_ENV !== "production") body.error_detail = errorDetail;
 
   log.info("Readiness endpoint checked", { ready, checks });
   return NextResponse.json(body, { status: ready ? 200 : 503 });

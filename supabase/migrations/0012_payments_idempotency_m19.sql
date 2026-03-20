@@ -1,5 +1,5 @@
 -- M19: Payment idempotency guardrails for Stripe identifiers.
--- Run after 0008_outbound_messages.sql.
+-- Run after 0010_outbound_messages.sql (lexicographic order in this repo).
 
 with ranked_checkout as (
   select

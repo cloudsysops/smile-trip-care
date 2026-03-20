@@ -1,6 +1,6 @@
 # Conectar GitHub con Vercel
 
-Pasos para enlazar el repo **cloudsysops/smile-transformation-platform-** con Vercel y desplegar en cada push a `main`.
+Pasos para enlazar el repo **cloudsysops/smile-transformation-platform-** con Vercel y desplegar en cada push a `main`. **Actualmente hay un solo proyecto en Vercel** (nombre que termina en `-dev`); ver [VERCEL_UN_SOLO_PROYECTO.md](VERCEL_UN_SOLO_PROYECTO.md).
 
 ---
 

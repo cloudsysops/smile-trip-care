@@ -1,4 +1,4 @@
-# Git Workflow — Smile Transformation
+# Git Workflow — Nebula Smile
 
 This repository follows a startup-grade branch model designed for speed and launch safety.
 

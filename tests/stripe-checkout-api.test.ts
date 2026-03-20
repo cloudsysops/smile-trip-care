@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const requireAdminMock = vi.fn();
+const getCurrentProfileMock = vi.fn();
 const fromMock = vi.fn();
 const createSessionMock = vi.fn();
 
 vi.mock("@/lib/auth", () => ({
-  requireAdmin: requireAdminMock,
+  getCurrentProfile: getCurrentProfileMock,
 }));
 
 vi.mock("@/lib/config/server", () => ({
@@ -42,7 +42,10 @@ describe("POST /api/stripe/checkout", () => {
   const leadId = "550e8400-e29b-41d4-a716-446655440000";
 
   beforeEach(() => {
-    requireAdminMock.mockResolvedValue({ user: { id: "admin-user" } });
+    getCurrentProfileMock.mockResolvedValue({
+      user: { id: "admin-user" },
+      profile: { role: "admin", email: "admin@test.com" },
+    });
     fromMock.mockReset();
     createSessionMock.mockReset();
   });
@@ -77,6 +80,9 @@ describe("POST /api/stripe/checkout", () => {
           }),
         };
       }
+      if (table === "packages") {
+        return { select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: null, error: null }) }) }) };
+      }
       if (table === "payments") {
         return { insert: vi.fn() };
       }
@@ -106,7 +112,10 @@ describe("POST /api/stripe/checkout", () => {
         return {
           select: () => ({
             eq: () => ({
-              maybeSingle: async () => ({ data: { id: leadId, package_slug: "smile-medellin" }, error: null }),
+              maybeSingle: async () => ({
+                data: { id: leadId, package_slug: "smile-medellin", recommended_package_slug: null, email: "lead@test.com" },
+                error: null,
+              }),
             }),
           }),
         };
@@ -115,7 +124,7 @@ describe("POST /api/stripe/checkout", () => {
         return {
           select: () => ({
             eq: () => ({
-              maybeSingle: async () => ({ data: { name: "Smile Transformation Medellín", deposit_cents: 75000 }, error: null }),
+              maybeSingle: async () => ({ data: { name: "SmileTripCare Medellín", deposit_cents: 75000 }, error: null }),
             }),
           }),
         };

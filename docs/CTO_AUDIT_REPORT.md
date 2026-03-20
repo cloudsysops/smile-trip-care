@@ -1,4 +1,4 @@
-# CTO Audit Report — Smile Transformation MVP
+# CTO Audit Report — Nebula Smile MVP
 
 ## Run & test steps (by module)
 

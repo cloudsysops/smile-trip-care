@@ -18,7 +18,7 @@
 
 ## AI policy (M9)
 - No medical advice, diagnosis, or treatment guarantees in generated content.
-- Sales messaging must frame Smile Transformation as coordination/hospitality support (clinic coordination, lodging, transport), not direct medical provider claims.
+- Sales messaging must frame Nebula Smile as coordination/hospitality support (clinic coordination, lodging, transport), not direct medical provider claims.
 - Agent outputs must be strict JSON and validated with Zod before saving.
 - Keep human-in-the-loop: generate drafts for review; do not auto-send outbound messages yet.
 - Avoid logging raw lead notes in error logs if they can contain sensitive personal details.

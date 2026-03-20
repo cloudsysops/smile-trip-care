@@ -1,4 +1,4 @@
-# Production Checklist — Smile Transformation
+# Production Checklist — Nebula Smile
 
 Use this checklist before promoting a release to production.
 

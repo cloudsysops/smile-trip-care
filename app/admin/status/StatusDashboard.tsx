@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type HealthRes = { status: string; time: string; service?: string; version?: string };
+type HealthRes = { status: string; timestamp: string; service?: string };
 type ReadyRes = { ready: boolean; timestamp: string; checks: Record<string, string> };
 type PaymentsMetricsRes = { metrics: Record<string, number>; request_id: string };
 type AutomationRes = {
@@ -56,60 +56,60 @@ export default function StatusDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold">Liveness</h2>
-        <p className="mt-1 text-sm text-zinc-500">GET /api/health — process is running.</p>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+        <h2 className="text-lg font-semibold text-zinc-100">Liveness</h2>
+        <p className="mt-1 text-sm text-zinc-400">GET /api/health — process is running.</p>
         {liveError && <p className="mt-2 text-sm text-red-600">{liveError}</p>}
         {live && (
-          <pre className="mt-2 overflow-auto rounded bg-zinc-100 p-3 text-xs">
+          <pre className="mt-2 overflow-auto rounded bg-zinc-900/40 p-3 text-xs text-zinc-200">
             {JSON.stringify(live, null, 2)}
           </pre>
         )}
       </div>
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold">Readiness</h2>
-        <p className="mt-1 text-sm text-zinc-500">GET /api/health/ready — DB and config.</p>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+        <h2 className="text-lg font-semibold text-zinc-100">Readiness</h2>
+        <p className="mt-1 text-sm text-zinc-400">GET /api/health/ready — DB and config.</p>
         {readyError && <p className="mt-2 text-sm text-red-600">{readyError}</p>}
         {ready && (
           <>
             <p className="mt-2 text-sm">
-              Ready: <span className={ready.ready ? "text-green-600" : "text-red-600"}>{String(ready.ready)}</span>
+              Ready: <span className={ready.ready ? "text-green-400" : "text-red-400"}>{String(ready.ready)}</span>
             </p>
-            <pre className="mt-2 overflow-auto rounded bg-zinc-100 p-3 text-xs">
+            <pre className="mt-2 overflow-auto rounded bg-zinc-900/40 p-3 text-xs text-zinc-200">
               {JSON.stringify(ready, null, 2)}
             </pre>
           </>
         )}
       </div>
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold">Payments reliability</h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          GET /api/admin/payments/metrics — pending aging, recoveries, and webhook processing.
-        </p>
-        {paymentsError && <p className="mt-2 text-sm text-red-600">{paymentsError}</p>}
-        {payments && (
-          <pre className="mt-2 overflow-auto rounded bg-zinc-100 p-3 text-xs">
-            {JSON.stringify(payments, null, 2)}
-          </pre>
-        )}
-      </div>
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <h2 className="text-lg font-semibold">Automation status</h2>
-        <p className="mt-1 text-sm text-zinc-500">GET /api/admin/status/automation — queue and outbound reliability.</p>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+        <h2 className="text-lg font-semibold text-zinc-100">Automation status</h2>
+        <p className="mt-1 text-sm text-zinc-400">GET /api/admin/status/automation — queue and outbound reliability.</p>
         {automationError && <p className="mt-2 text-sm text-red-600">{automationError}</p>}
         {automation && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <div className="rounded border border-zinc-200 bg-zinc-50 p-3 text-sm">
+            <div className="rounded border border-zinc-800 bg-zinc-900/40 p-3 text-sm text-zinc-200">
               <p><span className="font-medium">Pending jobs:</span> {automation.pending_jobs}</p>
               <p><span className="font-medium">Processing jobs:</span> {automation.processing_jobs}</p>
               <p><span className="font-medium">Retry jobs:</span> {automation.retry_jobs}</p>
               <p><span className="font-medium">Dead letter jobs:</span> {automation.dead_letter_jobs}</p>
             </div>
-            <div className="rounded border border-zinc-200 bg-zinc-50 p-3 text-sm">
+            <div className="rounded border border-zinc-800 bg-zinc-900/40 p-3 text-sm text-zinc-200">
               <p><span className="font-medium">Oldest job age (s):</span> {automation.oldest_job_age}</p>
               <p><span className="font-medium">Failed outbound:</span> {automation.failed_outbound_count}</p>
             </div>
           </div>
+        )}
+      </div>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+        <h2 className="text-lg font-semibold text-zinc-100">Payments reliability</h2>
+        <p className="mt-1 text-sm text-zinc-400">
+          GET /api/admin/payments/metrics — pending aging, recoveries, and webhook processing.
+        </p>
+        {paymentsError && <p className="mt-2 text-sm text-red-600">{paymentsError}</p>}
+        {payments && (
+          <pre className="mt-2 overflow-auto rounded bg-zinc-900/40 p-3 text-xs text-zinc-200">
+            {JSON.stringify(payments, null, 2)}
+          </pre>
         )}
       </div>
     </div>
