@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getCurrentProfile, getRedirectPathForRole, type ProfileRole } from "@/lib/auth";
 import { getProfileRoles } from "@/lib/services/roles.service";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { jsonBadRequest, jsonError } from "@/lib/http/response";
 
 const BodySchema = z.object({
   role: z.string().min(1),
@@ -23,26 +24,27 @@ function isKnownRole(role: string): role is ProfileRole {
 }
 
 export async function POST(request: Request) {
+  const requestId = crypto.randomUUID();
   const ctx = await getCurrentProfile();
   if (!ctx) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonError(401, "Unauthorized", requestId);
   }
 
   const body = await request.json().catch(() => ({}));
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    return jsonBadRequest("Invalid body", requestId);
   }
 
   const requestedRole = parsed.data.role;
   if (!isKnownRole(requestedRole)) {
-    return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    return jsonBadRequest("Invalid role", requestId);
   }
 
   const roleRows = await getProfileRoles(ctx.profile.id);
   const availableRoles = roleRows.map((r) => r.role);
   if (!availableRoles.includes(requestedRole)) {
-    return NextResponse.json({ error: "Role not assigned" }, { status: 403 });
+    return jsonError(403, "Role not assigned", requestId);
   }
 
   const supabase = getServerSupabase();
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
     .eq("id", ctx.profile.id);
 
   if (error) {
-    return NextResponse.json({ error: "Failed to update active role" }, { status: 500 });
+    return jsonError(500, "Failed to update active role", requestId);
   }
 
   const redirectPath = getRedirectPathForRole(requestedRole);

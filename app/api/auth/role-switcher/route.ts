@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentProfile, getEffectiveRoleForProfile } from "@/lib/auth";
 import { getProfileRoles } from "@/lib/services/roles.service";
 import type { ProfileRole } from "@/lib/auth";
+import { jsonError } from "@/lib/http/response";
 
 const KNOWN_ROLES: readonly ProfileRole[] = [
   "admin",
@@ -18,9 +19,10 @@ function isKnownRole(role: string): role is ProfileRole {
 }
 
 export async function GET() {
+  const requestId = crypto.randomUUID();
   const ctx = await getCurrentProfile();
   if (!ctx) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonError(401, "Unauthorized", requestId);
   }
 
   const { profile } = ctx;

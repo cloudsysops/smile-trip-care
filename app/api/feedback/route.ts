@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getCurrentProfile } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { submitFeedback, type FeedbackCategory, type FeedbackSentiment } from "@/lib/services/feedback.service";
+import { jsonBadRequest, jsonError } from "@/lib/http/response";
 
 const FeedbackBodySchema = z.object({
   page: z.string().trim().min(1).max(200),
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
   const parsed = FeedbackBodySchema.safeParse(raw);
   if (!parsed.success) {
     log.warn("beta_feedback: invalid body", { issues: parsed.error.issues });
-    return NextResponse.json({ error: "Invalid feedback payload" }, { status: 400 });
+    return jsonBadRequest("Invalid feedback payload", requestId);
   }
 
   const profileCtx = await getCurrentProfile();
@@ -38,10 +39,7 @@ export async function POST(request: Request) {
       requestId,
     });
   } catch {
-    return NextResponse.json(
-      { error: "Could not save feedback. Please try again later." },
-      { status: 500 },
-    );
+    return jsonError(500, "Could not save feedback. Please try again later.", requestId);
   }
 
   return NextResponse.json({ ok: true });

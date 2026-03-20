@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { getCurrentProfile } from "@/lib/auth";
 import { getProgressById, updateProgress } from "@/lib/clinical/progress";
 import { getOrderedStageKeys } from "@/lib/clinical/stages";
+import { jsonBadRequest, jsonError, jsonForbidden } from "@/lib/http/response";
 
 const STAGE_KEYS = getOrderedStageKeys();
 const VALID_STATUSES = ["active", "completed", "cancelled"] as const;
@@ -43,15 +44,16 @@ function parsePatchBody(body: Record<string, unknown>): { error?: string; update
 }
 
 export async function GET(_request: Request, { params }: Params) {
+  const requestId = crypto.randomUUID();
   try {
     const ctx = await getCurrentProfile();
     if (!ctx) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError(401, "Unauthorized", requestId);
     }
     const { id } = await params;
     const row = await getProgressById(id);
     if (!row) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return jsonError(404, "Not found", requestId);
     }
     const { profile } = ctx;
     if (profile.role === "admin") {
@@ -59,55 +61,56 @@ export async function GET(_request: Request, { params }: Params) {
     }
     if (profile.role === "patient" || profile.role === "user") {
       if (row.patient_id !== profile.id) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return jsonForbidden(requestId);
       }
       return NextResponse.json({ data: row });
     }
     if (profile.role === "specialist") {
       if (row.specialist_id !== profile.specialist_id) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        return jsonForbidden(requestId);
       }
       return NextResponse.json({ data: row });
     }
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Internal error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return jsonError(500, message, requestId);
   }
 }
 
 export async function PATCH(request: Request, { params }: Params) {
+  const requestId = crypto.randomUUID();
   try {
     const ctx = await getCurrentProfile();
     if (!ctx) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError(401, "Unauthorized", requestId);
     }
     const { profile } = ctx;
     const isSpecialist = profile.role === "specialist";
     const isAdmin = profile.role === "admin";
     if (!isSpecialist && !isAdmin) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonForbidden(requestId);
     }
 
     const { id } = await params;
     const existing = await getProgressById(id);
     if (!existing) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return jsonError(404, "Not found", requestId);
     }
     if (!isAdmin && existing.specialist_id !== profile.specialist_id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonForbidden(requestId);
     }
 
     const body = (await request.json()) as Record<string, unknown>;
     const { error: validationError, updates } = parsePatchBody(body);
     if (validationError) {
-      return NextResponse.json({ error: validationError }, { status: 400 });
+      return jsonBadRequest(validationError, requestId);
     }
 
     const row = await updateProgress(id, updates);
     return NextResponse.json({ data: row });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Internal error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return jsonError(500, message, requestId);
   }
 }

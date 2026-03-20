@@ -8,6 +8,7 @@ import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 import { ensurePatientProfileForUser } from "@/lib/services/profile.service";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { jsonError } from "@/lib/http/response";
 
 const BodySchema = z.object({
   full_name: z.string().trim().max(200).optional(),
@@ -18,7 +19,7 @@ export async function POST(request: Request) {
   const log = createLogger(requestId);
   const user = await getCurrentUser();
   if (!user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonError(401, "Unauthorized", requestId);
   }
 
   const ip =
@@ -27,10 +28,7 @@ export async function POST(request: Request) {
     "unknown";
   if (!(await checkRateLimit(ip))) {
     log.warn("Signup rate limit exceeded", { ip, user_id: user.id });
-    return NextResponse.json(
-      { error: "Too many requests. Please try again later." },
-      { status: 429 }
-    );
+    return jsonError(429, "Too many requests. Please try again later.", requestId);
   }
   const body = await request.json().catch(() => ({}));
   const parsed = BodySchema.safeParse(body);
@@ -42,10 +40,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, message: "Profile already exists" });
     }
   } catch {
-    return NextResponse.json(
-      { error: "Could not create profile. Contact support." },
-      { status: 500 }
-    );
+    return jsonError(500, "Could not create profile. Contact support.", requestId);
   }
   return NextResponse.json({ ok: true });
 }

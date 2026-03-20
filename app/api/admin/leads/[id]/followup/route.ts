@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
+import { jsonBadRequest, jsonError, jsonForbidden } from "@/lib/http/response";
 import {
   generate24hFollowup,
   generate3dFollowup,
@@ -15,10 +16,11 @@ const BodySchema = z.object({ type: z.enum(["24h", "3d", "7d"]) }).strict();
 type Props = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, { params }: Props) {
+  const requestId = crypto.randomUUID();
   try {
     await requireAdmin();
   } catch {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   }
 
   const { id } = await params;
@@ -26,11 +28,11 @@ export async function POST(request: Request, { params }: Props) {
   try {
     body = await request.json().catch(() => ({}));
   } catch {
-    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+    return jsonBadRequest("Invalid body", requestId);
   }
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid body", details: parsed.error.flatten() }, { status: 400 });
+    return jsonBadRequest("Invalid body", requestId);
   }
 
   const supabase = getServerSupabase();
@@ -41,7 +43,7 @@ export async function POST(request: Request, { params }: Props) {
     .single();
 
   if (leadError || !lead) {
-    return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+    return jsonError(404, "Lead not found", requestId);
   }
 
   const leadForFollowUp: LeadForFollowUp = {
@@ -73,7 +75,7 @@ export async function POST(request: Request, { params }: Props) {
   }
 
   if (message === null) {
-    return NextResponse.json({ error: "Failed to generate follow-up message" }, { status: 500 });
+    return jsonError(500, "Failed to generate follow-up message", requestId);
   }
 
   return NextResponse.json({

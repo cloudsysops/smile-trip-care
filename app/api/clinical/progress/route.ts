@@ -13,14 +13,16 @@ import {
   specialistHasConsultationForLead,
 } from "@/lib/clinical/progress";
 import { getOrderedStageKeys } from "@/lib/clinical/stages";
+import { jsonBadRequest, jsonError, jsonForbidden } from "@/lib/http/response";
 
 const STAGE_KEYS = getOrderedStageKeys();
 
 export async function GET() {
+  const requestId = crypto.randomUUID();
   try {
     const ctx = await getCurrentProfile();
     if (!ctx) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError(401, "Unauthorized", requestId);
     }
     const { profile } = ctx;
 
@@ -41,10 +43,10 @@ export async function GET() {
       return NextResponse.json({ data: list });
     }
 
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return jsonForbidden(requestId);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Internal error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return jsonError(500, message, requestId);
   }
 }
 
@@ -57,22 +59,20 @@ const createBodySchema = {
 };
 
 export async function POST(request: Request) {
+  const requestId = crypto.randomUUID();
   try {
     const ctx = await getCurrentProfile();
     if (!ctx) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return jsonError(401, "Unauthorized", requestId);
     }
     const { profile } = ctx;
 
     if (profile.role !== "specialist") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return jsonForbidden(requestId);
     }
     const specialistId = profile.specialist_id;
     if (!specialistId) {
-      return NextResponse.json(
-        { error: "Your account is not linked to a specialist" },
-        { status: 403 }
-      );
+      return jsonError(403, "Your account is not linked to a specialist", requestId);
     }
 
     const body = await request.json();
@@ -82,32 +82,23 @@ export async function POST(request: Request) {
     const booking_id = body.booking_id as unknown;
 
     if (!createBodySchema.lead_id(lead_id) || !createBodySchema.stage_key(stage_key)) {
-      return NextResponse.json(
-        { error: "Missing or invalid lead_id or stage_key" },
-        { status: 400 }
-      );
+      return jsonBadRequest("Missing or invalid lead_id or stage_key", requestId);
     }
     if (!createBodySchema.notes(notes) || !createBodySchema.booking_id(booking_id)) {
-      return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+      return jsonBadRequest("Invalid body", requestId);
     }
 
     const patient_id = await resolvePatientIdFromLead(lead_id);
     if (!patient_id) {
-      return NextResponse.json(
-        {
-          error:
-            "No patient account found for this lead. The patient must sign up with the same email to see progress.",
-        },
-        { status: 400 }
+      return jsonBadRequest(
+        "No patient account found for this lead. The patient must sign up with the same email to see progress.",
+        requestId,
       );
     }
 
     const allowed = await specialistHasConsultationForLead(specialistId, lead_id);
     if (!allowed) {
-      return NextResponse.json(
-        { error: "You do not have a consultation for this lead" },
-        { status: 403 }
-      );
+      return jsonError(403, "You do not have a consultation for this lead", requestId);
     }
 
     const row = await createProgress({
@@ -121,6 +112,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ data: row }, { status: 201 });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Internal error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return jsonError(500, message, requestId);
   }
 }

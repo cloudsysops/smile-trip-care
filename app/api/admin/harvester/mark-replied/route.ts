@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
 import { writeHarvesterMarkReplied } from "@/lib/growth/harvesterState";
+import { jsonBadRequest, jsonError } from "@/lib/http/response";
 
 const BodySchema = z.object({
   id: z.string().min(1, "id is required").max(200),
@@ -9,23 +10,24 @@ const BodySchema = z.object({
 });
 
 export async function POST(request: Request) {
+  const requestId = crypto.randomUUID();
   try {
     await requireAdmin();
   } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return jsonError(401, "Unauthorized", requestId);
   }
 
   let json: unknown;
   try {
     json = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    return jsonBadRequest("Invalid JSON body", requestId);
   }
 
   const parsed = BodySchema.safeParse(json);
   if (!parsed.success) {
     const message = parsed.error.errors[0]?.message ?? "Invalid request body";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return jsonBadRequest(message, requestId);
   }
 
   const { id, replied } = parsed.data;
@@ -35,9 +37,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     console.error("harvester mark-replied write failed", error);
-    return NextResponse.json(
-      { error: "Could not save state. Try again." },
-      { status: 500 },
-    );
+    return jsonError(500, "Could not save state. Try again.", requestId);
   }
 }
