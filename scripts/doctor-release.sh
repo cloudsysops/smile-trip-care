@@ -12,7 +12,7 @@ cd "${ROOT_DIR}"
 HOST="${1:-}"
 
 FAIL=0
-echo "=== MedVoyage Smile — Release doctor ==="
+echo "=== SmileTripCare — Release doctor ==="
 
 # Git
 echo ""

@@ -1,7 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+/** Override with PLAYWRIGHT_BASE_URL (e.g. http://localhost:3000 for local E2E). */
 const BASE_URL =
-  process.env.BASE_URL ?? process.env.PLAYWRIGHT_BASE_URL ?? "https://smile-transformation-platform-dev.vercel.app";
+  process.env.PLAYWRIGHT_BASE_URL || "https://smile-transformation-platform-dev.vercel.app";
 
 export default defineConfig({
   testDir: "./e2e",

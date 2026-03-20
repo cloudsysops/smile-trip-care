@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Compare localhost vs production for MedVoyage Smile (HTTP status + SEO metadata).
+# Compare localhost vs production for SmileTripCare (HTTP status + SEO metadata).
 # Usage: run with local server up (e.g. npm run build && npm start), then:
 #   ./scripts/devops/compare_local_vs_prod_full.sh
 
 set -e
 
 LOCAL_BASE="${LOCAL_BASE:-http://localhost:3000}"
+# Canonical dev/preview host (override if your Vercel URL differs).
 PROD_BASE="${PROD_BASE:-https://smile-transformation-platform-dev.vercel.app}"
 
 ROUTES=(
@@ -56,7 +57,7 @@ fetch_route() {
 }
 
 echo "=============================================="
-echo "  MedVoyage Smile — Local vs Prod Comparison"
+echo "  SmileTripCare — Local vs Prod Comparison"
 echo "=============================================="
 echo "  LOCAL: $LOCAL_BASE"
 echo "  PROD : $PROD_BASE"

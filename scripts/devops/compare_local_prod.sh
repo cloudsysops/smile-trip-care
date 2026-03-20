@@ -2,6 +2,7 @@
 set -euo pipefail
 
 LOCAL_BASE="${LOCAL_BASE:-http://localhost:3000}"
+# Canonical dev/preview host (override if your Vercel URL differs).
 PROD_BASE="${PROD_BASE:-https://smile-transformation-platform-dev.vercel.app}"
 
 ROUTES=(

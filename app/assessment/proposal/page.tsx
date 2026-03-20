@@ -94,13 +94,13 @@ export default async function ProposalPage({ searchParams }: Props) {
   const savingsRange = getSavingsRange(treatmentTypes);
   const usRange = getUsRange(treatmentTypes);
   const usMidCents = getUsMidCents(treatmentTypes);
-  const medvoyagePriceCents =
+  const packagePriceCents =
     recommendedPackage?.price_cents != null && recommendedPackage.price_cents > 0
       ? recommendedPackage.price_cents
       : null;
   const savingsDollars =
-    usMidCents != null && medvoyagePriceCents != null && usMidCents > medvoyagePriceCents
-      ? Math.round((usMidCents - medvoyagePriceCents) / 100)
+    usMidCents != null && packagePriceCents != null && usMidCents > packagePriceCents
+      ? Math.round((usMidCents - packagePriceCents) / 100)
       : null;
   const treatmentLabel =
     treatmentTypes[0] ?? recommendedPackage?.name ?? "my treatment";
