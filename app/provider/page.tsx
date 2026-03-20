@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { requireProviderManager } from "@/lib/auth";
 import { getProviderDashboardData } from "@/lib/dashboard-data";
-import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
 import StatCard from "@/app/components/dashboard/StatCard";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 import EmptyState from "@/app/components/ui/EmptyState";
+import AuthDashboardHeader from "@/app/components/dashboard/AuthDashboardHeader";
 
 export default async function ProviderDashboardPage() {
   let profile;
@@ -18,7 +18,13 @@ export default async function ProviderDashboardPage() {
   if (!providerId) {
     return (
       <div className="min-h-screen bg-zinc-50">
-        <RoleDashboardHeader title="Provider dashboard" navItems={[{ href: "/provider", label: "Overview", active: true }]} homeLabel="Home" />
+        <AuthDashboardHeader
+          title="Provider dashboard"
+          navItems={[{ href: "/provider", label: "Overview", active: true }]}
+          homeHref="/"
+          homeLabel="Home"
+          maxWidth="max-w-4xl"
+        />
         <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
           <p className="text-zinc-600">Your account is not linked to a provider. Contact an admin.</p>
         </main>
@@ -34,7 +40,13 @@ export default async function ProviderDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <RoleDashboardHeader title="Provider dashboard" navItems={[{ href: "/provider", label: "Overview", active: true }]} homeLabel="Home" />
+      <AuthDashboardHeader
+        title="Provider dashboard"
+        navItems={[{ href: "/provider", label: "Overview", active: true }]}
+        homeHref="/"
+        homeLabel="Home"
+        maxWidth="max-w-4xl"
+      />
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <DashboardLayout
           title={provider?.name ?? "Provider"}

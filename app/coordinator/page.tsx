@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { requireCoordinator } from "@/lib/auth";
 import { getCoordinatorDashboardData } from "@/lib/dashboard-data";
-import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
 import StatCard from "@/app/components/dashboard/StatCard";
 import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
 import DataTable, { type DataTableColumn } from "@/app/components/dashboard/DataTable";
 import EmptyState from "@/app/components/ui/EmptyState";
+import AuthDashboardHeader from "@/app/components/dashboard/AuthDashboardHeader";
 
 type CoordinatorLead = {
   id: string;
@@ -64,7 +64,13 @@ export default async function CoordinatorDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <RoleDashboardHeader title="Coordinator dashboard" navItems={[{ href: "/coordinator", label: "Overview", active: true }]} homeLabel="Home" />
+      <AuthDashboardHeader
+        title="Coordinator dashboard"
+        navItems={[{ href: "/coordinator", label: "Overview", active: true }]}
+        homeHref="/"
+        homeLabel="Home"
+        maxWidth="max-w-4xl"
+      />
       <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
         <DashboardLayout
           title="Operations & travel coordination"
