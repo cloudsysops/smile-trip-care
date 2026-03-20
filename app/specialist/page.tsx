@@ -94,6 +94,7 @@ export default async function SpecialistDashboardPage() {
                 <table className="min-w-full text-left text-sm">
                   <thead className="border-b border-zinc-800 bg-zinc-950/50">
                     <tr>
+                      <th className="px-4 py-3 font-medium text-zinc-300">Case</th>
                       <th className="px-4 py-3 font-medium text-zinc-300">Status</th>
                       <th className="px-4 py-3 font-medium text-zinc-300">Lead ID</th>
                       <th className="px-4 py-3 font-medium text-zinc-300">Requested</th>
@@ -104,6 +105,14 @@ export default async function SpecialistDashboardPage() {
                   <tbody>
                     {consultations.slice(0, 15).map((c) => (
                       <tr key={c.id} className="border-b border-zinc-800">
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/specialist/cases/${c.id}`}
+                            className="text-sm font-medium text-emerald-400 hover:underline"
+                          >
+                            Open case
+                          </Link>
+                        </td>
                         <td className="px-4 py-3">{c.status}</td>
                         <td className="px-4 py-3 font-mono text-xs">{c.lead_id.slice(0, 8)}…</td>
                         <td className="px-4 py-3 text-zinc-300">
