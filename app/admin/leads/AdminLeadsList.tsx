@@ -225,12 +225,13 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
     },
     {
       header: "",
+      stopRowClick: true,
       cell: (lead) => (
         <Link
           href={`/admin/leads/${lead.id}`}
-          className="rounded-full border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-zinc-800/40"
+          className="inline-flex items-center gap-1 rounded-full border border-zinc-600 px-3 py-1.5 text-xs font-medium text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/60"
         >
-          Open
+          View →
         </Link>
       ),
     },
@@ -259,6 +260,8 @@ export default function AdminLeadsList({ initialLeads, nowIso }: Props) {
           columns={columns}
           rows={visibleLeads}
           emptyMessage="No leads yet. New assessments will appear here."
+          getRowHref={(lead) => `/admin/leads/${lead.id}`}
+          getRowKey={(lead) => lead.id}
         />
       </DashboardSection>
     </DashboardLayout>

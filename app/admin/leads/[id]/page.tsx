@@ -107,9 +107,36 @@ export default async function AdminLeadDetailPage({ params }: Props) {
     .eq("lead_id", id)
     .order("created_at", { ascending: false });
 
+  const { data: paymentRows } = await supabase
+    .from("payments")
+    .select("id, status, amount_cents, created_at, stripe_checkout_session_id")
+    .eq("lead_id", id)
+    .order("created_at", { ascending: false });
+
   const publishedPackages = await getPublishedPackages();
   const packageOptions = publishedPackages.map((p) => ({ id: p.id, slug: p.slug, name: p.name }));
   const latestProgress = await getLatestProgressForLead(lead.id);
+  const score = (() => {
+    const hasTreatment =
+      (Array.isArray(lead.selected_specialties) && lead.selected_specialties.length > 0) ||
+      (lead.recommended_package_slug ?? "").trim() !== "" ||
+      (lead.package_slug ?? "").trim() !== "";
+    const hasBudget = (lead.budget_range ?? "").trim() !== "";
+    if (hasTreatment && hasBudget) return "HIGH";
+    if (hasTreatment || hasBudget) return "MEDIUM";
+    return "LOW";
+  })();
+  const priority = (() => {
+    const active = new Set(["new", "contacted", "qualified"]).has(lead.status);
+    if (!active) return "On track";
+    if (!lead.next_follow_up_at) return "Unplanned";
+    return "Planned";
+  })();
+  const timeline = [
+    { label: "Lead created", value: lead.created_at ? new Date(lead.created_at as string).toLocaleString() : null },
+    { label: "Last contacted", value: lead.last_contacted_at ? new Date(lead.last_contacted_at as string).toLocaleString() : null },
+    { label: "Next follow-up", value: lead.next_follow_up_at ? new Date(lead.next_follow_up_at as string).toLocaleString() : null },
+  ].filter((t) => t.value);
 
   return (
     <AdminShell
@@ -215,6 +242,14 @@ export default async function AdminLeadDetailPage({ params }: Props) {
                 <dd className="whitespace-pre-wrap">{lead.follow_up_notes}</dd>
               </div>
             )}
+            <div>
+              <dt className="font-medium text-zinc-300">Lead score</dt>
+              <dd>{score}</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-zinc-300">Priority</dt>
+              <dd>{priority}</dd>
+            </div>
             {attributionFields.some((item) => item.value) && (
               <div className="space-y-1 pt-2">
                 <dt className="font-medium text-zinc-300">Attribution</dt>
@@ -233,6 +268,46 @@ export default async function AdminLeadDetailPage({ params }: Props) {
               </div>
             )}
           </dl>
+        </section>
+
+        <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+          <h2 className="text-sm font-semibold text-zinc-100">Payment history</h2>
+          {!paymentRows || paymentRows.length === 0 ? (
+            <p className="mt-2 text-sm text-zinc-400">No payments yet.</p>
+          ) : (
+            <ul className="mt-3 space-y-2 text-sm">
+              {paymentRows.map((p) => (
+                <li key={p.id} className="rounded border border-zinc-800 bg-zinc-950/60 px-3 py-2">
+                  <p>
+                    <span className="font-medium text-zinc-300">Status:</span> {p.status}
+                  </p>
+                  <p>
+                    <span className="font-medium text-zinc-300">Amount:</span>{" "}
+                    {typeof p.amount_cents === "number" ? `$${(p.amount_cents / 100).toFixed(2)}` : "—"}
+                  </p>
+                  <p className="text-xs text-zinc-400">
+                    {p.created_at ? new Date(p.created_at).toLocaleString() : "—"}
+                    {p.stripe_checkout_session_id ? ` · session ${p.stripe_checkout_session_id}` : ""}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+          <h2 className="text-sm font-semibold text-zinc-100">Activity timeline</h2>
+          {timeline.length === 0 ? (
+            <p className="mt-2 text-sm text-zinc-400">No activity timeline available yet.</p>
+          ) : (
+            <ul className="mt-3 space-y-2 text-sm">
+              {timeline.map((item) => (
+                <li key={item.label} className="rounded border border-zinc-800 bg-zinc-950/60 px-3 py-2">
+                  <span className="font-medium text-zinc-300">{item.label}:</span> {item.value}
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         {latestProgress && (
