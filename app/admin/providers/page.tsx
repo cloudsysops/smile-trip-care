@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { getProviders } from "@/lib/providers";
+import { getServerSupabase } from "@/lib/supabase/server";
+import LinkEntityProfileButton from "@/app/admin/LinkEntityProfileButton";
 
 export default async function AdminProvidersPage() {
   try {
@@ -10,6 +12,23 @@ export default async function AdminProvidersPage() {
     redirect("/admin/login?next=/admin/providers");
   }
   const providers = await getProviders();
+  const supabase = getServerSupabase();
+  const providerIds = providers.map((p) => p.id);
+  const linkedProfilesByProviderId = new Map<string, { email: string | null }>();
+  if (providerIds.length > 0) {
+    const { data: linkedProfiles } = await supabase
+      .from("profiles")
+      .select("provider_id, email")
+      .in("provider_id", providerIds)
+      .eq("is_active", true);
+    for (const profile of linkedProfiles ?? []) {
+      if (profile.provider_id) {
+        linkedProfilesByProviderId.set(profile.provider_id as string, {
+          email: (profile.email as string | null) ?? null,
+        });
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -60,6 +79,7 @@ export default async function AdminProvidersPage() {
                   <th className="px-4 py-3 font-semibold text-zinc-400">City</th>
                   <th className="px-4 py-3 font-semibold text-zinc-400">Status</th>
                   <th className="px-4 py-3 font-semibold text-zinc-400">Published</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-400">Profile link</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,6 +105,14 @@ export default async function AdminProvidersPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-zinc-300">{p.published ? "Yes" : "No"}</td>
+                    <td className="px-4 py-3">
+                      <LinkEntityProfileButton
+                        entityId={p.id}
+                        entityLabel="provider"
+                        endpoint={`/api/admin/providers/${p.id}`}
+                        currentLinkedEmail={linkedProfilesByProviderId.get(p.id)?.email ?? null}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>

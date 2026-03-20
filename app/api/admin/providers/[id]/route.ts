@@ -4,6 +4,7 @@ import { createLogger } from "@/lib/logger";
 import { getProviderById, updateProvider } from "@/lib/providers";
 import { ProviderUpdateSchema } from "@/lib/validation/provider";
 import { RouteIdParamSchema } from "@/lib/validation/common";
+import { getServerSupabase } from "@/lib/supabase/server";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -53,6 +54,60 @@ export async function PATCH(request: Request, { params }: Props) {
         { error: "Invalid request body", request_id: requestId },
         { status: 400 }
       );
+    }
+    const profileId = (body as Record<string, unknown>).profile_id;
+    if (profileId !== undefined) {
+      if (typeof profileId !== "string" || profileId.length === 0) {
+        return NextResponse.json(
+          { error: "Invalid profile_id", request_id: requestId },
+          { status: 400 }
+        );
+      }
+      const provider = await getProviderById(parsedParams.data.id);
+      if (!provider) {
+        return NextResponse.json({ error: "Not found", request_id: requestId }, { status: 404 });
+      }
+      const supabase = getServerSupabase();
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id, email, full_name")
+        .eq("id", profileId)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (profileError || !profile) {
+        return NextResponse.json(
+          { error: "Profile not found", request_id: requestId },
+          { status: 404 }
+        );
+      }
+      await supabase
+        .from("profiles")
+        .update({ provider_id: null })
+        .eq("provider_id", parsedParams.data.id)
+        .neq("id", profileId);
+      await supabase
+        .from("profiles")
+        .update({
+          provider_id: parsedParams.data.id,
+          role: "provider_manager",
+          active_role: "provider_manager",
+        })
+        .eq("id", profileId);
+      await supabase
+        .from("profile_roles")
+        .upsert(
+          {
+            profile_id: profileId,
+            role: "provider_manager",
+            is_active: true,
+          },
+          { onConflict: "profile_id,role" }
+        );
+      return NextResponse.json({
+        ok: true,
+        provider_id: parsedParams.data.id,
+        linked_profile: profile,
+      });
     }
     const parsed = ProviderUpdateSchema.safeParse(body);
     if (!parsed.success) {

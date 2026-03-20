@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { getAllSpecialists } from "@/lib/specialists";
+import { getServerSupabase } from "@/lib/supabase/server";
+import LinkEntityProfileButton from "@/app/admin/LinkEntityProfileButton";
 
 export default async function AdminSpecialistsPage() {
   try {
@@ -10,6 +12,23 @@ export default async function AdminSpecialistsPage() {
     redirect("/admin/login?next=/admin/specialists");
   }
   const specialists = await getAllSpecialists();
+  const supabase = getServerSupabase();
+  const specialistIds = specialists.map((s) => s.id);
+  const linkedProfilesBySpecialistId = new Map<string, { email: string | null }>();
+  if (specialistIds.length > 0) {
+    const { data: linkedProfiles } = await supabase
+      .from("profiles")
+      .select("specialist_id, email")
+      .in("specialist_id", specialistIds)
+      .eq("is_active", true);
+    for (const profile of linkedProfiles ?? []) {
+      if (profile.specialist_id) {
+        linkedProfilesBySpecialistId.set(profile.specialist_id as string, {
+          email: (profile.email as string | null) ?? null,
+        });
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -60,6 +79,7 @@ export default async function AdminSpecialistsPage() {
                   <th className="px-4 py-3 font-semibold text-zinc-400">City</th>
                   <th className="px-4 py-3 font-semibold text-zinc-400">Status</th>
                   <th className="px-4 py-3 font-semibold text-zinc-400">Published</th>
+                  <th className="px-4 py-3 font-semibold text-zinc-400">Profile link</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,6 +102,14 @@ export default async function AdminSpecialistsPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-zinc-300">{s.published ? "Yes" : "No"}</td>
+                    <td className="px-4 py-3">
+                      <LinkEntityProfileButton
+                        entityId={s.id}
+                        entityLabel="specialist"
+                        endpoint={`/api/admin/specialists/${s.id}`}
+                        currentLinkedEmail={linkedProfilesBySpecialistId.get(s.id)?.email ?? null}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
