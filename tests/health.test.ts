@@ -7,9 +7,10 @@ describe("GET /api/health", () => {
     expect(response.status).toBe(200);
 
     const payload = await response.json();
-    expect(payload.ok).toBe(true);
-    expect(payload.service).toBe("smile-transformation");
-    expect(typeof payload.timestamp).toBe("string");
-    expect(Number.isNaN(Date.parse(payload.timestamp))).toBe(false);
+    expect(payload.status).toBe("ok");
+    expect(typeof payload.version).toBe("string");
+    expect(typeof payload.time).toBe("string");
+    expect(typeof payload.request_id).toBe("string");
+    expect(Number.isNaN(Date.parse(payload.time))).toBe(false);
   });
 });

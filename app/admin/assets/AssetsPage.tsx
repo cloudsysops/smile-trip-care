@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import AdminShell from "../_components/AdminShell";
 
 type AssetRow = {
   id: string;
@@ -27,12 +28,12 @@ type FilterState = {
 
 const CATEGORY_OPTIONS = ["all", "clinic", "finca", "lodging", "tour", "team", "other"];
 const LOCATION_OPTIONS = ["all", "Medellín", "Manizales", "Other"];
+const PAGE_SIZE = 20;
 
 export default function AssetsPage() {
   const [items, setItems] = useState<AssetRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const pageSize = 20;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
@@ -47,19 +48,23 @@ export default function AssetsPage() {
   const [editAlt, setEditAlt] = useState("");
   const [editTags, setEditTags] = useState("");
 
-  const fetchAssets = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const queryString = useMemo(() => {
     const params = new URLSearchParams();
     params.set("page", String(page));
-    params.set("pageSize", String(pageSize));
+    params.set("pageSize", String(PAGE_SIZE));
     if (filters.category !== "all") params.set("category", filters.category);
     if (filters.location !== "all") params.set("location", filters.location);
     if (filters.approved !== "all") params.set("approved", filters.approved);
     if (filters.published !== "all") params.set("published", filters.published);
     if (filters.q.trim()) params.set("q", filters.q.trim());
+    return params.toString();
+  }, [page, filters.category, filters.location, filters.approved, filters.published, filters.q]);
+
+  const fetchAssets = useCallback(async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(`/api/admin/assets?${params.toString()}`);
+      const res = await fetch(`/api/admin/assets?${queryString}`, { signal });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Failed to load assets.");
@@ -67,17 +72,22 @@ export default function AssetsPage() {
         setItems(data.items ?? []);
         setTotal(data.count ?? 0);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setError("Network error.");
+    } finally {
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
-    setLoading(false);
-  }, [filters.approved, filters.category, filters.location, filters.published, filters.q, page, pageSize]);
+  }, [queryString]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void fetchAssets();
-    }, 0);
-    return () => window.clearTimeout(timer);
+    const controller = new AbortController();
+    void fetchAssets(controller.signal);
+    return () => {
+      controller.abort();
+    };
   }, [fetchAssets]);
 
   async function patchAsset(id: string, patch: Record<string, unknown>) {
@@ -136,37 +146,36 @@ export default function AssetsPage() {
   }
 
   const totalPages = useMemo(
-    () => (total > 0 ? Math.ceil(total / pageSize) : 1),
-    [total, pageSize],
+    () => (total > 0 ? Math.ceil(total / PAGE_SIZE) : 1),
+    [total],
   );
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <h1 className="text-xl font-semibold">Admin — Assets</h1>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/admin/assets/new"
-              className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-            >
-              Upload asset
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-6 py-8 space-y-4">
-        <section className="rounded-lg border border-zinc-200 bg-white p-4 flex flex-wrap gap-3 items-end">
+    <AdminShell
+      title="Admin — Assets"
+      currentSection="assets"
+      headerContainerClassName="max-w-5xl"
+      mainContainerClassName="max-w-5xl"
+      headerActions={
+        <Link
+          href="/admin/assets/new"
+          className="rounded-full bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
+        >
+          Upload asset
+        </Link>
+      }
+    >
+      <div className="space-y-4">
+        <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 flex flex-wrap gap-3 items-end">
           <div>
-            <label className="block text-xs font-medium text-zinc-600">Category</label>
+            <label className="block text-xs font-medium text-zinc-300">Category</label>
             <select
               value={filters.category}
               onChange={(e) => {
                 setPage(1);
                 setFilters((f) => ({ ...f, category: e.target.value }));
               }}
-              className="mt-1 rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100"
             >
               {CATEGORY_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
@@ -176,14 +185,14 @@ export default function AssetsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600">Location</label>
+            <label className="block text-xs font-medium text-zinc-300">Location</label>
             <select
               value={filters.location}
               onChange={(e) => {
                 setPage(1);
                 setFilters((f) => ({ ...f, location: e.target.value }));
               }}
-              className="mt-1 rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100"
             >
               {LOCATION_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
@@ -193,14 +202,14 @@ export default function AssetsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600">Approved</label>
+            <label className="block text-xs font-medium text-zinc-300">Approved</label>
             <select
               value={filters.approved}
               onChange={(e) => {
                 setPage(1);
                 setFilters((f) => ({ ...f, approved: e.target.value }));
               }}
-              className="mt-1 rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100"
             >
               <option value="all">all</option>
               <option value="true">approved</option>
@@ -208,14 +217,14 @@ export default function AssetsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600">Published</label>
+            <label className="block text-xs font-medium text-zinc-300">Published</label>
             <select
               value={filters.published}
               onChange={(e) => {
                 setPage(1);
                 setFilters((f) => ({ ...f, published: e.target.value }));
               }}
-              className="mt-1 rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100"
             >
               <option value="all">all</option>
               <option value="true">published</option>
@@ -223,7 +232,7 @@ export default function AssetsPage() {
             </select>
           </div>
           <div className="flex-1 min-w-[160px]">
-            <label className="block text-xs font-medium text-zinc-600">Search</label>
+            <label className="block text-xs font-medium text-zinc-300">Search</label>
             <input
               type="text"
               value={filters.q}
@@ -232,17 +241,17 @@ export default function AssetsPage() {
                 setFilters((f) => ({ ...f, q: e.target.value }));
               }}
               placeholder="Title or tag…"
-              className="mt-1 w-full rounded border border-zinc-300 px-2 py-1 text-sm"
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-sm text-zinc-100 placeholder-zinc-500"
             />
           </div>
         </section>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {loading && <p className="text-sm text-zinc-500">Loading…</p>}
+        {loading && <p className="text-sm text-zinc-400">Loading…</p>}
 
-        <section className="rounded-lg border border-zinc-200 bg-white overflow-x-auto">
+        <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 overflow-x-auto">
           <table className="min-w-full text-left text-xs">
-            <thead className="border-b border-zinc-200 bg-zinc-50">
+            <thead className="border-b border-zinc-800 bg-zinc-900/40">
               <tr>
                 <th className="px-3 py-2">Preview</th>
                 <th className="px-3 py-2">Title</th>
@@ -259,7 +268,7 @@ export default function AssetsPage() {
               {items.map((asset) => {
                 const isEditing = editingId === asset.id;
                 return (
-                  <tr key={asset.id} className="border-b border-zinc-100">
+                  <tr key={asset.id} className="border-b border-zinc-800">
                     <td className="px-3 py-2">
                       {asset.signed_url && (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -273,7 +282,7 @@ export default function AssetsPage() {
                     <td className="px-3 py-2 align-top">
                       {isEditing ? (
                         <input
-                          className="w-full rounded border border-zinc-300 px-2 py-1 text-xs"
+                          className="w-full rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-100 placeholder-zinc-500"
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
                         />
@@ -286,7 +295,7 @@ export default function AssetsPage() {
                     <td className="px-3 py-2 align-top">
                       {isEditing ? (
                         <input
-                          className="w-full rounded border border-zinc-300 px-2 py-1 text-xs"
+                          className="w-full rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-100 placeholder-zinc-500"
                           value={editTags}
                           onChange={(e) => setEditTags(e.target.value)}
                         />
@@ -324,7 +333,7 @@ export default function AssetsPage() {
                           <button
                             type="button"
                             onClick={() => setEditingId(null)}
-                            className="text-zinc-500 hover:underline"
+                            className="text-zinc-400 hover:underline"
                           >
                             Cancel
                           </button>
@@ -352,11 +361,11 @@ export default function AssetsPage() {
             </tbody>
           </table>
           {items.length === 0 && !loading && (
-            <p className="p-4 text-sm text-zinc-500">No assets yet.</p>
+            <p className="p-4 text-sm text-zinc-400">No assets yet.</p>
           )}
         </section>
 
-        <section className="flex items-center justify-between text-xs text-zinc-600">
+        <section className="flex items-center justify-between text-xs text-zinc-400">
           <span>
             Page {page} of {totalPages} ({total} assets)
           </span>
@@ -365,7 +374,7 @@ export default function AssetsPage() {
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="rounded border border-zinc-300 px-2 py-1 disabled:opacity-50"
+              className="rounded border border-zinc-700 px-2 py-1 disabled:opacity-50"
             >
               Previous
             </button>
@@ -373,14 +382,14 @@ export default function AssetsPage() {
               type="button"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="rounded border border-zinc-300 px-2 py-1 disabled:opacity-50"
+              className="rounded border border-zinc-700 px-2 py-1 disabled:opacity-50"
             >
               Next
             </button>
           </div>
         </section>
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }
 

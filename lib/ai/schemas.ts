@@ -31,6 +31,46 @@ export const ItineraryOutputSchema = z.object({
   whatsapp_summary: z.string().min(1),
 }).strict();
 
+export const OpsCoordinatorOutputSchema = z.object({
+  operational_priority: z.enum(["standard", "high"]),
+  coordination_tasks: z.array(
+    z.object({
+      task: z.string().min(1),
+      owner: z.enum(["coordinator", "patient", "clinic", "transport"]),
+      due_in_hours: z.number().int().min(0).max(168),
+    }).strict(),
+  ).min(1).max(10),
+  blockers: z.array(z.string().min(1)).max(5),
+  patient_message_summary: z.string().min(1),
+  internal_note: z.string().min(1),
+}).strict();
+
+/** Ops tasks format (tasks array + summary, max 8 tasks). */
+export const OpsTasksOutputSchema = z.object({
+  tasks: z.array(
+    z.object({
+      title: z.string().min(1),
+      due_relative: z.string().min(1),
+      assignee: z.string().min(1),
+      notes: z.string(),
+    }).strict(),
+  ).max(8),
+  summary: z.string().min(1),
+}).strict();
+
+/** AI Lead Copilot: summary, priority, and coordinator drafts (no schema change; on-demand only). */
+export const LeadCopilotOutputSchema = z.object({
+  summary: z.string().min(1),
+  priority: z.enum(["high", "medium", "low"]),
+  whatsapp_draft: z.string().min(1),
+  email_draft: z.string().min(1),
+  email_subject: z.string().min(1).optional(),
+}).strict();
+
+export type LeadCopilotOutput = z.infer<typeof LeadCopilotOutputSchema>;
+
 export type LeadTriageOutput = z.infer<typeof LeadTriageOutputSchema>;
 export type SalesResponderOutput = z.infer<typeof SalesResponderOutputSchema>;
 export type ItineraryOutput = z.infer<typeof ItineraryOutputSchema>;
+export type OpsCoordinatorOutput = z.infer<typeof OpsCoordinatorOutputSchema>;
+export type OpsTasksOutput = z.infer<typeof OpsTasksOutputSchema>;

@@ -5,7 +5,7 @@ insert into public.packages (slug, name, location, description, duration_days, d
 values
   (
     'smile-medellin',
-    'Smile Transformation Medellín',
+    'Nebula Smile Medellín',
     'Medellín',
     'Premium dental transformation in Medellín with optional Guatapé tour. Coordinated with Clínica San Martín.',
     7,
@@ -16,7 +16,7 @@ values
   ),
   (
     'smile-manizales',
-    'Smile Transformation Manizales',
+    'Nebula Smile Manizales',
     'Manizales',
     'Recovery and experience in the coffee region. Finca foundation HQ with Clínica San Martín.',
     7,

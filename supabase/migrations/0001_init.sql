@@ -1,4 +1,4 @@
--- Smile Transformation MVP: init schema + RLS
+-- Nebula Smile MVP: init schema + RLS
 -- Run in Supabase SQL editor or via supabase db push
 
 -- profiles (extends auth.users; link via auth.uid())

@@ -1,0 +1,62 @@
+---
+description: Full project audit — architecture, code quality, security, performance
+alwaysApply: false
+---
+
+# General Project Audit
+
+Run this when asked: "audit this project" or "run general audit"
+
+---
+
+SECTION 1 — ARCHITECTURE
+- Overall structure and separation of concerns
+- Patterns used and misused
+- What a senior engineer would change first
+
+SECTION 2 — CODE QUALITY
+- Duplicated logic
+- Inconsistent naming or style
+- Functions doing too much
+- Missing error handling
+- Missing input validation
+- Dead code or unused imports
+
+SECTION 3 — SECURITY
+- Exposed secrets or credentials
+- Unvalidated inputs
+- Insecure dependencies
+- Auth/authz gaps
+
+SECTION 4 — PERFORMANCE
+- Obvious bottlenecks
+- N+1 queries or bad DB patterns
+- Missing indexes
+- Heavy synchronous operations
+
+SECTION 5 — DEPENDENCIES
+- Outdated or risky packages
+- Unnecessary dependencies
+- Version conflicts
+
+SECTION 6 — DEVOPS READINESS
+- Deployable as-is?
+- Missing env config
+- Hardcoded values that should be env vars
+
+SECTION 7 — TECHNICAL DEBT
+- Top 5 things that will hurt at scale
+- Priority: Critical / High / Medium / Low
+
+---
+
+OUTPUT FORMAT
+
+For each issue:
+- Location (file + line if possible)
+- Problem
+- Why it matters
+- Recommended fix
+
+End with:
+PRIORITY ACTION LIST — top 10 fixes ordered by impact

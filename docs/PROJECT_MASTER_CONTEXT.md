@@ -1,10 +1,10 @@
-# Smile Transformation — Project Master Context
+# Nebula Smile — Project Master Context
 
 ## Goal
 Premium, trustworthy, scalable **health + tourism coordination** platform.
 
 ## Locations
-- **Medellín** — Smile Transformation + optional Guatapé tour
+- **Medellín** — Nebula Smile + optional Guatapé tour
 - **Manizales** — Recovery + finca foundation HQ + coffee region experience
 
 ## Trust anchor
