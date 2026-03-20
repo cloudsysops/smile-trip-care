@@ -3,7 +3,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-type AdminSection = "leads" | "assets" | "status";
+import AdminRoleSwitcher from "./AdminRoleSwitcher";
+
+type AdminSection = "leads" | "outbound" | "analytics" | "assets" | "status";
 
 type Props = {
   title: ReactNode;
@@ -19,15 +21,17 @@ type Props = {
 
 const NAV_ITEMS: Array<{ section: AdminSection; href: string; label: string }> = [
   { section: "leads", href: "/admin/leads", label: "Leads" },
+  { section: "outbound", href: "/admin/outbound", label: "Outbound" },
+  { section: "analytics", href: "/admin/analytics", label: "Analytics" },
   { section: "assets", href: "/admin/assets", label: "Assets" },
   { section: "status", href: "/admin/status", label: "Status" },
 ];
 
 function navItemClass(isActive: boolean) {
   if (isActive) {
-    return "font-medium text-zinc-900";
+    return "font-medium text-zinc-100 underline";
   }
-  return "text-zinc-600 hover:underline";
+  return "text-zinc-400 hover:underline";
 }
 
 export default function AdminShell({
@@ -42,12 +46,12 @@ export default function AdminShell({
   showSignOut = true,
 }: Props) {
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+      <header className="border-b border-zinc-800 bg-zinc-950/95 px-6 py-4 backdrop-blur">
         <div className={`mx-auto flex ${headerContainerClassName} items-center justify-between gap-4`}>
           <div className="flex min-w-0 items-center gap-4">
             {headerLeading}
-            <h1 className="truncate text-xl font-semibold">{title}</h1>
+            <h1 className="truncate text-xl font-semibold text-zinc-100">{title}</h1>
           </div>
           <div className="flex shrink-0 items-center gap-4 text-sm">
             {headerActions}
@@ -61,9 +65,12 @@ export default function AdminShell({
                   {item.label}
                 </Link>
               ))}
+
+            <AdminRoleSwitcher />
+
             {showSignOut && (
               <form action="/api/auth/signout" method="post" className="inline">
-                <button type="submit" className="text-zinc-600 hover:underline">
+                <button type="submit" className="text-zinc-400 hover:underline">
                   Sign out
                 </button>
               </form>

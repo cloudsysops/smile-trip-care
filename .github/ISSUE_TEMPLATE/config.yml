@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentación del proyecto
+    url: https://github.com/cloudsysops/smile-transformation-platform-/blob/main/README.md
+    about: README y docs del repo
+  - name: Guía GitHub (enterprise setup)
+    url: https://github.com/cloudsysops/smile-transformation-platform-/blob/main/docs/GITHUB_ENTERPRISE_SETUP.md
+    about: Configuración y flujo de trabajo

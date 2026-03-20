@@ -17,6 +17,14 @@
 - All outputs are validated with Zod before persistence.
 - Failed validation is treated as execution failure and does not expose stack traces to clients.
 
+### AI safety guidelines (global)
+
+- Never include secrets (API keys, tokens, internal admin URLs) in prompts or responses.
+- Validate and sanitize all inputs to agents; treat user-provided content as untrusted.
+- Keep fallbacks or retries when models fail; do not break user-facing flows on AI errors.
+- Log errors and key decisions for auditability without leaking sensitive patient data.
+- Keep humans in control for external communications (WhatsApp/email drafts, proposals); agents assist, they do not auto-send.
+
 ## Trigger-driven automation (M14)
 
 AI execution is queued via `ai_automation_jobs` and executed by `/api/automation/worker`.
@@ -38,7 +46,6 @@ AI execution is queued via `ai_automation_jobs` and executed by `/api/automation
 ### Trigger: inactive lead 24h/48h
 
 - Source: `POST /api/automation/followups` (secret-protected cron endpoint)
-- Lead scan is processed in paginated batches to reduce starvation on large lead volumes.
 - Enqueued jobs:
   - `sales-responder` for `lead_inactive_24h`
   - `sales-responder` for `lead_inactive_48h`
@@ -56,7 +63,7 @@ Statuses in `ai_automation_jobs`:
 Worker behavior:
 
 1. Claim due jobs (`pending` / `retry_scheduled` with `run_after <= now`)
-   - Reclaim stale jobs stuck in `processing` when lock lease expires
+   - Recover stale `processing` jobs by moving them back to `retry_scheduled`
 2. Lock and execute
 3. On success → `completed`
 4. On failure:
@@ -73,4 +80,34 @@ Worker behavior:
 - `POST /api/automation/followups`
 - `POST /api/automation/worker`
 
-Both require `AUTOMATION_CRON_SECRET` (or `CRON_SECRET`) via `x-automation-secret` or Bearer token.
+Both require `AUTOMATION_CRON_SECRET` via `x-automation-secret` or Bearer token.
+
+## Assisted outbound conversion (M16)
+
+AI responders still generate drafts into `lead_ai.messages_json`, and admin now has an outbound lifecycle queue:
+
+- Data model: `outbound_messages`
+- Channels: `whatsapp`, `email`
+- Source: `ai_draft` or `manual`
+- Lifecycle statuses:
+  - `draft`
+  - `approved`
+  - `queued`
+  - `sent`
+  - `delivered`
+  - `failed`
+  - `replied`
+  - `cancelled`
+
+This keeps execution human-supervised while enabling measurable conversion tracking per lead.
+
+M17 adds an admin outbound command center (`/admin/outbound`) and API metrics endpoints so sales operators can prioritize queue actions and SLA-risk leads from AI-generated drafts.
+
+M18 adds `POST /api/automation/outbound-worker`:
+
+- Claims due outbound messages (`approved`, `queued`, `failed` with due schedule)
+- Dispatches through configured providers (`resend` for email, HTTP provider for WhatsApp)
+- Marks `sent` on success
+- On failure:
+  - schedules retry with backoff while attempts remain
+  - keeps failed-permanent state once max attempts is reached

@@ -1,6 +1,6 @@
 # Conectar GitHub con Vercel
 
-Pasos para enlazar el repo **cloudsysops/smile-transformation-platform-** con Vercel y desplegar en cada push a `main`.
+Pasos para enlazar el repo **cloudsysops/smile-transformation-platform-** con Vercel y desplegar en cada push a `main`. **Actualmente hay un solo proyecto en Vercel** (nombre que termina en `-dev`); ver [VERCEL_UN_SOLO_PROYECTO.md](VERCEL_UN_SOLO_PROYECTO.md).
 
 ---
 
@@ -66,8 +66,12 @@ Opcional (M9 AI):
 | `OPENAI_API_KEY` | Production (y Preview si pruebas AI en preview) |
 | `OPENAI_MODEL` | Production, Preview |
 | `RATE_LIMIT_PROVIDER` | Production, Preview (`memory` por defecto) |
-| `AUTOMATION_CRON_SECRET` | Production (secreto para endpoints internos de automation) |
-| `CRON_SECRET` | Production (usar mismo valor que `AUTOMATION_CRON_SECRET` para Vercel Cron) |
+| `AUTOMATION_CRON_SECRET` | Production (worker/followups/outbound-worker) |
+| `CRON_SECRET` | Production (fallback para cron bearer auth) |
+| `RESEND_API_KEY` | Production (si usarás email outbound automático) |
+| `OUTBOUND_EMAIL_FROM` | Production (si usarás email outbound automático) |
+| `OUTBOUND_WHATSAPP_API_URL` | Production (si usarás WhatsApp outbound automático) |
+| `OUTBOUND_WHATSAPP_API_TOKEN` | Production (si usarás WhatsApp outbound automático) |
 
 - Marca **Production** (y **Preview** si quieres que los deploys de PR también tengan env).
 - No subas `.env` al repo; solo configúralas en Vercel.
@@ -119,9 +123,10 @@ Después de cada deploy a Production:
    - el webhook devuelve 2xx
    - `payments.status` cambia a `succeeded`
    - `leads.status` cambia a `deposit_paid`.
-4. Ejecuta cron manual desde Vercel (o `curl` con Bearer secret) y confirma:
-   - `/api/automation/worker` procesa jobs
-   - `/api/automation/followups` encola drafts de seguimiento.
+4. Ejecuta workers internos con secret y confirma 200:
+   - `POST /api/automation/followups`
+   - `POST /api/automation/worker`
+   - `POST /api/automation/outbound-worker`
 
 ---
 

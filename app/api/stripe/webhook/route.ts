@@ -14,6 +14,12 @@ const CheckoutSessionMetadataSchema = z.object({
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-02-25.clover";
 export const runtime = "nodejs";
 
+function isUniqueViolation(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { code?: string; message?: string };
+  return candidate.code === "23505" || candidate.message?.includes("duplicate key value violates unique constraint") === true;
+}
+
 /** Stripe webhook: MUST use raw body for signature verification. */
 export async function POST(request: Request) {
   const requestId = crypto.randomUUID();
@@ -51,33 +57,64 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid signature", request_id: requestId }, { status: 400 });
   }
 
+  log.info("Stripe event received", { type: event.type });
+
   if (event.type !== "checkout.session.completed") {
-    return NextResponse.json({ received: true });
+    return NextResponse.json({ received: true }, { status: 200 });
   }
 
   const session = event.data.object as Stripe.Checkout.Session;
+  // Do not log session object or any payment/card data
   if (session.mode !== "payment") {
-    log.info("Ignoring non-payment checkout session webhook", {
-      session_id: session.id,
-      mode: session.mode,
-    });
-    return NextResponse.json({ received: true });
+    log.info("Ignoring checkout session with unsupported mode", { session_id: session.id, mode: session.mode });
+    return NextResponse.json({ received: true, ignored: "unsupported_mode" });
   }
   if (session.payment_status !== "paid") {
-    log.info("Ignoring checkout session without paid status", {
-      session_id: session.id,
-      payment_status: session.payment_status,
-    });
-    return NextResponse.json({ received: true });
+    log.warn("checkout.session.completed with payment_status not paid");
+    return NextResponse.json({ received: true, ignored: "payment_not_paid" }, { status: 200 });
   }
   const sessionId = session.id;
   const metadataParsed = CheckoutSessionMetadataSchema.safeParse(session.metadata ?? {});
   if (!metadataParsed.success) {
     log.warn("checkout.session.completed with invalid lead_id metadata");
+    return NextResponse.json({ received: true }, { status: 200 });
   }
   const leadIdFromMetadata = metadataParsed.success ? metadataParsed.data.lead_id : null;
 
   const supabase = getServerSupabase();
+
+  // Persist webhook event for audit/observability (append-only), only for relevant checkout events.
+  try {
+    const eventType = event.type;
+    const eventId = event.id ?? null;
+    const receivedAt = new Date().toISOString();
+    const payloadJson = payload;
+    const baseStatus = "received";
+
+    const insert = await supabase
+      .from("stripe_webhook_events")
+      .insert({
+        stripe_event_id: eventId,
+        event_type: eventType,
+        payload_json: payloadJson,
+        received_at: receivedAt,
+        status: baseStatus,
+      });
+
+    if (insert.error) {
+      // If unique constraint or any insert failure occurs, log it but do not fail the webhook.
+      log.warn("Failed to persist stripe_webhook_event", {
+        error: insert.error.message,
+        stripe_event_id: eventId,
+        event_type: eventType,
+      });
+    }
+  } catch (persistErr) {
+    log.warn("Exception while persisting stripe_webhook_event", {
+      error: String(persistErr),
+    });
+  }
+
   const { data: paymentRows, error: paymentLookupError } = await supabase
     .from("payments")
     .select("id, lead_id, status")
@@ -120,14 +157,37 @@ export async function POST(request: Request) {
       .select("id, lead_id")
       .single();
     if (createPaymentError || !createdPayment) {
-      log.error("Failed to create payment from webhook", {
-        error: String(createPaymentError),
-        session_id: sessionId,
-      });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      if (isUniqueViolation(createPaymentError)) {
+        const { data: raceRows, error: raceLookupError } = await supabase
+          .from("payments")
+          .select("id, lead_id, status")
+          .eq("stripe_checkout_session_id", sessionId)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        if (raceLookupError || !raceRows?.[0]) {
+          log.error("Failed to recover payment after duplicate insert race", {
+            error: String(raceLookupError ?? createPaymentError),
+            session_id: sessionId,
+          });
+          return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+        }
+        const recovered = raceRows[0];
+        paymentId = recovered.id as string;
+        if (typeof recovered.lead_id === "string" && recovered.lead_id.length > 0) {
+          leadIdToUpdate = recovered.lead_id;
+        }
+        idempotentReplay = recovered.status === "succeeded";
+      } else {
+        log.error("Failed to create payment from webhook", {
+          error: String(createPaymentError),
+          session_id: sessionId,
+        });
+        return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+      }
+    } else {
+      paymentId = createdPayment.id as string;
+      leadIdToUpdate = createdPayment.lead_id as string;
     }
-    paymentId = createdPayment.id as string;
-    leadIdToUpdate = createdPayment.lead_id as string;
   } else {
     if (paymentRows.length > 1) {
       log.warn("Multiple payments found for Stripe session; using latest row", {
@@ -182,21 +242,28 @@ export async function POST(request: Request) {
       log.error("Failed to update lead status", { error: leadError.message });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
     }
-    try {
-      const jobs = await enqueueDepositPaidAutomationJobs(leadIdToUpdate);
-      log.info("Automation jobs enqueued", {
-        lead_id: leadIdToUpdate,
-        trigger_type: "lead_deposit_paid",
-        job_count: jobs.length,
-      });
-    } catch (err) {
-      log.error("Deposit-paid automation enqueue failed", {
-        lead_id: leadIdToUpdate,
-        trigger_type: "lead_deposit_paid",
-        error: err instanceof Error ? err.message : String(err),
-      });
-      return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    const { error: bookingError } = await supabase
+      .from("bookings")
+      .update({ status: "deposit_paid", updated_at: now })
+      .eq("lead_id", leadIdToUpdate);
+    if (bookingError) {
+      log.warn("Failed to update booking status", { error: bookingError.message });
     }
+    void enqueueDepositPaidAutomationJobs(leadIdToUpdate)
+      .then((jobs) => {
+        log.info("Automation jobs enqueued", {
+          lead_id: leadIdToUpdate,
+          trigger_type: "lead_deposit_paid",
+          job_count: jobs.length,
+        });
+      })
+      .catch((err) => {
+        log.error("Deposit-paid automation enqueue failed", {
+          lead_id: leadIdToUpdate,
+          trigger_type: "lead_deposit_paid",
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
   } else {
     log.warn("No lead id available for succeeded payment", {
       payment_id: paymentId,

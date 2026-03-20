@@ -3,11 +3,6 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 export async function updateSession(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  if (pathname.startsWith("/admin/login")) {
-    return NextResponse.next({ request });
-  }
-
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
@@ -30,10 +25,31 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    const redirect = new URL("/admin/login", request.url);
-    redirect.searchParams.set("next", pathname);
-    return NextResponse.redirect(redirect);
+  const pathname = request.nextUrl.pathname;
+
+  // Authenticated users hitting /login should go through callback for role-based redirect
+  if (pathname === "/login" && user) {
+    const callback = new URL("/auth/callback", request.url);
+    const next = request.nextUrl.searchParams.get("next");
+    if (next) callback.searchParams.set("next", next);
+    return NextResponse.redirect(callback);
+  }
+
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("next", pathname);
+
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    if (!user) {
+      const redirect = new URL("/admin/login", request.url);
+      redirect.searchParams.set("next", pathname);
+      return NextResponse.redirect(redirect);
+    }
+  }
+
+  if (pathname.startsWith("/patient") || pathname.startsWith("/coordinator")) {
+    if (!user) {
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return response;

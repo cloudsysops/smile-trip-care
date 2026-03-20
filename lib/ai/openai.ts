@@ -1,5 +1,7 @@
-import { getAgentSystemPrompt } from "@/lib/ai/prompts";
-import { SalesResponderOutputSchema, type LeadTriageOutput, type SalesResponderOutput } from "@/lib/ai/schemas";
+import { loadAgentPrompt } from "@/lib/ai/agent-loader";
+import type { AgentId } from "@/lib/ai/agent-registry";
+import { SalesResponderOutputSchema } from "@/lib/ai/schemas";
+import type { LeadTriageOutput, SalesResponderOutput } from "@/lib/ai/schemas";
 
 type OpenAIMessage = {
   role: "system" | "user";
@@ -8,13 +10,11 @@ type OpenAIMessage = {
 
 type ChatCompletionResponse = {
   choices?: Array<{
-    message?: {
-      content?: string | null;
-    };
+    message?: { content?: string | null };
+    usage?: { total_tokens?: number; prompt_tokens?: number; completion_tokens?: number };
   }>;
-  error?: {
-    message?: string;
-  };
+  usage?: { total_tokens?: number; prompt_tokens?: number; completion_tokens?: number };
+  error?: { message?: string };
 };
 
 export type CallAgentArgs = {
@@ -36,32 +36,38 @@ export type SalesResponderInput = {
   cta_url: string;
 };
 
+export type RunChatJsonResult = {
+  json: unknown;
+  raw: string;
+  model: string;
+  tokens?: { total?: number; prompt?: number; completion?: number };
+};
+
 function extractJsonText(raw: string): string {
   const trimmed = raw.trim();
   if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
     return trimmed;
   }
-
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
   if (fenced?.[1]) {
     return fenced[1].trim();
   }
-
   const firstBrace = trimmed.indexOf("{");
   const lastBrace = trimmed.lastIndexOf("}");
   if (firstBrace >= 0 && lastBrace > firstBrace) {
     return trimmed.slice(firstBrace, lastBrace + 1).trim();
   }
-
   throw new Error("Model did not return JSON content");
 }
 
-async function runChatCompletion(messages: OpenAIMessage[], withResponseFormat: boolean): Promise<string> {
+async function runChatCompletion(
+  messages: OpenAIMessage[],
+  withResponseFormat: boolean
+): Promise<{ content: string; usage?: ChatCompletionResponse["usage"] }> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY missing");
   }
-
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
   const payload: Record<string, unknown> = {
     model,
@@ -82,42 +88,83 @@ async function runChatCompletion(messages: OpenAIMessage[], withResponseFormat: 
     cache: "no-store",
   });
 
-  const json = await response.json().catch(() => ({} as ChatCompletionResponse));
+  const json = (await response.json().catch(() => ({}))) as ChatCompletionResponse;
   if (!response.ok) {
-    const message = (json as ChatCompletionResponse)?.error?.message ?? `OpenAI API error (${response.status})`;
+    const message = json?.error?.message ?? `OpenAI API error (${response.status})`;
     throw new Error(message);
   }
 
-  const content = (json as ChatCompletionResponse)?.choices?.[0]?.message?.content;
+  const content = json?.choices?.[0]?.message?.content;
   if (typeof content !== "string" || !content.trim()) {
     throw new Error("OpenAI returned empty content");
   }
-  return content;
+  const usage = json?.usage ?? json?.choices?.[0]?.usage;
+  return { content, usage };
 }
 
-export async function callAgent({ agentName, systemPrompt, userJson }: CallAgentArgs): Promise<unknown> {
-  const userMessage = JSON.stringify(userJson);
+/**
+ * Request JSON-only output from OpenAI. Retries once without response_format if first attempt fails to parse.
+ */
+export async function runChatJson(params: {
+  systemPrompt: string;
+  userJson: unknown;
+  requestId?: string;
+}): Promise<RunChatJsonResult> {
+  const { systemPrompt, userJson } = params;
+  const userMessage = typeof userJson === "string" ? userJson : JSON.stringify(userJson);
   const messages: OpenAIMessage[] = [
     { role: "system", content: systemPrompt },
     { role: "user", content: userMessage },
   ];
 
   let content = "";
+  let usage: RunChatJsonResult["tokens"];
   try {
-    content = await runChatCompletion(messages, true);
+    const out = await runChatCompletion(messages, true);
+    content = out.content;
+    if (out.usage) {
+      usage = {
+        total: out.usage.total_tokens,
+        prompt: out.usage.prompt_tokens,
+        completion: out.usage.completion_tokens,
+      };
+    }
   } catch {
-    content = await runChatCompletion(messages, false);
+    const out = await runChatCompletion(messages, false);
+    content = out.content;
+    if (out.usage) {
+      usage = {
+        total: out.usage.total_tokens,
+        prompt: out.usage.prompt_tokens,
+        completion: out.usage.completion_tokens,
+      };
+    }
   }
 
   try {
-    return JSON.parse(extractJsonText(content));
+    const json = JSON.parse(extractJsonText(content));
+    return {
+      json,
+      raw: content,
+      model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+      tokens: usage,
+    };
+  } catch (err) {
+    throw new Error(`Failed to parse JSON from model: ${String(err)}`);
+  }
+}
+
+export async function callAgent({ agentName, systemPrompt, userJson }: CallAgentArgs): Promise<unknown> {
+  try {
+    const result = await runChatJson({ systemPrompt, userJson });
+    return result.json;
   } catch (err) {
     throw new Error(`Failed to parse JSON for ${agentName}: ${String(err)}`);
   }
 }
 
 export async function callSalesResponder(input: SalesResponderInput): Promise<SalesResponderOutput> {
-  const systemPrompt = await getAgentSystemPrompt("sales-responder");
+  const systemPrompt = await loadAgentPrompt("sales-responder" as AgentId);
   const raw = await callAgent({
     agentName: "sales-responder",
     systemPrompt,

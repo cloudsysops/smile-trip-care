@@ -1,0 +1,6 @@
+# CODEOWNERS — revisores por defecto (opcional)
+# Sustituye por tu equipo (ej. @org/team-name) o por usernames (@user1 @user2).
+# Si el equipo no existe, crea uno en la org o borra esta línea.
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# * @cloudsysops/smile-transformation-maintainers

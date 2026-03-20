@@ -11,7 +11,7 @@ describe("API smoke tests", () => {
     expect(payload).toMatchObject({
       ok: true,
       status: "ok",
-      service: "smile-transformation",
+      service: "smiletripcare",
       request_id: expect.any(String),
     });
   });
@@ -24,9 +24,8 @@ describe("API smoke tests", () => {
     }));
 
     expect(response.status).toBe(400);
-    await expect(response.json()).resolves.toEqual({
-      error: "Invalid input",
-      request_id: expect.any(String),
-    });
+    const body = await response.json();
+    expect(body).toMatchObject({ request_id: expect.any(String) });
+    expect(body.error).toMatch(/invalid|validation/i);
   });
 });

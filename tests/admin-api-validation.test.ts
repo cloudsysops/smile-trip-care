@@ -24,7 +24,7 @@ vi.mock("@/lib/logger", () => ({
 
 describe("admin API input validation", () => {
   beforeEach(() => {
-    requireAdminMock.mockResolvedValue({ user: { id: "admin-user" } });
+    requireAdminMock.mockResolvedValue({ user: { id: "admin-user" }, profile: { id: "admin-user-id" } });
     fromMock.mockReset();
   });
 

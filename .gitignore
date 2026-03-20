@@ -12,6 +12,11 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
+/blob-report/
+/e2e-results.json
+/e2e-ux-issues.txt
 
 # next.js
 /.next/
@@ -34,6 +39,9 @@ yarn-error.log*
 .env*
 !.env.example
 !.env.local.example
+!.env.development.example
+!.env.staging.example
+!.env.production.example
 
 # vercel
 .vercel
@@ -41,3 +49,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+supabase/.temp/
+.env*.local
+
+# growth engine output
+/data/reddit-leads.json
+setup-secrets.sh

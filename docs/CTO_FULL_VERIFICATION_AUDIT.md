@@ -1,6 +1,6 @@
 # CTO Full Verification Audit — Production Polish
 
-**Project:** Smile Transformation Platform  
+**Project:** Nebula Smile  
 **Date:** 2026-03-05  
 **Mode:** Production Polish (conversion + hardening + security)
 
@@ -20,20 +20,50 @@
   - marks `dead_letter` on max-attempt exhaustion
 - Added queue idempotency via unique key `(lead_id, trigger_type, job_type)` and enqueue upsert with `ignoreDuplicates`.
 
-## 0.1) M15 addendum — Revenue conversion hardening (2026-03-06)
+## 0.1) M16 addendum — Assisted outbound conversion engine (2026-03-06)
 
-- Conversion/mobile:
-  - Simplified bottom CTA zone on landing (single fixed bar with primary assessment CTA plus secondary WhatsApp).
-  - Reduced mobile form friction in `/assessment` with autofill hints and stronger conversion copy.
-- Automation reliability:
-  - Worker now reclaims stale `processing` jobs after lock lease expiry.
-  - Inactive follow-up scanner now paginates lead batches (instead of fixed 200 row window).
-- Payment integrity and security:
-  - Stripe webhook now enforces `checkout.session.mode === "payment"` and `payment_status === "paid"` before state transitions.
-  - Added migration `0008_payments_stripe_uniqueness.sql` to enforce DB-level uniqueness for Stripe session/payment intent IDs.
-- Deployment readiness:
-  - Added `vercel.json` cron schedules for queue worker and follow-ups.
-  - Added `CRON_SECRET` support (fallback) for Vercel Cron Bearer auth compatibility.
+- Added `public.outbound_messages` table for managed outbound lifecycle per lead.
+- Added admin APIs:
+  - `GET/POST /api/admin/leads/[id]/outbound` (list/create drafts)
+  - `PATCH /api/admin/outbound-messages/[id]` (approve/queue/send/deliver/fail/reply/cancel transitions)
+- Added lead-detail admin panel for:
+  - create outbound drafts from latest AI responder output
+  - create manual drafts
+  - transition statuses with tracking
+- Added contact telemetry update: outbound statuses `sent/delivered/replied` update `leads.last_contacted_at`.
+
+## 0.2) M17 addendum — Outbound command center (2026-03-06)
+
+- Added admin outbound command center page: `/admin/outbound`.
+- Added admin APIs:
+  - `GET /api/admin/outbound/metrics`
+  - `GET /api/admin/outbound/queue`
+- Added KPI view for outbound lifecycle and SLA-risk leads to prioritize follow-up.
+- Added quick action queue controls linked to outbound status transitions.
+
+## 0.3) M18 addendum — Outbound dispatcher worker (2026-03-06)
+
+- Added endpoint: `POST /api/automation/outbound-worker` (secret-protected).
+- Worker responsibilities:
+  - claim due outbound rows
+  - dispatch via configured providers (email/WhatsApp)
+  - mark `sent` on success
+  - retry failed sends with exponential backoff
+  - keep permanent failure state when attempts are exhausted
+- Added provider abstraction and dispatch queue helpers to decouple transport from workflow.
+
+## 0.4) M19 addendum — Launch reliability guardrails (2026-03-06)
+
+- Stripe webhook hardening now requires:
+  - `event.type === checkout.session.completed`
+  - `session.mode === payment`
+  - `session.payment_status === paid`
+- Added payments idempotency migration (`0009_payments_idempotency.sql`) with unique constraints on Stripe session and payment intent IDs.
+- Added stale automation lock recovery:
+  - stuck `processing` jobs older than lock timeout are moved back to `retry_scheduled`.
+- Added operational visibility endpoint:
+  - `GET /api/admin/status/automation` with queue and outbound failure metrics.
+- Updated admin status UI to surface automation reliability summary.
 
 ---
 

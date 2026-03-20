@@ -5,6 +5,7 @@ import {
   claimDueAutomationJobs,
   markAutomationJobCompleted,
   markAutomationJobDeadLetter,
+  recoverStuckAutomationJobs,
   retryBackoffMs,
   scheduleAutomationJobRetry,
 } from "@/lib/automation/queue";
@@ -58,8 +59,10 @@ export async function POST(request: Request) {
   const limit = getLimitFromRequest(request);
   const workerId = `${process.env.VERCEL_REGION ?? "local"}:${requestId}`;
   try {
+    const recovered = await recoverStuckAutomationJobs();
     const claimed = await claimDueAutomationJobs(workerId, limit);
     const result = {
+      recovered,
       claimed: claimed.length,
       completed: 0,
       retried: 0,
