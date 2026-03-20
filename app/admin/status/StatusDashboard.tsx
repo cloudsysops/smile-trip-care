@@ -17,22 +17,28 @@ type AutomationRes = {
 export default function StatusDashboard() {
   const [live, setLive] = useState<HealthRes | null>(null);
   const [liveError, setLiveError] = useState<string | null>(null);
+  const [liveLoading, setLiveLoading] = useState(true);
   const [ready, setReady] = useState<ReadyRes | null>(null);
   const [readyError, setReadyError] = useState<string | null>(null);
+  const [readyLoading, setReadyLoading] = useState(true);
   const [payments, setPayments] = useState<PaymentsMetricsRes | null>(null);
   const [paymentsError, setPaymentsError] = useState<string | null>(null);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [automation, setAutomation] = useState<AutomationRes | null>(null);
   const [automationError, setAutomationError] = useState<string | null>(null);
+  const [automationLoading, setAutomationLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
       .then(setLive)
-      .catch(() => setLiveError("Failed to fetch"));
+      .catch(() => setLiveError("Failed to fetch"))
+      .finally(() => setLiveLoading(false));
     fetch("/api/health/ready")
       .then((r) => r.json())
       .then(setReady)
-      .catch(() => setReadyError("Failed to fetch"));
+      .catch(() => setReadyError("Failed to fetch"))
+      .finally(() => setReadyLoading(false));
     fetch("/api/admin/payments/metrics")
       .then((r) => r.json())
       .then((payload) => {
@@ -41,7 +47,8 @@ export default function StatusDashboard() {
         }
         setPayments(payload as PaymentsMetricsRes);
       })
-      .catch(() => setPaymentsError("Failed to fetch"));
+      .catch(() => setPaymentsError("Failed to fetch"))
+      .finally(() => setPaymentsLoading(false));
     fetch("/api/admin/status/automation")
       .then((r) => r.json())
       .then((payload) => {
@@ -51,7 +58,8 @@ export default function StatusDashboard() {
         }
         setAutomation(payload as AutomationRes);
       })
-      .catch(() => setAutomationError("Failed to fetch"));
+      .catch(() => setAutomationError("Failed to fetch"))
+      .finally(() => setAutomationLoading(false));
   }, []);
 
   return (
@@ -59,6 +67,7 @@ export default function StatusDashboard() {
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
         <h2 className="text-lg font-semibold text-zinc-100">Liveness</h2>
         <p className="mt-1 text-sm text-zinc-400">GET /api/health — process is running.</p>
+        {liveLoading && <p className="mt-2 text-sm text-zinc-400">Loading...</p>}
         {liveError && <p className="mt-2 text-sm text-red-600">{liveError}</p>}
         {live && (
           <pre className="mt-2 overflow-auto rounded bg-zinc-900/40 p-3 text-xs text-zinc-200">
@@ -69,6 +78,7 @@ export default function StatusDashboard() {
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
         <h2 className="text-lg font-semibold text-zinc-100">Readiness</h2>
         <p className="mt-1 text-sm text-zinc-400">GET /api/health/ready — DB and config.</p>
+        {readyLoading && <p className="mt-2 text-sm text-zinc-400">Loading...</p>}
         {readyError && <p className="mt-2 text-sm text-red-600">{readyError}</p>}
         {ready && (
           <>
@@ -84,6 +94,7 @@ export default function StatusDashboard() {
       <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
         <h2 className="text-lg font-semibold text-zinc-100">Automation status</h2>
         <p className="mt-1 text-sm text-zinc-400">GET /api/admin/status/automation — queue and outbound reliability.</p>
+        {automationLoading && <p className="mt-2 text-sm text-zinc-400">Loading...</p>}
         {automationError && <p className="mt-2 text-sm text-red-600">{automationError}</p>}
         {automation && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -105,6 +116,7 @@ export default function StatusDashboard() {
         <p className="mt-1 text-sm text-zinc-400">
           GET /api/admin/payments/metrics — pending aging, recoveries, and webhook processing.
         </p>
+        {paymentsLoading && <p className="mt-2 text-sm text-zinc-400">Loading...</p>}
         {paymentsError && <p className="mt-2 text-sm text-red-600">{paymentsError}</p>}
         {payments && (
           <pre className="mt-2 overflow-auto rounded bg-zinc-900/40 p-3 text-xs text-zinc-200">

@@ -88,6 +88,9 @@ export function FeedbackButton({ page }: FeedbackButtonProps) {
               We couldn&apos;t save your feedback. Please try again.
             </p>
           )}
+          {status === "submitting" && (
+            <p className="mb-2 text-xs text-zinc-400">Loading...</p>
+          )}
           {status === "success" && (
             <p className="mb-2 text-xs text-emerald-400">Thank you for your feedback.</p>
           )}

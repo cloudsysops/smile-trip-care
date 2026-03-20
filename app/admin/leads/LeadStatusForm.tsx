@@ -45,6 +45,7 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
           {saving ? "Saving…" : "Save"}
         </button>
       </div>
+      {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
     </form>
   );
 }

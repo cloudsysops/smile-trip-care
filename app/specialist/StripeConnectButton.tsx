@@ -1,11 +1,16 @@
 "use client";
 
+import { useState } from "react";
+
 type Props = {
   disabled: boolean;
 };
 
 export default function SpecialistStripeConnectButton({ disabled }: Props) {
+  const [connecting, setConnecting] = useState(false);
+
   async function handleClick() {
+    setConnecting(true);
     try {
       const res = await fetch("/api/stripe/connect/specialist/onboarding", {
         method: "POST",
@@ -17,6 +22,8 @@ export default function SpecialistStripeConnectButton({ disabled }: Props) {
       }
     } catch {
       // ignore; user can retry
+    } finally {
+      setConnecting(false);
     }
   }
 
@@ -28,9 +35,10 @@ export default function SpecialistStripeConnectButton({ disabled }: Props) {
     <button
       type="button"
       onClick={handleClick}
+      disabled={connecting}
       className="inline-flex items-center rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-sky-950 shadow-sm transition hover:bg-sky-400"
     >
-      Connect Stripe
+      {connecting ? "Loading..." : "Connect Stripe"}
     </button>
   );
 }

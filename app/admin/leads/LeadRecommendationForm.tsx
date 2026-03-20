@@ -63,6 +63,7 @@ export default function LeadRecommendationForm({
           {saving ? "Saving…" : "Save recommendation"}
         </button>
       </div>
+      {saving && <p className="mt-2 text-xs text-zinc-400">Loading...</p>}
     </form>
   );
 }
