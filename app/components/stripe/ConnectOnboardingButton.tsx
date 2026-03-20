@@ -15,7 +15,7 @@ export default function ConnectOnboardingButton({
   endpoint,
   label = "Connect Stripe",
   loadingLabel = "Loading...",
-  className = "inline-flex items-center rounded-full bg-sky-500 px-4 py-2 text-sm font-semibold text-sky-950 shadow-sm transition hover:bg-sky-400",
+  className = "inline-flex items-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-950 shadow-sm transition hover:bg-emerald-400",
 }: Props) {
   const [connecting, setConnecting] = useState(false);
 

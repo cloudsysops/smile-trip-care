@@ -97,7 +97,7 @@ export function FeedbackButton({ page }: FeedbackButtonProps) {
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="inline-flex w-full items-center justify-center rounded-xl bg-sky-500 px-3 py-2 text-xs font-semibold text-zinc-950 shadow-sm hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-3 py-2 text-xs font-semibold text-zinc-950 shadow-sm hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {status === "submitting" ? "Sending..." : "Send feedback"}
           </button>
