@@ -18,7 +18,7 @@ This module delivers health/readiness APIs, thank-you redirect, migration consol
   {
     "status": "ok",
     "timestamp": "2025-03-04T12:00:00.000Z",
-    "service": "smile-transformation-platform"
+    "service": "nebula-smile"
   }
   ```
 

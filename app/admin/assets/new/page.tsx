@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AdminShell from "../../_components/AdminShell";
 
 const CATEGORIES = ["clinic", "finca", "lodging", "tour", "team", "other"];
 const LOCATIONS = ["Medellín", "Manizales", "Other"];
@@ -62,68 +63,116 @@ export default function NewAssetPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-center justify-between">
-          <Link href="/admin/assets" className="text-sm text-zinc-600 hover:underline">← Assets</Link>
-          <h1 className="text-xl font-semibold">Upload asset</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-2xl px-6 py-8">
+    <AdminShell
+      title="Upload asset"
+      currentSection="assets"
+      headerLeading={
+        <Link href="/admin/assets" className="text-sm text-zinc-400 hover:underline">
+          ← Assets
+        </Link>
+      }
+      headerContainerClassName="max-w-2xl"
+      mainContainerClassName="max-w-2xl"
+    >
+      <div>
         {success && (
-          <div className="mb-6 rounded-lg bg-emerald-50 p-4 text-emerald-800">
+          <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-300">
             Asset uploaded. It will not appear on the site until approved and published.
           </div>
         )}
-        <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-zinc-200 bg-white p-6">
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
           <div>
-            <label htmlFor="file" className="block text-sm font-medium text-zinc-700">Image *</label>
+            <label htmlFor="file" className="block text-sm font-medium text-zinc-300">Image *</label>
             <input
               id="file"
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="mt-1 block w-full text-sm"
+              className="mt-1 block w-full text-sm text-zinc-200"
             />
-            <p className="mt-1 text-xs text-zinc-500">JPEG, PNG, or WebP. Max 8MB.</p>
+            <p className="mt-1 text-xs text-zinc-400">JPEG, PNG, or WebP. Max 8MB.</p>
           </div>
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-zinc-700">Title</label>
-            <input id="title" type="text" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} className="mt-1 w-full rounded border border-zinc-300 px-3 py-2" />
+            <label htmlFor="title" className="block text-sm font-medium text-zinc-300">Title</label>
+            <input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={300}
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500"
+            />
           </div>
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-zinc-700">Category *</label>
-            <select id="category" value={category} onChange={(e) => setCategory(e.target.value as typeof category)} className="mt-1 w-full rounded border border-zinc-300 px-3 py-2">
+            <label htmlFor="category" className="block text-sm font-medium text-zinc-300">Category *</label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value as typeof category)}
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100"
+            >
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-zinc-700">Location *</label>
-            <select id="location" value={location} onChange={(e) => setLocation(e.target.value as typeof location)} className="mt-1 w-full rounded border border-zinc-300 px-3 py-2">
+            <label htmlFor="location" className="block text-sm font-medium text-zinc-300">Location *</label>
+            <select
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value as typeof location)}
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100"
+            >
               {LOCATIONS.map((l) => <option key={l} value={l}>{l}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="tags" className="block text-sm font-medium text-zinc-700">Tags (comma-separated)</label>
-            <input id="tags" type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="clinic, medellin" className="mt-1 w-full rounded border border-zinc-300 px-3 py-2" />
+            <label htmlFor="tags" className="block text-sm font-medium text-zinc-300">Tags (comma-separated)</label>
+            <input
+              id="tags"
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="clinic, medellin"
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500"
+            />
           </div>
           <div>
-            <label htmlFor="alt_text" className="block text-sm font-medium text-zinc-700">Alt text *</label>
-            <input id="alt_text" type="text" value={alt_text} onChange={(e) => setAltText(e.target.value)} maxLength={500} required className="mt-1 w-full rounded border border-zinc-300 px-3 py-2" placeholder="Describe the image for accessibility" />
+            <label htmlFor="alt_text" className="block text-sm font-medium text-zinc-300">Alt text *</label>
+            <input
+              id="alt_text"
+              type="text"
+              value={alt_text}
+              onChange={(e) => setAltText(e.target.value)}
+              maxLength={500}
+              required
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500"
+              placeholder="Describe the image for accessibility"
+            />
           </div>
           <div>
-            <label htmlFor="source_url" className="block text-sm font-medium text-zinc-700">Source URL (optional)</label>
-            <input id="source_url" type="url" value={source_url} onChange={(e) => setSourceUrl(e.target.value)} className="mt-1 w-full rounded border border-zinc-300 px-3 py-2" />
+            <label htmlFor="source_url" className="block text-sm font-medium text-zinc-300">Source URL (optional)</label>
+            <input
+              id="source_url"
+              type="url"
+              value={source_url}
+              onChange={(e) => setSourceUrl(e.target.value)}
+              className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-zinc-100 placeholder-zinc-500"
+            />
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex gap-3">
             <button type="submit" disabled={loading} className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50">
               {loading ? "Uploading…" : "Upload"}
             </button>
-            <Link href="/admin/assets" className="rounded border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">Cancel</Link>
+            <Link
+              href="/admin/assets"
+              className="rounded border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/40"
+            >
+              Cancel
+            </Link>
           </div>
         </form>
-      </main>
-    </div>
+      </div>
+    </AdminShell>
   );
 }
