@@ -25,6 +25,22 @@ Default branch is typically **main**. CI runs on push/PR to main, staging, dev, 
 
 ---
 
+## Branch protection policy (summary)
+
+For this repo, the **recommended minimal policy** is:
+
+- **Protected branch:** `main`
+- **PR required** to merge into `main` (no direct pushes)
+- **Minimum approvals:** 1
+- **Required checks:**
+  - `CI / lint-and-build` (verify: lint + test + build + env_check)
+  - `security / secret-scan` (TruffleHog secret scan)
+- **Require branches to be up to date before merging**
+
+Details and step-by-step UI instructions: [BRANCH_PROTECTION_SETUP.md](BRANCH_PROTECTION_SETUP.md) and [GITHUB_GOVERNANCE_FINAL.md](GITHUB_GOVERNANCE_FINAL.md).
+
+---
+
 ## GitHub CLI (gh)
 
 ### Verify auth

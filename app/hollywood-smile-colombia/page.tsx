@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { branding } from "@/lib/branding";
 
 export const metadata: Metadata = {
-  title: "Hollywood Smile in Colombia | Veneers & Smile Design | MedVoyage Smile",
+  title: `Hollywood Smile in Colombia | Veneers & Smile Design | ${branding.productName}`,
   description:
     "Plan your Hollywood smile makeover in Colombia with veneers and aesthetic dentistry. Trusted clinics, international coordination, and secure deposit.",
   openGraph: {
-    title: "Hollywood Smile in Colombia — MedVoyage Smile",
+    title: `Hollywood Smile in Colombia — ${branding.productName}`,
     description:
       "Premium Hollywood smile makeovers in Medellín and Manizales with vetted clinics and concierge support.",
   },
@@ -90,6 +90,43 @@ export default function HollywoodSmileColombiaPage() {
           </div>
         </section>
 
+        {/* Savings comparison: Typical US cost vs Colombia */}
+        <section className="mb-20">
+          <h2 className="text-xl font-semibold text-white sm:text-2xl">
+            Typical US cost vs Colombia
+          </h2>
+          <p className="mt-3 text-sm text-zinc-300 sm:text-base">
+            A Hollywood smile makeover is a significant investment. These example ranges illustrate how patients often save when planning
+            their transformation in Colombia instead of major U.S. cities.
+          </p>
+          <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/80">
+            <table className="min-w-full border-separate border-spacing-0 text-sm text-zinc-200">
+              <thead className="bg-zinc-900/90">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-zinc-300">Treatment</th>
+                  <th className="px-4 py-3 text-left font-semibold text-zinc-300">Typical U.S. range</th>
+                  <th className="px-4 py-3 text-left font-semibold text-zinc-300">Estimate in Colombia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-t border-zinc-800">
+                  <td className="px-4 py-3">Hollywood smile makeover</td>
+                  <td className="px-4 py-3 text-zinc-400">$20,000–$35,000+</td>
+                  <td className="px-4 py-3 text-emerald-400">From ~$8,500–$15,000</td>
+                </tr>
+                <tr className="border-t border-zinc-800">
+                  <td className="px-4 py-3">Combined veneers + whitening plan</td>
+                  <td className="px-4 py-3 text-zinc-400">$12,000–$20,000+</td>
+                  <td className="px-4 py-3 text-emerald-400">From ~$5,000–$10,000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-zinc-500">
+            These are illustrative ranges, not a quote. Your specialist will confirm a personalized plan and pricing after reviewing your case.
+          </p>
+        </section>
+
         {/* Treatment overview */}
         <section className="mb-20 grid gap-10 md:grid-cols-2 md:items-start">
           <div>
@@ -117,7 +154,7 @@ export default function HollywoodSmileColombiaPage() {
           </div>
         </section>
 
-        {/* Why MedVoyage Smile */}
+        {/* Why SmileTripCare */}
         <section className="mb-16">
           <h2 className="text-xl font-semibold text-white sm:text-2xl">
             Why {branding.productName} for your Hollywood smile

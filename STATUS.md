@@ -6,7 +6,7 @@
 |-------|--------|--------------------|
 | **M8** Assets Manager + hardening | ✅ Done | CI green (`lint` + `build`), health endpoints, unified migration, admin assets fixes |
 | **M9** AI Workers (triage/reply/itinerary) | ✅ Done | Endpoints + admin UI connected, outputs persisted and visible in lead detail |
-| **Deploy** (Vercel + Stripe + Supabase) | 🔶 Casi listo | **Un solo proyecto Vercel** (nombre termina en `-dev`), URL: https://smile-transformation-platform-dev.vercel.app. Rama en Vercel: `main`. Env + webhook configurados; smoke OK. [docs/VERCEL_UN_SOLO_PROYECTO.md](docs/VERCEL_UN_SOLO_PROYECTO.md). Checklist: [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md). |
+| **Deploy** (Vercel + Stripe + Supabase) | 🔶 Casi listo | **Un solo proyecto Vercel (dev canónico)**: `smile-transformation-platform-dev` → URL: https://smile-transformation-platform-dev.vercel.app (rama `main`). Env + webhook configurados; smoke OK. No usar `transformation-platform-dev.vercel.app` para QA (proyecto antiguo). [docs/VERCEL_UN_SOLO_PROYECTO.md](docs/VERCEL_UN_SOLO_PROYECTO.md). Checklist: [docs/DEPLOY_CHECKLIST.md](docs/DEPLOY_CHECKLIST.md). |
 
 ---
 
@@ -51,3 +51,11 @@ Aplicar migraciones en orden lexicográfico **0001 → 0018**. Desde repo (con S
 
 ## Env
 Copy `.env.example` to `.env.local` and set Supabase (and Stripe when M7 is added). Ver [docs/ENV_Y_STRIPE.md](docs/ENV_Y_STRIPE.md).
+
+### Hosts canónicos
+
+- Local: `http://localhost:3000`
+- Dev (Vercel): `https://smile-transformation-platform-dev.vercel.app` (`smile-transformation-platform-dev`, rama `main`)
+- Prod: dominio final (ej. `https://medvoyagesmile.com`) conectado a Vercel cuando se haga el lanzamiento
+
+No usar `https://transformation-platform-dev.vercel.app` para pruebas: es un proyecto antiguo / no alineado con este repo.

@@ -13,7 +13,7 @@ export default async function AdminLeadsPage() {
   const supabase = getServerSupabase();
   const { data: leads, error } = await supabase
     .from("leads")
-    .select("id, first_name, last_name, email, status, created_at, last_contacted_at, next_follow_up_at, recommended_package_slug")
+    .select("id, first_name, last_name, email, status, created_at, last_contacted_at, next_follow_up_at, recommended_package_slug, package_slug, selected_specialties, budget_range")
     .order("created_at", { ascending: false });
   if (error) {
     return <p className="p-8 text-red-600">Error loading leads.</p>;

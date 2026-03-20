@@ -26,6 +26,15 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
+
+  // Authenticated users hitting /login should go through callback for role-based redirect
+  if (pathname === "/login" && user) {
+    const callback = new URL("/auth/callback", request.url);
+    const next = request.nextUrl.searchParams.get("next");
+    if (next) callback.searchParams.set("next", next);
+    return NextResponse.redirect(callback);
+  }
+
   const loginUrl = new URL("/login", request.url);
   loginUrl.searchParams.set("next", pathname);
 

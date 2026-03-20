@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Compare localhost vs production route-by-route for MedVoyage Smile.
+# Compare localhost vs production route-by-route for SmileTripCare.
 # Usage: ensure local server is running (e.g. npm run build && npm start), then:
 #   ./scripts/devops/compare_local_vs_prod.sh
 
 LOCAL_BASE="${LOCAL_BASE:-http://localhost:3000}"
+# Canonical dev/preview host (override if your Vercel URL differs).
 PROD_BASE="${PROD_BASE:-https://smile-transformation-platform-dev.vercel.app}"
 
 ROUTES=(

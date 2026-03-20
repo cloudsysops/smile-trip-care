@@ -2,12 +2,13 @@
 # Quita un usuario de los miembros de un proyecto Vercel (y opcionalmente del equipo).
 # Uso:
 #   ./scripts/remove_vercel_collaborator.sh cboteros-sf
-#   ./scripts/remove_vercel_collaborator.sh cboteros-sf smile-transformation-platform-dev
+#   ./scripts/remove_vercel_collaborator.sh cboteros-sf <vercel-project-slug>
 # Requisito: variable de entorno VERCEL_TOKEN con un token de cuenta/team admin.
 # Crear token: https://vercel.com/account/tokens
 
 set -e
 USER_TO_REMOVE="${1:?Usage: $0 <vercel-username> [project-name]}"
+# Default matches current Vercel project slug; pass explicit name when renamed.
 PROJECT_NAME="${2:-smile-transformation-platform-dev}"
 
 if [ -z "$VERCEL_TOKEN" ]; then

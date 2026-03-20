@@ -35,9 +35,9 @@ export default function LeadRecommendationForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-200 bg-white p-6">
-      <h2 className="text-sm font-semibold text-zinc-900">Recommend package</h2>
-      <p className="mt-1 text-sm text-zinc-600">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
+      <h2 className="text-sm font-semibold text-zinc-100">Recommend package</h2>
+      <p className="mt-1 text-sm text-zinc-400">
         Choose the journey you want to recommend for this lead. This is for orientation; final treatment planning
         belongs to the specialist.
       </p>
@@ -45,7 +45,7 @@ export default function LeadRecommendationForm({
         <select
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          className="min-w-[220px] rounded border border-zinc-300 px-3 py-2 text-sm"
+          className="min-w-[220px] rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
           aria-label="Recommended package"
         >
           <option value="">— No recommended package —</option>

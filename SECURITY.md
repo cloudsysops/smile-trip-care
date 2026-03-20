@@ -4,7 +4,7 @@
 
 Si encuentras una vulnerabilidad de seguridad, **no** abras un issue público.
 
-- **Email:** [indicar email de contacto de seguridad, ej. security@tudominio.com]
+- **Email:** security@medvoyagesmile.com
 - **Alternativa:** Mensaje privado al mantenedor del repositorio o a la organización.
 
 Incluye, si puedes:

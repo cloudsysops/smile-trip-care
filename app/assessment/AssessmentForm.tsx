@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { PackageRow } from "@/lib/packages";
+import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
 
 type Props = Readonly<{ packages: PackageRow[]; prefillPackageSlug?: string }>;
 
@@ -20,7 +21,18 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
       const value = currentUrl.searchParams.get(key)?.trim();
       return value ? value : undefined;
     };
-    const referrer = document.referrer.trim();
+    const rawReferrer = (typeof document.referrer === "string" ? document.referrer : "").trim();
+    let referrer_url: string | undefined;
+    if (rawReferrer) {
+      try {
+        new URL(rawReferrer);
+        referrer_url = rawReferrer.length <= 2000 ? rawReferrer : undefined;
+      } catch {
+        referrer_url = undefined;
+      }
+    } else {
+      referrer_url = undefined;
+    }
     const body = {
       first_name: fd.get("first_name") ?? "",
       last_name: fd.get("last_name") ?? "",
@@ -37,7 +49,7 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
       utm_term: utm("utm_term"),
       utm_content: utm("utm_content"),
       landing_path: `${currentUrl.pathname}${currentUrl.search}`,
-      referrer_url: referrer.length > 0 ? referrer : undefined,
+      referrer_url,
       company_website: (fd.get("company_website") as string) || undefined,
     };
 
@@ -250,6 +262,7 @@ export default function AssessmentForm({ packages, prefillPackageSlug = "" }: Pr
           <p className="mt-3 text-center text-xs text-zinc-500">We respond within 24 hours. No commitment.</p>
         </div>
       </form>
+      <FeedbackButton page="/assessment" />
     </>
   );
 }

@@ -1,51 +1,52 @@
-# Cómo contribuir — MedVoyage Smile
+# Contributing — MedVoyage Smile
 
-Gracias por contribuir. Sigue estas pautas para mantener el flujo claro y el código alineado con el resto del equipo.
+Este repositorio es el **producto canónico** de Smile / MedVoyage.
 
-## Antes de empezar
+## Flujo básico
 
-- Revisa [README.md](README.md) para arrancar el proyecto en local.
-- Revisa [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md) para el modelo de ramas (feature → main o dev/staging/main según configuración).
-- Revisa [docs/GITHUB_ENTERPRISE_SETUP.md](docs/GITHUB_ENTERPRISE_SETUP.md) para la configuración de GitHub y protección de ramas.
+1. **Crear rama**
+   - `feature/<descripcion>`
+   - `fix/<descripcion>`
 
-## Flujo de trabajo
+2. **Implementar cambios** siguiendo los estándares de código existentes.
 
-1. **Crea una rama** desde `main` (o desde `dev` si usas flujo completo):
-   ```bash
-   git checkout main
-   git pull --ff-only origin main
-   git checkout -b feature/nombre-descriptivo
-   ```
-
-2. **Desarrolla** con commits atómicos y mensajes claros (ej. `feat: ...`, `fix: ...`, `docs: ...`).
-
-3. **Verifica en local** antes de abrir el PR:
+3. **Antes del PR ejecutar**
    ```bash
    npm run verify
    ```
    (lint + tests + build).
 
-4. **Abre un Pull Request** hacia `main` (o hacia `dev` si aplica). Usa la plantilla de PR y rellena checklist.
+4. **Revisar secrets**
+   - No añadir `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `OPENAI_API_KEY` ni otros secrets en código, commits ni logs.
 
-5. **CI** debe estar en verde (lint, test, build). No se hace merge con CI en rojo.
+5. **Abrir Pull Request**
+   - Hacia `main` (o rama de destino definida).
+   - Usar la plantilla de PR y rellenar checklist.
 
-6. **Review** según la política del equipo (ej. 1 aprobación para `main`).
+6. **CI en verde**
+   - No hacer merge con CI en rojo.
 
-7. **Merge** (squash o merge commit según política del repo). Borra la rama tras el merge.
+## Regla importante: reuse-first
 
-## Estándares de código
+Antes de implementar algo nuevo:
 
-- **TypeScript/React:** Estilo coherente con el resto del proyecto; ESLint sin errores.
-- **Tests:** Nuevas funcionalidades críticas con tests cuando sea razonable; no romper tests existentes.
-- **Migraciones:** Cualquier cambio de esquema en `supabase/migrations/` con nombre secuencial y actualización de `MIGRATION_ORDER.md`.
-- **Secrets:** Nunca en el código; solo variables de entorno y referencias en `.env.example` (sin valores reales).
+1. Buscar en `docs/` (especialmente `ARCHITECTURE.md`, `PRODUCT_PLATFORM_STRATEGY.md`, `QA_RELEASE_PLAYBOOK.md`).
+2. Buscar en el código existente (componentes, helpers, APIs).
+3. Confirmar que la lógica no existe ya o que no hay un patrón reutilizable razonable.
 
-## Documentación
+Preferir **reutilizar** antes que duplicar.
 
-- Actualiza README, STATUS.md o docs relevantes si cambias comportamiento público, scripts o pasos de despliegue.
-- Los agentes (Cursor, etc.) siguen [AGENTS.md](AGENTS.md) y las reglas en `.cursor/`.
+## Documentos clave
 
-## Dudas
+- `DEFINITION_OF_READY.md` — cuándo una tarea está lista.
+- `DEFINITION_OF_DONE.md` — cuándo un cambio está realmente terminado.
+- `docs/NEXT_TASKS.md`
+- `docs/PLAN_MEJORAS_PRODUCCION_POR_SPRINT.md`
+- `docs/QA_RELEASE_PLAYBOOK.md`
+- `docs/ENGINEERING_WORKFLOW.md`
 
-- Abre un **issue** para preguntas de diseño o proceso.
-- Para vulnerabilidades, sigue [SECURITY.md](SECURITY.md).
+## Más detalles
+
+- Cómo trabajar con ramas y GitHub: [docs/GIT_AND_GITHUB_WORKFLOW.md](docs/GIT_AND_GITHUB_WORKFLOW.md).
+- Para temas de seguridad: [SECURITY.md](SECURITY.md).
+

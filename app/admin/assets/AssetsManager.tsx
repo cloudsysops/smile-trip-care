@@ -93,39 +93,39 @@ export default function AssetsManager() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && fetchAssets()}
-          className="rounded border border-zinc-300 px-3 py-1.5 text-sm"
+          className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-100 placeholder-zinc-500"
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded border border-zinc-300 px-3 py-1.5 text-sm">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-100">
           <option value="">All categories</option>
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
-        <select value={location} onChange={(e) => setLocation(e.target.value)} className="rounded border border-zinc-300 px-3 py-1.5 text-sm">
+        <select value={location} onChange={(e) => setLocation(e.target.value)} className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-100">
           <option value="">All locations</option>
           {LOCATIONS.map((l) => (
             <option key={l} value={l}>{l}</option>
           ))}
         </select>
-        <select value={approved} onChange={(e) => setApproved(e.target.value)} className="rounded border border-zinc-300 px-3 py-1.5 text-sm">
+        <select value={approved} onChange={(e) => setApproved(e.target.value)} className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-100">
           <option value="">Approved: any</option>
           <option value="true">Approved</option>
           <option value="false">Not approved</option>
         </select>
-        <select value={published} onChange={(e) => setPublished(e.target.value)} className="rounded border border-zinc-300 px-3 py-1.5 text-sm">
+        <select value={published} onChange={(e) => setPublished(e.target.value)} className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-100">
           <option value="">Published: any</option>
           <option value="true">Published</option>
           <option value="false">Not published</option>
         </select>
-        <button type="button" onClick={fetchAssets} className="rounded bg-zinc-200 px-3 py-1.5 text-sm hover:bg-zinc-300">Apply</button>
+        <button type="button" onClick={fetchAssets} className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm text-zinc-100 hover:bg-zinc-800/40">Apply</button>
       </div>
 
       {loading ? (
-        <p className="text-zinc-500">Loading…</p>
+        <p className="text-zinc-400">Loading…</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-zinc-800 bg-zinc-900/60">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-zinc-200 bg-zinc-50">
+            <thead className="border-b border-zinc-800 bg-zinc-900/40">
               <tr>
                 <th className="px-3 py-2 font-medium">Thumb</th>
                 <th className="px-3 py-2 font-medium">Title</th>
@@ -140,10 +140,10 @@ export default function AssetsManager() {
             </thead>
             <tbody>
               {assets.map((a) => (
-                <tr key={a.id} className="border-b border-zinc-100">
+                <tr key={a.id} className="border-b border-zinc-800">
                   <td className="px-3 py-2">
                     {a.signed_url ? (
-                      <div className="relative h-12 w-16 overflow-hidden rounded bg-zinc-100">
+                      <div className="relative h-12 w-16 overflow-hidden rounded bg-zinc-700/20">
                         <Image src={a.signed_url} alt={a.title ?? a.slug} fill className="object-cover" sizes="64px" unoptimized />
                       </div>
                     ) : (
@@ -158,7 +158,11 @@ export default function AssetsManager() {
                     <button
                       type="button"
                       onClick={() => toggleApproved(a.id, !a.approved)}
-                      className={`rounded px-2 py-0.5 text-xs ${a.approved ? "bg-emerald-100 text-emerald-800" : "bg-zinc-100 text-zinc-600"}`}
+                      className={`rounded px-2 py-0.5 text-xs ${
+                        a.approved
+                          ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
+                          : "bg-zinc-700/20 text-zinc-300 border border-zinc-700"
+                      }`}
                     >
                       {a.approved ? "Yes" : "No"}
                     </button>
@@ -167,12 +171,16 @@ export default function AssetsManager() {
                     <button
                       type="button"
                       onClick={() => togglePublished(a.id, !a.published)}
-                      className={`rounded px-2 py-0.5 text-xs ${a.published ? "bg-emerald-100 text-emerald-800" : "bg-zinc-100 text-zinc-600"}`}
+                      className={`rounded px-2 py-0.5 text-xs ${
+                        a.published
+                          ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
+                          : "bg-zinc-700/20 text-zinc-300 border border-zinc-700"
+                      }`}
                     >
                       {a.published ? "Yes" : "No"}
                     </button>
                   </td>
-                  <td className="px-3 py-2 text-zinc-500">{new Date(a.created_at).toLocaleDateString()}</td>
+                  <td className="px-3 py-2 text-zinc-400">{new Date(a.created_at).toLocaleDateString()}</td>
                   <td className="px-3 py-2">
                     <button type="button" onClick={() => deleteAsset(a.id)} className="text-red-600 hover:underline text-xs">Delete</button>
                   </td>
@@ -180,8 +188,8 @@ export default function AssetsManager() {
               ))}
             </tbody>
           </table>
-          {assets.length === 0 && <p className="p-6 text-center text-zinc-500">No assets. Upload one to get started.</p>}
-          {total > 0 && <p className="border-t border-zinc-100 px-3 py-2 text-xs text-zinc-500">Total: {total}</p>}
+          {assets.length === 0 && <p className="p-6 text-center text-zinc-400">No assets. Upload one to get started.</p>}
+          {total > 0 && <p className="border-t border-zinc-800 px-3 py-2 text-xs text-zinc-400">Total: {total}</p>}
         </div>
       )}
     </div>

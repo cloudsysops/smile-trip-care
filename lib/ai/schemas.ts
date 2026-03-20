@@ -58,6 +58,17 @@ export const OpsTasksOutputSchema = z.object({
   summary: z.string().min(1),
 }).strict();
 
+/** AI Lead Copilot: summary, priority, and coordinator drafts (no schema change; on-demand only). */
+export const LeadCopilotOutputSchema = z.object({
+  summary: z.string().min(1),
+  priority: z.enum(["high", "medium", "low"]),
+  whatsapp_draft: z.string().min(1),
+  email_draft: z.string().min(1),
+  email_subject: z.string().min(1).optional(),
+}).strict();
+
+export type LeadCopilotOutput = z.infer<typeof LeadCopilotOutputSchema>;
+
 export type LeadTriageOutput = z.infer<typeof LeadTriageOutputSchema>;
 export type SalesResponderOutput = z.infer<typeof SalesResponderOutputSchema>;
 export type ItineraryOutput = z.infer<typeof ItineraryOutputSchema>;

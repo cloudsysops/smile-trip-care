@@ -28,7 +28,7 @@ const WHY_COLOMBIA = [
 const TESTIMONIALS = [
   { quote: "I saved over $8,000 compared to US prices. The clinic was modern and the team made everything easy.", author: "Sarah M.", role: "Dental implants, USA", stars: 5 },
   { quote: "Amazing care and beautiful recovery experience. From the first message to arrival, everything was coordinated.", author: "Patient", role: "Medellín package", stars: 5 },
-  { quote: "The specialists were excellent and the recovery in Manizales was perfect. I recommend MedVoyage Smile to anyone considering dental travel.", author: "James K.", role: "Smile design", stars: 5 },
+  { quote: `The specialists were excellent and the recovery in Manizales was perfect. I recommend ${branding.productName} to anyone considering dental travel.`, author: "James K.", role: "Smile design", stars: 5 },
 ];
 
 /** Trusted partners / institutions (verified public info only; images are placeholders until approved assets). */
@@ -119,20 +119,25 @@ export default async function Home() {
       {/* Announcement bar */}
       <div className="bg-emerald-950/90 border-b border-emerald-800/50 text-center py-2 px-4">
         <p className="text-sm text-emerald-100">
-          Free Smile Evaluation — no commitment. We respond within 24 hours.{" "}
+          Free coordinator review · Personalized treatment planning · Start with a no-pressure assessment. Response typically within 24 hours.{" "}
           <Link href="/assessment" className="font-semibold text-white underline underline-offset-2 hover:text-emerald-200">
             Start free
           </Link>
         </p>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-white/20 bg-white/70 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:py-5">
-          <Link href="/" className="text-lg font-semibold text-zinc-900 hover:text-zinc-700">{branding.productName}</Link>
-          <nav className="flex items-center gap-2 sm:gap-3">
-            <Link href="/login" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
-              Sign in
-            </Link>
+          <Link href="/" className="text-lg font-semibold text-zinc-100 hover:text-white">{branding.productName}</Link>
+          <nav className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link href="/login" className="text-sm font-medium text-zinc-300 hover:text-white">
+                Sign in
+              </Link>
+              <Link href="/signup" className="text-sm font-medium text-zinc-300 hover:text-white">
+                Sign up
+              </Link>
+            </div>
             <Link
               href="/assessment"
               className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 sm:px-5 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white/80"
@@ -141,20 +146,20 @@ export default async function Home() {
             </Link>
             <Link
               href="/packages"
-              className="hidden rounded-full border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-white/80"
+              className="hidden rounded-full border border-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800/40 sm:inline-block focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
             >
               See My Savings
             </Link>
-            <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#how-it-works" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               How it works
             </Link>
-            <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#specialists" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Specialists
             </Link>
-            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#trusted-clinical-network" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Clinical network
             </Link>
-            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:inline-block">
+            <Link href="/#trusted-partners" className="hidden text-sm font-medium text-zinc-400 hover:text-white sm:inline-block">
               Partners
             </Link>
           </nav>
@@ -167,17 +172,17 @@ export default async function Home() {
           <div className="grid gap-12 md:grid-cols-2 md:items-center md:gap-16">
             <div>
               <h1 className="font-serif mb-6 text-3xl font-normal tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-                Your New Smile, 70% Less. Experience Medellín&apos;s World-Class Dental Care.
+                Premium dental care in Colombia with guided coordination from assessment to treatment.
               </h1>
               <p className="mb-10 max-w-lg text-lg leading-relaxed text-zinc-400">
-                A full-service concierge experience. From consultation to recovery, we manage every detail of your dental journey in Colombia.
+                Complete your free smile assessment and receive a personalized treatment plan with estimated savings.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                 <Link
                   href="/assessment"
                   className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-white px-8 py-4 text-base font-semibold text-zinc-900 hover:bg-zinc-100 sm:w-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-zinc-950"
                 >
-                  Get My Free Treatment Plan
+                  Start Free Smile Assessment
                 </Link>
                 <Link
                   href="/packages"
@@ -187,7 +192,7 @@ export default async function Home() {
                 </Link>
               </div>
               <p className="mt-4 text-sm text-zinc-500" aria-hidden="true">
-                Trusted by international patients · Secure deposit · Guided by concierge coordinators · No commitment
+                Verified dental clinics · International patient coordination · Secure deposit payments · Guided travel and treatment planning
               </p>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:aspect-square">
@@ -220,42 +225,42 @@ export default async function Home() {
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
                 <svg className="h-4 w-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
               </span>
-              Verified clinic
+              Verified dental clinics
             </span>
             <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
                 <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </span>
-              International standards
+              International patient coordination
             </span>
             <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
                 <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
               </span>
-              Secure payments
+              Secure deposit payments
             </span>
             <span className="inline-flex items-center gap-2 text-sm font-medium text-zinc-300">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
                 <svg className="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
               </span>
-              Concierge support
+              Guided travel and treatment planning
             </span>
           </div>
           <ul className="grid gap-6 sm:grid-cols-3">
             <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center transition hover:border-emerald-500/50">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20"><TrustIcon icon="clinic" /></div>
-              <h3 className="mb-1 font-bold text-white">Verified Clinics</h3>
+              <h3 className="mb-1 font-bold text-white">Verified dental clinics</h3>
               <p className="text-sm text-zinc-400">Vetted partners in Medellín and Manizales. Quality and safety first.</p>
             </li>
             <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center transition hover:border-emerald-500/50">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20"><TrustIcon icon="people" /></div>
-              <h3 className="mb-1 font-bold text-white">International Patients</h3>
-              <p className="text-sm text-zinc-400">Thousands of patients from the US, Canada, and Europe choose Colombia.</p>
+              <h3 className="mb-1 font-bold text-white">International patient coordination</h3>
+              <p className="text-sm text-zinc-400">From first contact to follow-up. We coordinate your journey so you&apos;re never alone.</p>
             </li>
             <li className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 text-center transition hover:border-emerald-500/50">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20"><TrustIcon icon="transport" /></div>
-              <h3 className="mb-1 font-bold text-white">Concierge Medical Travel</h3>
-              <p className="text-sm text-zinc-400">We handle lodging, transport, and appointments so you focus on your smile.</p>
+              <h3 className="mb-1 font-bold text-white">Guided travel and treatment planning</h3>
+              <p className="text-sm text-zinc-400">Secure deposit payments. We handle lodging, transport, and appointments so you focus on your smile.</p>
             </li>
           </ul>
           <p className="mt-6 rounded-xl border border-zinc-700 bg-zinc-900/60 px-5 py-4 text-sm text-zinc-400">
@@ -454,6 +459,50 @@ export default async function Home() {
             >
               Start Free Smile Evaluation
             </Link>
+          </div>
+        </section>
+
+        {/* 2b. Meet your smile coordinator */}
+        <section id="coordinator" className="mb-24 scroll-mt-6 md:mb-32 py-12 md:py-16">
+          <div className="grid gap-10 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-center">
+            <div>
+              <h2 className="font-serif text-2xl font-normal tracking-tight text-white sm:text-3xl">
+                Meet your smile coordinator
+              </h2>
+              <p className="mt-3 text-sm text-zinc-300 sm:text-base">
+                Every patient is assigned a dedicated medical travel coordinator. Your coordinator reviews your assessment,
+                discusses your goals, and helps plan your treatment and travel in Colombia.
+              </p>
+              <ul className="mt-5 space-y-2 text-sm text-zinc-300">
+                <li className="flex gap-2">
+                  <span className="mt-1 text-emerald-400" aria-hidden>•</span>
+                  <span>Reviews your smile assessment with our specialists and clarifies your options.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 text-emerald-400" aria-hidden>•</span>
+                  <span>Helps you understand treatment timelines, recovery, and when to travel.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 text-emerald-400" aria-hidden>•</span>
+                  <span>Coordinates dates, city choice between Medellín and Manizales, and key appointments.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="mt-1 text-emerald-400" aria-hidden>•</span>
+                  <span>Stays available on WhatsApp for questions before and during your journey.</span>
+                </li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-6 sm:p-8">
+              <h3 className="text-sm font-semibold text-white">What your coordinator does not do</h3>
+              <p className="mt-2 text-xs text-zinc-400">
+                Your coordinator is not a substitute for medical advice from your dentist or specialist. Their role is to
+                help you navigate options, logistics, and communication so your experience feels guided—not rushed.
+              </p>
+              <p className="mt-4 text-xs text-zinc-400">
+                After you submit your assessment, we usually respond within one business day with a coordinator‑led
+                review and next steps.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -832,6 +881,15 @@ export default async function Home() {
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Legal</h3>
               <Link href="/legal" className="block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
                 Privacy &amp; legal
+              </Link>
+              <Link href="/trust-and-safety" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                Trust &amp; safety
+              </Link>
+              <Link href="/how-payments-work" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                How payments work
+              </Link>
+              <Link href="/our-clinical-network" className="mt-1 block text-sm text-zinc-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-zinc-950 rounded">
+                Clinical network
               </Link>
             </div>
           </div>

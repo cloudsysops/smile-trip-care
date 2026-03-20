@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { requireProviderManager } from "@/lib/auth";
 import { getProviderDashboardData } from "@/lib/dashboard-data";
+import RoleDashboardHeader from "@/app/components/dashboard/RoleDashboardHeader";
+import StatCard from "@/app/components/dashboard/StatCard";
+import DashboardLayout, { DashboardSection } from "@/app/components/dashboard/DashboardLayout";
+import EmptyState from "@/app/components/ui/EmptyState";
 
 export default async function ProviderDashboardPage() {
   let profile;
@@ -15,17 +18,8 @@ export default async function ProviderDashboardPage() {
   if (!providerId) {
     return (
       <div className="min-h-screen bg-zinc-50">
-        <header className="border-b border-zinc-200 bg-white px-6 py-4">
-          <div className="mx-auto flex max-w-4xl items-center justify-between">
-            <nav className="flex items-center gap-3">
-              <Link href="/provider" className="text-sm font-medium text-zinc-900 underline">
-                Provider
-              </Link>
-            </nav>
-            <h1 className="text-xl font-semibold">Provider dashboard</h1>
-          </div>
-        </header>
-        <main className="mx-auto max-w-4xl px-6 py-8">
+        <RoleDashboardHeader title="Provider dashboard" navItems={[{ href: "/provider", label: "Overview", active: true }]} homeLabel="Home" />
+        <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
           <p className="text-zinc-600">Your account is not linked to a provider. Contact an admin.</p>
         </main>
       </div>
@@ -40,65 +34,50 @@ export default async function ProviderDashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <nav className="flex flex-wrap items-center gap-3">
-            <Link href="/provider" className="text-sm font-medium text-zinc-900 underline">
-              Overview
-            </Link>
-          </nav>
-          <h1 className="text-xl font-semibold">Provider dashboard</h1>
-        </div>
-      </header>
-      <main className="mx-auto max-w-4xl px-6 py-8">
-        <h2 className="mb-6 text-2xl font-semibold">
-          {provider?.name ?? "Provider"} {provider?.city ? ` · ${provider.city}` : ""}
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Packages</p>
-            <p className="mt-1 text-2xl font-semibold">{packages.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Specialists</p>
-            <p className="mt-1 text-2xl font-semibold">{specialists.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Experiences</p>
-            <p className="mt-1 text-2xl font-semibold">{experiences.length}</p>
-          </div>
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <p className="text-sm font-medium text-zinc-500">Recent bookings</p>
-            <p className="mt-1 text-2xl font-semibold">{bookings.length}</p>
-          </div>
-        </div>
-        <div className="mt-8">
-          <h3 className="mb-2 text-lg font-medium">Recent bookings</h3>
-          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
-            {bookings.length === 0 ? (
-              <p className="p-6 text-sm text-zinc-500">No bookings yet.</p>
-            ) : (
-              <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-zinc-200 bg-zinc-50">
-                  <tr>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Lead ID</th>
-                    <th className="px-4 py-3 font-medium">Package ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.slice(0, 10).map((b) => (
-                    <tr key={b.id} className="border-b border-zinc-100">
-                      <td className="px-4 py-3">{b.status}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{b.lead_id.slice(0, 8)}…</td>
-                      <td className="px-4 py-3 font-mono text-xs">{b.package_id.slice(0, 8)}…</td>
+      <RoleDashboardHeader title="Provider dashboard" navItems={[{ href: "/provider", label: "Overview", active: true }]} homeLabel="Home" />
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        <DashboardLayout
+          title={provider?.name ?? "Provider"}
+          description={provider?.city ? `Provider · ${provider.city}` : "Provider overview"}
+        >
+          <DashboardSection>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <StatCard label="Packages" value={packages.length} />
+              <StatCard label="Specialists" value={specialists.length} />
+              <StatCard label="Experiences" value={experiences.length} />
+              <StatCard label="Recent bookings" value={bookings.length} helper="last 20" />
+            </div>
+          </DashboardSection>
+          <DashboardSection title="Recent bookings">
+            <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+              {bookings.length === 0 ? (
+                <EmptyState
+                  title="No bookings yet"
+                  description="When patients confirm and pay deposits for packages with your clinic, bookings will appear here."
+                />
+              ) : (
+                <table className="min-w-full text-left text-sm">
+                  <thead className="border-b border-zinc-200 bg-zinc-50">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Status</th>
+                      <th className="px-4 py-3 font-medium">Lead ID</th>
+                      <th className="px-4 py-3 font-medium">Package ID</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
+                  </thead>
+                  <tbody>
+                    {bookings.slice(0, 10).map((b) => (
+                      <tr key={b.id} className="border-b border-zinc-100">
+                        <td className="px-4 py-3">{b.status}</td>
+                        <td className="px-4 py-3 font-mono text-xs">{b.lead_id.slice(0, 8)}…</td>
+                        <td className="px-4 py-3 font-mono text-xs">{b.package_id.slice(0, 8)}…</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </DashboardSection>
+        </DashboardLayout>
       </main>
     </div>
   );

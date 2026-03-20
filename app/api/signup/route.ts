@@ -4,9 +4,10 @@
  */
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getServerSupabase } from "@/lib/supabase/server";
 import { createLogger } from "@/lib/logger";
 import { z } from "zod";
+import { ensurePatientProfileForUser } from "@/lib/services/profile.service";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const BodySchema = z.object({
   full_name: z.string().trim().max(200).optional(),
@@ -19,29 +20,28 @@ export async function POST(request: Request) {
   if (!user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "unknown";
+  if (!(await checkRateLimit(ip))) {
+    log.warn("Signup rate limit exceeded", { ip, user_id: user.id });
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
   const body = await request.json().catch(() => ({}));
   const parsed = BodySchema.safeParse(body);
   const full_name = parsed.success ? parsed.data.full_name ?? null : null;
 
-  const supabase = getServerSupabase();
-  const { data: existing } = await supabase
-    .from("profiles")
-    .select("id, role")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (existing) {
-    return NextResponse.json({ ok: true, message: "Profile already exists" });
-  }
-
-  const { error } = await supabase.from("profiles").insert({
-    id: user.id,
-    email: user.email,
-    full_name: full_name ?? user.user_metadata?.full_name ?? null,
-    role: "patient",
-    is_active: true,
-  });
-  if (error) {
-    log.error("Signup profile insert failed", { error: error.message, user_id: user.id });
+  try {
+    const result = await ensurePatientProfileForUser(user, full_name, log);
+    if (!result.created) {
+      return NextResponse.json({ ok: true, message: "Profile already exists" });
+    }
+  } catch {
     return NextResponse.json(
       { error: "Could not create profile. Contact support." },
       { status: 500 }

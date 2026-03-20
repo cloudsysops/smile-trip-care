@@ -18,10 +18,10 @@ export default function AftercareSection({ instructions }: Props) {
     ? customTrimmed
     : `${DEFAULT_AFTERCARE_INTRO}\n\n${DEFAULT_AFTERCARE_BULLETS}`;
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Aftercare</h3>
-      <p className="mt-1 text-sm text-zinc-600">Recovery and follow-up guidance</p>
-      <div className="mt-4 whitespace-pre-line rounded-lg bg-zinc-50 p-4 text-sm text-zinc-700">
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 shadow-sm">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">Aftercare</h3>
+      <p className="mt-1 text-sm text-zinc-400">Recovery and follow-up guidance</p>
+      <div className="mt-4 whitespace-pre-line rounded-lg bg-zinc-900/40 p-4 text-sm text-zinc-300">
         {content}
       </div>
     </section>

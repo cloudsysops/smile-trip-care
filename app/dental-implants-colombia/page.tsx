@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { branding } from "@/lib/branding";
 
 export const metadata: Metadata = {
-  title: "Dental Implants in Colombia | Save up to 70% | MedVoyage Smile",
+  title: `Dental Implants in Colombia | Save up to 70% | ${branding.productName}`,
   description:
     "Get world-class dental implants in Medellín and Manizales with trusted clinics, international patient support, and up to 70% savings vs the U.S.",
   openGraph: {
-    title: "Dental Implants in Colombia — MedVoyage Smile",
+    title: `Dental Implants in Colombia — ${branding.productName}`,
     description:
       "Premium dental implants in Colombia with vetted clinics, concierge coordination, and secure online deposit.",
   },
@@ -94,6 +94,43 @@ export default function DentalImplantsColombiaPage() {
           </div>
         </section>
 
+        {/* Savings comparison: Typical US cost vs Colombia */}
+        <section className="mb-20">
+          <h2 className="text-xl font-semibold text-white sm:text-2xl">
+            Typical US cost vs Colombia
+          </h2>
+          <p className="mt-3 text-sm text-zinc-300 sm:text-base">
+            Exact pricing depends on your case, but many patients see substantial savings when comparing typical U.S. fees with
+            treatment in Colombia.
+          </p>
+          <div className="mt-5 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/80">
+            <table className="min-w-full border-separate border-spacing-0 text-sm text-zinc-200">
+              <thead className="bg-zinc-900/90">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-zinc-300">Treatment</th>
+                  <th className="px-4 py-3 text-left font-semibold text-zinc-300">Typical U.S. range</th>
+                  <th className="px-4 py-3 text-left font-semibold text-zinc-300">Estimate in Colombia</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-t border-zinc-800">
+                  <td className="px-4 py-3">Single dental implant</td>
+                  <td className="px-4 py-3 text-zinc-400">$3,000–$4,500 per implant</td>
+                  <td className="px-4 py-3 text-emerald-400">From ~$1,200 per implant</td>
+                </tr>
+                <tr className="border-t border-zinc-800">
+                  <td className="px-4 py-3">All-on-4 / full-arch implants</td>
+                  <td className="px-4 py-3 text-zinc-400">$20,000–$30,000 per arch</td>
+                  <td className="px-4 py-3 text-emerald-400">From ~$7,500 per arch</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-zinc-500">
+            These are illustrative ranges, not a quote. Your specialist will confirm a personalized plan and pricing after reviewing your case.
+          </p>
+        </section>
+
         {/* Treatment overview */}
         <section className="mb-20 grid gap-10 md:grid-cols-2 md:items-start">
           <div>
@@ -138,7 +175,7 @@ export default function DentalImplantsColombiaPage() {
           </div>
         </section>
 
-        {/* Why MedVoyage Smile */}
+        {/* Why SmileTripCare */}
         <section className="mb-16">
           <h2 className="text-xl font-semibold text-white sm:text-2xl">Why {branding.productName}</h2>
           <p className="mt-3 max-w-2xl text-sm text-zinc-300 sm:text-base">

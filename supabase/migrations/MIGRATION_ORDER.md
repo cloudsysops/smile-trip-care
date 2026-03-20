@@ -29,6 +29,13 @@ O en Supabase SQL Editor, ejecutar en este orden:
 19. 0019_leads_qualification_indexes.sql  
 20. 0020_leads_recommended_package.sql  
 21. 0021_lead_audit_updated_by_and_events.sql  
+22. 0022_treatment_progress.sql  
+23. 0023_patient_pipeline.sql  
+24. 0024_profile_roles.sql  
+25. 0025_beta_feedback.sql  
+26. 0026_package_builder_items.sql  
+27. 0027_multi_host_foundation.sql  
+28. 0028_stripe_connect_foundation.sql  
 
 Luego opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`.
 

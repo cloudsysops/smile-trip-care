@@ -9,8 +9,17 @@ Guía para proteger ramas en GitHub. **Guía maestra:** [GITHUB_ENTERPRISE_SETUP
 Si solo usas la rama `main` y un proyecto Vercel:
 
 1. **Settings** → **Branches** → **Add rule** → Branch name: `main`.
-2. Activar: **Require a pull request**, **Require status checks** → marcar `lint-and-build`, **Require branch up to date**, **Do not allow bypassing**.
-3. Guardar. Con esto nadie puede mergear a `main` sin PR y sin CI en verde.
+2. Activar (política mínima recomendada):
+   - **Require a pull request before merging**
+   - **Require approvals**: al menos **1**
+   - **Require status checks to pass before merging**
+     - Required checks:
+       - `CI / lint-and-build`  (equivale a `npm run verify` en CI)
+       - `security / secret-scan` (TruffleHog secrets scan)
+   - **Require branches to be up to date before merging**
+   - **Restrict who can push to matching branches** (si tu plan lo permite)
+   - **Do not allow bypassing the above settings**
+3. Guardar. Con esto nadie puede mergear a `main` sin PR, sin review y sin CI (verify + security) en verde.
 
 El resto de ramas (`feature/*`, `hotfix/*`) no necesitan protección; el merge siempre será a `main` por PR.
 

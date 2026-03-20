@@ -3,11 +3,11 @@
  * Use these values for product name, company, and tagline across the app and docs.
  */
 export const branding = {
-  productName: "MedVoyage Smile",
-  companyName: "MedVoyage",
-  tagline: "Premium Dental Tourism Platform",
+  productName: "SmileTripCare",
+  companyName: "SmileTripCare",
+  tagline: "Trusted medical travel, curated with care.",
   supportCopy:
-    "Transform your smile in Colombia with trusted specialists, guided care, and premium travel coordination.",
+    "Travel. Heal. Smile. SmileTripCare coordinates dental treatment and recovery in Colombia with vetted specialists and warm, family-curated hospitality.",
 } as const;
 
 export type Branding = typeof branding;

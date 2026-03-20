@@ -21,7 +21,7 @@ function parseFilters(params: Record<string, string | undefined>) {
 }
 
 export const metadata = {
-  title: "Tour Experiences | MedVoyage Smile",
+  title: "Tour Experiences | SmileTripCare",
   description: "Recovery and tour experiences in Medellín and Manizales.",
 };
 

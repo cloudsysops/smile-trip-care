@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
@@ -10,12 +10,60 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams?.get("next") ?? "";
+  const message = searchParams?.get("message") ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  // If already authenticated with a valid profile, redirect to dashboard by role.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (cancelled || !res.ok) return;
+        const data = (await res.json()) as { redirectPath?: string };
+        const target = next || data.redirectPath || "/patient";
+        router.replace(target);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [next, router]);
+
+  async function handleGoogleSignIn() {
+    setError(null);
+    const supabase = getBrowserSupabase();
+    if (!supabase) {
+      setError("Auth not configured.");
+      return;
+    }
+    try {
+      setOauthLoading(true);
+      const origin = globalThis.location.origin;
+      const callbackUrl = new URL("/auth/callback", origin);
+      if (next) {
+        callbackUrl.searchParams.set("next", next);
+      }
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: callbackUrl.toString(),
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      setError("Could not start Google sign-in. Please try again.");
+      setOauthLoading(false);
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -27,23 +75,25 @@ function LoginForm() {
     }
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
-      setError("Invalid email or password");
+      const msg = err.message ?? "";
+      const needsConfirm =
+        msg.toLowerCase().includes("confirm") ||
+        msg.toLowerCase().includes("not confirmed") ||
+        (err as { code?: string }).code === "email_not_confirmed";
+      setError(
+        needsConfirm
+          ? "Please confirm your email first. Check your inbox and spam folder, then try again."
+          : "Invalid email or password"
+      );
       setLoading(false);
       return;
     }
-    try {
-      const res = await fetch("/api/auth/me", { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        const target = next || data.redirectPath || "/admin";
-        router.push(target);
-        router.refresh();
-        return;
-      }
-    } catch {
-      // fallback
-    }
-    router.push(next || "/admin");
+    // Let server-side /auth/callback ensure profile exists and redirect by role.
+    // Avoids race with session cookie and handles missing profile (creates patient).
+    const callbackUrl = next
+      ? `/auth/callback?next=${encodeURIComponent(next)}`
+      : "/auth/callback";
+    router.push(callbackUrl);
     router.refresh();
   }
 
@@ -70,15 +120,21 @@ function LoginForm() {
               Use your account to access your dashboard. Patient accounts can be created via sign up; team accounts are created by the admin.
             </p>
 
-            {/* Optional: Continue with Google — visual space only; wire OAuth when ready */}
+            {message === "confirm_email" && (
+              <p className="mt-4 rounded-lg border border-emerald-800/60 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200" aria-live="polite">
+                Check your email to confirm your account, then sign in below.
+              </p>
+            )}
+
             <div className="mt-6 border-b border-zinc-800 pb-6">
               <button
                 type="button"
-                disabled
-                className="w-full rounded-xl border border-zinc-700 bg-zinc-800/50 py-3 text-sm font-medium text-zinc-500"
-                aria-label="Continue with Google (coming soon)"
+                onClick={handleGoogleSignIn}
+                disabled={oauthLoading}
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-800/50 py-3 text-sm font-medium text-white hover:bg-zinc-800/80 disabled:opacity-60"
+                aria-label="Continue with Google"
               >
-                Continue with Google (coming soon)
+                {oauthLoading ? "Redirecting to Google…" : "Continue with Google"}
               </button>
             </div>
 

@@ -17,6 +17,14 @@
 - All outputs are validated with Zod before persistence.
 - Failed validation is treated as execution failure and does not expose stack traces to clients.
 
+### AI safety guidelines (global)
+
+- Never include secrets (API keys, tokens, internal admin URLs) in prompts or responses.
+- Validate and sanitize all inputs to agents; treat user-provided content as untrusted.
+- Keep fallbacks or retries when models fail; do not break user-facing flows on AI errors.
+- Log errors and key decisions for auditability without leaking sensitive patient data.
+- Keep humans in control for external communications (WhatsApp/email drafts, proposals); agents assist, they do not auto-send.
+
 ## Trigger-driven automation (M14)
 
 AI execution is queued via `ai_automation_jobs` and executed by `/api/automation/worker`.
