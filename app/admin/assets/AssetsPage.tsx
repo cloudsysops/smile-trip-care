@@ -28,12 +28,12 @@ type FilterState = {
 
 const CATEGORY_OPTIONS = ["all", "clinic", "finca", "lodging", "tour", "team", "other"];
 const LOCATION_OPTIONS = ["all", "Medellín", "Manizales", "Other"];
+const PAGE_SIZE = 20;
 
 export default function AssetsPage() {
   const [items, setItems] = useState<AssetRow[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const pageSize = 20;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
@@ -48,19 +48,23 @@ export default function AssetsPage() {
   const [editAlt, setEditAlt] = useState("");
   const [editTags, setEditTags] = useState("");
 
-  const fetchAssets = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const queryString = useMemo(() => {
     const params = new URLSearchParams();
     params.set("page", String(page));
-    params.set("pageSize", String(pageSize));
+    params.set("pageSize", String(PAGE_SIZE));
     if (filters.category !== "all") params.set("category", filters.category);
     if (filters.location !== "all") params.set("location", filters.location);
     if (filters.approved !== "all") params.set("approved", filters.approved);
     if (filters.published !== "all") params.set("published", filters.published);
     if (filters.q.trim()) params.set("q", filters.q.trim());
+    return params.toString();
+  }, [page, filters.category, filters.location, filters.approved, filters.published, filters.q]);
+
+  const fetchAssets = useCallback(async (signal?: AbortSignal) => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch(`/api/admin/assets?${params.toString()}`);
+      const res = await fetch(`/api/admin/assets?${queryString}`, { signal });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Failed to load assets.");
@@ -68,17 +72,22 @@ export default function AssetsPage() {
         setItems(data.items ?? []);
         setTotal(data.count ?? 0);
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
       setError("Network error.");
+    } finally {
+      if (!signal?.aborted) {
+        setLoading(false);
+      }
     }
-    setLoading(false);
-  }, [filters.approved, filters.category, filters.location, filters.published, filters.q, page, pageSize]);
+  }, [queryString]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void fetchAssets();
-    }, 0);
-    return () => window.clearTimeout(timer);
+    const controller = new AbortController();
+    void fetchAssets(controller.signal);
+    return () => {
+      controller.abort();
+    };
   }, [fetchAssets]);
 
   async function patchAsset(id: string, patch: Record<string, unknown>) {
@@ -137,8 +146,8 @@ export default function AssetsPage() {
   }
 
   const totalPages = useMemo(
-    () => (total > 0 ? Math.ceil(total / pageSize) : 1),
-    [total, pageSize],
+    () => (total > 0 ? Math.ceil(total / PAGE_SIZE) : 1),
+    [total],
   );
 
   return (
