@@ -9,6 +9,7 @@ type Props = Readonly<{
 }>;
 
 export default function SpecialistProgressUpdateForm({ leadId, onSuccess }: Props) {
+  const hasStages = Boolean(TREATMENT_STAGES[0]);
   const [stageKey, setStageKey] = useState<string>(TREATMENT_STAGES[0].key);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -62,12 +63,16 @@ export default function SpecialistProgressUpdateForm({ leadId, onSuccess }: Prop
           <label htmlFor="stage_key" className="block text-sm font-medium text-zinc-700">
             Stage
           </label>
+          {!hasStages && (
+            <p className="mt-1 text-xs text-zinc-500">No stages yet.</p>
+          )}
           <select
             id="stage_key"
             value={stageKey}
             onChange={(e) => setStageKey(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
             required
+            disabled={!hasStages}
           >
             {TREATMENT_STAGES.map((s) => (
               <option key={s.key} value={s.key}>

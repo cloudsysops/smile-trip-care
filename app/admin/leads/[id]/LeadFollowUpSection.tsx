@@ -57,6 +57,7 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
   }
 
   const hasPhone = leadPhone && phoneDigits(leadPhone).length >= 10;
+  const followUpTypes: FollowUpType[] = ["24h", "3d", "7d"];
 
   return (
     <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
@@ -72,7 +73,10 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
       )}
 
       <div className="mt-4 space-y-4">
-        {(["24h", "3d", "7d"] as const).map((type) => {
+        {followUpTypes.length === 0 && (
+          <p className="text-sm text-zinc-400">No follow-up templates yet.</p>
+        )}
+        {followUpTypes.map((type) => {
           const text = messages[type];
           const isLoading = loading === type;
           return (

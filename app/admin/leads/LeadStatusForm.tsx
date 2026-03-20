@@ -9,6 +9,7 @@ type Props = { leadId: string; currentStatus: string };
 
 export default function LeadStatusForm({ leadId, currentStatus }: Props) {
   const router = useRouter();
+  const statusOptions = [...STATUSES];
   const [status, setStatus] = useState(currentStatus);
   const [saving, setSaving] = useState(false);
 
@@ -27,13 +28,17 @@ export default function LeadStatusForm({ leadId, currentStatus }: Props) {
   return (
     <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
       <h2 className="font-semibold">Update status</h2>
+      {statusOptions.length === 0 && (
+        <p className="mt-2 text-xs text-zinc-400">No statuses yet.</p>
+      )}
       <div className="mt-3 flex gap-2">
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
+          disabled={statusOptions.length === 0}
           className="rounded border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100"
         >
-          {STATUSES.map((s) => (
+          {statusOptions.map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}
         </select>

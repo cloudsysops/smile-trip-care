@@ -75,6 +75,11 @@ export default function NewAssetPage() {
       mainContainerClassName="max-w-2xl"
     >
       <div>
+        {CATEGORIES.length === 0 || LOCATIONS.length === 0 ? (
+          <p className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 text-sm text-zinc-300">
+            No options available yet.
+          </p>
+        ) : null}
         {success && (
           <div className="mb-6 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-4 text-emerald-300">
             Asset uploaded. It will not appear on the site until approved and published.

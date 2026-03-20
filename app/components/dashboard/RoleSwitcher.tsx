@@ -56,10 +56,13 @@ export default function RoleSwitcher({ availableRoles, activeRole }: Props) {
           Active: {ROLE_LABELS[activeRole] ?? activeRole}
         </span>
       </div>
+      {options.length === 0 && (
+        <p className="text-xs text-zinc-400">No roles yet.</p>
+      )}
       <select
         aria-label="Switch active role"
         value={activeRole}
-        disabled={loading}
+        disabled={loading || options.length === 0}
         onChange={(e) => void handleChange(e.target.value as ProfileRole)}
         className="h-9 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 text-sm text-zinc-100 outline-none transition hover:border-emerald-400/70 focus:border-emerald-400/70 disabled:opacity-60"
       >
