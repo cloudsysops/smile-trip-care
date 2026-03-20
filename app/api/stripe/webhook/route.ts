@@ -6,6 +6,7 @@ import { createLogger } from "@/lib/logger";
 import { z } from "zod";
 import { UuidSchema } from "@/lib/validation/common";
 import { enqueueDepositPaidAutomationJobs } from "@/lib/ai/automation";
+import { notifyDepositReceived } from "@/lib/notifications/specialist";
 
 const CheckoutSessionMetadataSchema = z.object({
   lead_id: UuidSchema,
@@ -233,14 +234,29 @@ export async function POST(request: Request) {
   }
 
   if (leadIdToUpdate) {
-    const { error: leadError } = await supabase
+    const { data: updatedLeads, error: leadError } = await supabase
       .from("leads")
       .update({ status: "deposit_paid", updated_at: now })
       .eq("id", leadIdToUpdate)
-      .neq("status", "deposit_paid");
+      .neq("status", "deposit_paid")
+      .select("id");
     if (leadError) {
       log.error("Failed to update lead status", { error: leadError.message });
       return NextResponse.json({ error: "Internal server error", request_id: requestId }, { status: 500 });
+    }
+    if (updatedLeads && updatedLeads.length > 0) {
+      const { data: consultationRows } = await supabase
+        .from("consultations")
+        .select("specialist_id")
+        .eq("lead_id", leadIdToUpdate);
+      const seen = new Set<string>();
+      for (const row of consultationRows ?? []) {
+        const sid = row.specialist_id as string;
+        if (sid && !seen.has(sid)) {
+          seen.add(sid);
+          notifyDepositReceived(sid, leadIdToUpdate);
+        }
+      }
     }
     const { error: bookingError } = await supabase
       .from("bookings")

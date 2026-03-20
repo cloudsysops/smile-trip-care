@@ -36,6 +36,8 @@ O en Supabase SQL Editor, ejecutar en este orden:
 26. 0026_package_builder_items.sql  
 27. 0027_multi_host_foundation.sql  
 28. 0028_stripe_connect_foundation.sql  
+29. 0030_specialist_availability.sql  
+30. 0031_consultations_specialist_workflow.sql  
 
 Luego opcional: `scripts/seed_packages.sql`, `scripts/seed_marketplace_foundation.sql`.
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
 import { getConsultations, createConsultation } from "@/lib/consultations";
+import { notifyNewCase } from "@/lib/notifications/specialist";
 import { ConsultationCreateSchema } from "@/lib/validation/consultation";
 
 export async function GET() {
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
       scheduled_date: payload.scheduled_date ?? null,
       scheduled_time: payload.scheduled_time ?? null,
       requested_at: new Date().toISOString(),
-      case_priority: "normal",
+      case_priority: payload.case_priority ?? "normal",
       specialist_coordinator_request: null,
       notes: payload.notes ?? null,
     });
@@ -72,6 +73,9 @@ export async function POST(request: Request) {
         { error: error || "Create failed", request_id: requestId },
         { status: 422 }
       );
+    }
+    if (data) {
+      notifyNewCase(data.specialist_id, data.lead_id);
     }
     return NextResponse.json(data, { status: 201 });
   } catch (err) {

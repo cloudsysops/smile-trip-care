@@ -58,16 +58,59 @@ export async function getProviderDashboardData(providerId: string) {
   };
 }
 
+export type SpecialistConsultationListRow = {
+  id: string;
+  lead_id: string;
+  status: string;
+  requested_at: string | null;
+  scheduled_at: string | null;
+  case_priority: string;
+  patient_name: string;
+};
+
 /** Specialist dashboard: own profile, consultation requests, related items */
 export async function getSpecialistDashboardData(specialistId: string) {
   const supabase = getServerSupabase();
   const [specialistRes, consultationsRes] = await Promise.all([
     supabase.from("specialists").select("id, name, specialty, city, approval_status, published").eq("id", specialistId).single(),
-    supabase.from("consultations").select("id, lead_id, status, requested_at, scheduled_at").eq("specialist_id", specialistId).order("requested_at", { ascending: false }).limit(30),
+    supabase
+      .from("consultations")
+      .select(
+        "id, lead_id, status, requested_at, scheduled_at, case_priority, leads!inner(first_name, last_name)",
+      )
+      .eq("specialist_id", specialistId)
+      .order("requested_at", { ascending: false, nullsFirst: false })
+      .limit(100),
   ]);
+
+  type RawRow = {
+    id: string;
+    lead_id: string;
+    status: string;
+    requested_at: string | null;
+    scheduled_at: string | null;
+    case_priority?: string | null;
+    leads?: { first_name?: string | null; last_name?: string | null } | null;
+  };
+  const raw = (consultationsRes.data ?? []) as RawRow[];
+  const consultations: SpecialistConsultationListRow[] = raw.map((row) => {
+    const first = row.leads?.first_name ?? "";
+    const last = row.leads?.last_name ?? "";
+    const patient_name = `${first} ${last}`.trim() || "Patient";
+    return {
+      id: row.id,
+      lead_id: row.lead_id,
+      status: row.status,
+      requested_at: row.requested_at,
+      scheduled_at: row.scheduled_at,
+      case_priority: row.case_priority ?? "normal",
+      patient_name,
+    };
+  });
+
   return {
     specialist: specialistRes.data ?? null,
-    consultations: consultationsRes.data ?? [],
+    consultations,
   };
 }
 
@@ -77,7 +120,12 @@ export async function getCoordinatorDashboardData() {
   const [leadsRes, bookingsRes, consultationsRes] = await Promise.all([
     supabase.from("leads").select("id, first_name, last_name, email, status, created_at").in("status", ["new", "contacted", "qualified"]).order("created_at", { ascending: false }).limit(50),
     supabase.from("bookings").select("id, lead_id, package_id, status, created_at").in("status", ["draft", "confirmed", "in_progress", "deposit_paid", "pending"]).order("updated_at", { ascending: false }).limit(30),
-    supabase.from("consultations").select("id, lead_id, specialist_id, status, requested_at, scheduled_at").in("status", ["requested", "scheduled"]).order("requested_at", { ascending: false }).limit(30),
+    supabase
+      .from("consultations")
+      .select("id, lead_id, specialist_id, status, requested_at, scheduled_at")
+      .in("status", ["requested", "accepted", "scheduled"])
+      .order("requested_at", { ascending: false })
+      .limit(30),
   ]);
   return {
     leads: leadsRes.data ?? [],

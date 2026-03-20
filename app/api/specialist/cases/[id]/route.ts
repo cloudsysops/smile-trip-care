@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireSpecialist } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { jsonError } from "@/lib/http/response";
+import { SpecialistCasePatchSchema } from "@/lib/validation/specialist-case";
 
 type Props = Readonly<{ params: Promise<{ id: string }> }>;
 
@@ -20,7 +21,9 @@ export async function GET(_request: Request, { params }: Props) {
 
   const { data: consultation, error: consultationError } = await supabase
     .from("consultations")
-    .select("id, lead_id, specialist_id, status, requested_at, scheduled_at, notes")
+    .select(
+      "id, lead_id, specialist_id, status, requested_at, scheduled_at, case_priority, specialist_coordinator_request, notes",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -65,7 +68,10 @@ export async function GET(_request: Request, { params }: Props) {
 
   const recommendations: string[] = [];
   if (consultation.status === "requested") {
-    recommendations.push("Confirm consultation date and share pre-consult checklist.");
+    recommendations.push("Accept or decline this case, then schedule when ready.");
+  }
+  if (consultation.status === "accepted") {
+    recommendations.push("Schedule the consultation and share pre-consult checklist with the patient.");
   }
   if (consultation.status === "scheduled") {
     recommendations.push("Upload a same-day progress update after the consultation.");
@@ -91,5 +97,104 @@ export async function GET(_request: Request, { params }: Props) {
     progress: progress ?? [],
     recommendations,
   });
+}
+
+export async function PATCH(request: Request, { params }: Props) {
+  const requestId = crypto.randomUUID();
+  let profile;
+  try {
+    const ctx = await requireSpecialist();
+    profile = ctx.profile;
+  } catch {
+    return jsonError(401, "Unauthorized", requestId);
+  }
+
+  const specialistId = profile.specialist_id;
+  const isAdmin = profile.role === "admin";
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonError(400, "Invalid JSON body", requestId);
+  }
+
+  const parsed = SpecialistCasePatchSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: parsed.error.flatten(), request_id: requestId },
+      { status: 400 },
+    );
+  }
+
+  const { id } = await params;
+  const supabase = getServerSupabase();
+
+  const { data: row, error: loadErr } = await supabase
+    .from("consultations")
+    .select("id, specialist_id, status, scheduled_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (loadErr || !row) {
+    return jsonError(404, "Case not found", requestId);
+  }
+
+  if (!isAdmin && (!specialistId || row.specialist_id !== specialistId)) {
+    return jsonError(403, "Forbidden", requestId);
+  }
+
+  const now = new Date().toISOString();
+  const updates: Record<string, unknown> = { updated_at: now };
+
+  switch (parsed.data.action) {
+    case "accept": {
+      if (row.status !== "requested") {
+        return jsonError(400, "Case cannot be accepted in current status", requestId);
+      }
+      updates.status = "accepted";
+      break;
+    }
+    case "decline": {
+      if (row.status !== "requested" && row.status !== "accepted") {
+        return jsonError(400, "Case cannot be declined in current status", requestId);
+      }
+      updates.status = "declined";
+      break;
+    }
+    case "schedule": {
+      const ts = Date.parse(parsed.data.scheduled_at);
+      if (Number.isNaN(ts)) {
+        return jsonError(400, "Invalid scheduled_at", requestId);
+      }
+      if (row.status !== "requested" && row.status !== "accepted") {
+        return jsonError(400, "Case cannot be scheduled in current status", requestId);
+      }
+      updates.scheduled_at = new Date(ts).toISOString();
+      updates.status = "scheduled";
+      break;
+    }
+    case "complete": {
+      if (row.status !== "scheduled") {
+        return jsonError(400, "Only scheduled cases can be marked complete", requestId);
+      }
+      updates.status = "completed";
+      break;
+    }
+    case "request_info": {
+      updates.specialist_coordinator_request = parsed.data.message;
+      break;
+    }
+  }
+
+  const { error: upErr } = await supabase.from("consultations").update(updates).eq("id", id);
+  if (upErr) {
+    return NextResponse.json(
+      { error: "Update failed", details: upErr.message, request_id: requestId },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({ ok: true, request_id: requestId });
 }
 

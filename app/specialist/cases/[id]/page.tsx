@@ -21,6 +21,7 @@ export default async function SpecialistCaseDetailPage({ params }: Props) {
         title="Specialist case detail"
         navItems={[
           { href: "/specialist", label: "Overview" },
+          { href: "/specialist/availability", label: "Availability" },
           { href: "/specialist/progress", label: "Progress" },
         ]}
         homeHref="/"

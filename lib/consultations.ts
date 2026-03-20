@@ -1,7 +1,15 @@
 import { getServerConfigSafe } from "@/lib/config/server";
 import { getServerSupabase } from "@/lib/supabase/server";
 
-export type ConsultationStatus = "requested" | "scheduled" | "completed" | "cancelled";
+export type ConsultationStatus =
+  | "requested"
+  | "accepted"
+  | "declined"
+  | "scheduled"
+  | "completed"
+  | "cancelled";
+
+export type CasePriority = "low" | "normal" | "high" | "urgent";
 
 export type ConsultationRow = {
   id: string;
@@ -11,13 +19,16 @@ export type ConsultationRow = {
   scheduled_date: string | null;
   scheduled_time: string | null;
   scheduled_at: string | null;
+  requested_at: string | null;
+  case_priority: CasePriority | string;
+  specialist_coordinator_request: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
 };
 
 const CONSULTATION_SELECT =
-  "id, lead_id, specialist_id, status, scheduled_date, scheduled_time, scheduled_at, notes, created_at, updated_at";
+  "id, lead_id, specialist_id, status, scheduled_date, scheduled_time, scheduled_at, requested_at, case_priority, specialist_coordinator_request, notes, created_at, updated_at";
 
 /** Fetch all consultations (admin). */
 export async function getConsultations(): Promise<ConsultationRow[]> {
@@ -103,6 +114,9 @@ export async function createConsultation(payload: ConsultationInsert): Promise<C
         scheduled_date: payload.scheduled_date ?? null,
         scheduled_time: payload.scheduled_time ?? null,
         scheduled_at: payload.scheduled_at ?? null,
+        requested_at: payload.requested_at ?? new Date().toISOString(),
+        case_priority: payload.case_priority ?? "normal",
+        specialist_coordinator_request: payload.specialist_coordinator_request ?? null,
         notes: payload.notes ?? null,
       })
       .select(CONSULTATION_SELECT)

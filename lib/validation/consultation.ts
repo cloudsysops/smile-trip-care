@@ -4,6 +4,8 @@ const UuidSchema = z.string().uuid();
 
 export const ConsultationStatusSchema = z.enum([
   "requested",
+  "accepted",
+  "declined",
   "scheduled",
   "completed",
   "cancelled",
@@ -17,6 +19,7 @@ export const ConsultationCreateSchema = z.object({
   scheduled_date: z.string().optional().nullable(),
   scheduled_time: z.string().optional().nullable(),
   notes: z.string().max(2000).optional(),
+  case_priority: z.enum(["low", "normal", "high", "urgent"]).optional(),
 });
 
 export const ConsultationUpdateSchema = z.object({
