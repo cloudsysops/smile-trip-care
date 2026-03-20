@@ -35,11 +35,20 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(callback);
   }
 
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("next", pathname);
+
   if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
     if (!user) {
       const redirect = new URL("/admin/login", request.url);
       redirect.searchParams.set("next", pathname);
       return NextResponse.redirect(redirect);
+    }
+  }
+
+  if (pathname.startsWith("/patient") || pathname.startsWith("/coordinator")) {
+    if (!user) {
+      return NextResponse.redirect(loginUrl);
     }
   }
 

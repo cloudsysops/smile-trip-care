@@ -50,27 +50,30 @@ export async function getCoordinatorDashboardData() {
   };
 }
 
-/** Patient dashboard: leads matching email, their bookings, consultations, payment status */
+/** Patient dashboard: leads matching email, their bookings, consultations, payment status. Payments are filtered in DB by lead_id. */
 export async function getPatientDashboardData(email: string) {
   if (!email?.trim()) return { leads: [], bookings: [], consultations: [], payments: [] };
   const supabase = getServerSupabase();
-  const [leadsRes, paymentsRes] = await Promise.all([
-    supabase.from("leads").select("id, first_name, last_name, email, status, package_slug, recommended_package_slug, created_at").ilike("email", email.trim()).order("created_at", { ascending: false }).limit(10),
-    supabase.from("payments").select("id, lead_id, status, amount_cents, created_at").order("created_at", { ascending: false }),
-  ]);
-  const leads = leadsRes.data ?? [];
-  const leadIds = leads.map((l) => l.id);
-  let bookings: unknown[] = [];
-  let consultations: unknown[] = [];
-  if (leadIds.length > 0) {
-    const [bRes, cRes] = await Promise.all([
-      supabase.from("bookings").select("id, lead_id, package_id, status, total_price_usd, deposit_paid, deposit_cents, start_date, end_date").in("lead_id", leadIds).order("created_at", { ascending: false }),
-      supabase.from("consultations").select("id, lead_id, specialist_id, status, requested_at, scheduled_at").in("lead_id", leadIds).order("requested_at", { ascending: false }),
-    ]);
-    bookings = bRes.data ?? [];
-    consultations = cRes.data ?? [];
+  const { data: leads } = await supabase
+    .from("leads")
+    .select("id, first_name, last_name, email, status, package_slug, recommended_package_slug, created_at")
+    .ilike("email", email.trim())
+    .order("created_at", { ascending: false })
+    .limit(10);
+  const leadList = leads ?? [];
+  const leadIds = leadList.map((l) => l.id);
+  if (leadIds.length === 0) {
+    return { leads: leadList, bookings: [], consultations: [], payments: [] };
   }
-  const allPayments = paymentsRes.data ?? [];
-  const payments = allPayments.filter((p) => leadIds.includes(p.lead_id));
-  return { leads, bookings, consultations, payments };
+  const [bRes, cRes, pRes] = await Promise.all([
+    supabase.from("bookings").select("id, lead_id, package_id, status, total_price_usd, deposit_paid, deposit_cents, start_date, end_date").in("lead_id", leadIds).order("created_at", { ascending: false }),
+    supabase.from("consultations").select("id, lead_id, specialist_id, status, requested_at, scheduled_at").in("lead_id", leadIds).order("requested_at", { ascending: false }),
+    supabase.from("payments").select("id, lead_id, status, amount_cents, created_at").in("lead_id", leadIds).order("created_at", { ascending: false }),
+  ]);
+  return {
+    leads: leadList,
+    bookings: bRes.data ?? [],
+    consultations: cRes.data ?? [],
+    payments: pRes.data ?? [],
+  };
 }
