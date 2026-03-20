@@ -3,11 +3,9 @@
  */
 
 import { runChatJson } from "@/lib/ai/openai";
+import { getSiteOriginFromEnv } from "@/lib/config/urls";
 
-const siteOrigin =
-  typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
-    ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
-    : "http://localhost:3000";
+const siteOrigin = getSiteOriginFromEnv();
 
 const ASSESSMENT_URL = process.env.NEXT_PUBLIC_ASSESSMENT_URL ?? `${siteOrigin}/assessment`;
 

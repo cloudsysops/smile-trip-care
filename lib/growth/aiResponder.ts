@@ -1,3 +1,5 @@
+import { getSiteOriginFromEnv } from "@/lib/config/urls";
+
 /**
  * Growth helper: generate a suggested reply inviting a user
  * to take the Smile assessment for a free evaluation.
@@ -5,10 +7,7 @@
  * This is intentionally simple and synchronous – no external calls.
  */
 export function generateSuggestedReply(postText: string, keywordHint?: string): string {
-  const siteOrigin =
-    typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
-      ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
-      : "http://localhost:3000";
+  const siteOrigin = getSiteOriginFromEnv();
 
   const assessmentUrl = `${siteOrigin}/assessment`;
 

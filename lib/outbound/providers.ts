@@ -1,4 +1,5 @@
 import { getServerConfigSafe } from "@/lib/config/server";
+import { RESEND_EMAILS_API_URL } from "@/lib/config/urls";
 
 type SendEmailInput = {
   toEmail: string;
@@ -35,7 +36,7 @@ async function sendEmailViaResend(input: SendEmailInput): Promise<SendOutboundRe
     throw new Error("Email provider not configured");
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await fetch(RESEND_EMAILS_API_URL, {
     method: "POST",
     headers: {
       "content-type": "application/json",

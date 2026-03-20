@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 type FollowUpType = "24h" | "3d" | "7d";
 
@@ -109,7 +110,7 @@ export default function LeadFollowUpSection({ leadId, leadPhone }: Props) {
                     </button>
                     {hasPhone && (
                       <a
-                        href={`https://wa.me/${phoneDigits(leadPhone)}?text=${encodeURIComponent(text)}`}
+                        href={buildWhatsAppUrl(phoneDigits(leadPhone), text)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded border border-zinc-700 bg-zinc-900/60 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800/40"

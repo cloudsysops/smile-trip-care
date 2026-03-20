@@ -1,4 +1,5 @@
 import { createLogger } from "@/lib/logger";
+import { OPENAI_CHAT_COMPLETIONS_URL } from "@/lib/config/urls";
 
 const DEFAULT_MODEL = "gpt-4.1-mini";
 
@@ -59,7 +60,7 @@ export async function generateText(
 
   let response: Response;
   try {
-    response = await fetch("https://api.openai.com/v1/chat/completions", {
+    response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

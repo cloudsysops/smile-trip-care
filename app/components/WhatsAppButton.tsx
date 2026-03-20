@@ -1,6 +1,7 @@
 "use client";
 
 import { branding } from "@/lib/branding";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const DEFAULT_MESSAGE = `Hi, I'm interested in the ${branding.productName} program.`;
 /** Default when NEXT_PUBLIC_WHATSAPP_NUMBER is not set. Use env in production. */
@@ -10,8 +11,7 @@ function buildWaLink(text: string): string {
   const num = typeof process.env.NEXT_PUBLIC_WHATSAPP_NUMBER === "string"
     ? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER.replace(/\D/g, "")
     : FALLBACK_NUMBER;
-  const encoded = encodeURIComponent(text);
-  return `https://wa.me/${num}?text=${encoded}`;
+  return buildWhatsAppUrl(num, text);
 }
 
 type Props = {

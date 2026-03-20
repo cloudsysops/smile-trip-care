@@ -2,6 +2,7 @@
  * Reddit Lead Discovery — fetches recent posts from target subreddits and filters by keywords.
  * Uses Reddit's public JSON API (no auth required). Set a descriptive User-Agent.
  */
+import { REDDIT_BASE_URL } from "@/lib/config/urls";
 
 const SUBREDDITS = [
   "dentalimplants",
@@ -68,7 +69,7 @@ function toSummary(title: string, selftext: string): string {
 }
 
 async function fetchSubredditNew(subreddit: string): Promise<RedditLeadPost[]> {
-  const url = `https://www.reddit.com/r/${subreddit}/new.json?limit=25`;
+  const url = `${REDDIT_BASE_URL}/r/${subreddit}/new.json?limit=25`;
   const res = await fetch(url, {
     headers: { "User-Agent": USER_AGENT },
     signal: AbortSignal.timeout(15_000),
@@ -90,11 +91,11 @@ async function fetchSubredditNew(subreddit: string): Promise<RedditLeadPost[]> {
     let post_url = "";
     if (d.permalink) {
       const prefix = d.permalink.startsWith("/") ? "" : "/";
-      post_url = `https://www.reddit.com${prefix}${d.permalink}`;
+      post_url = `${REDDIT_BASE_URL}${prefix}${d.permalink}`;
     } else if (typeof d.url === "string") {
       post_url = d.url;
     }
-    if (!post_url) post_url = `https://www.reddit.com/r/${subreddit}`;
+    if (!post_url) post_url = `${REDDIT_BASE_URL}/r/${subreddit}`;
     out.push({
       post_title: title,
       post_url,

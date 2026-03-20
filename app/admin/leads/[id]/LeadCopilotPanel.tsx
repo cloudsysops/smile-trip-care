@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import type { LeadCopilotOutput } from "@/lib/ai/schemas";
 
 type Props = Readonly<{
@@ -118,7 +119,7 @@ export default function LeadCopilotPanel({ leadId, leadPhone }: Props) {
                 </button>
                 {leadPhone && phoneDigits(leadPhone).length >= 10 ? (
                   <a
-                    href={`https://wa.me/${phoneDigits(leadPhone)}?text=${encodeURIComponent(copilot.whatsapp_draft)}`}
+                    href={buildWhatsAppUrl(phoneDigits(leadPhone), copilot.whatsapp_draft)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs font-medium text-emerald-300 hover:underline"

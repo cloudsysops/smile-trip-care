@@ -1,10 +1,8 @@
 import { generateSuggestedReply } from "@/lib/growth/aiResponder";
 import { generateText } from "./provider";
+import { getSiteOriginFromEnv } from "@/lib/config/urls";
 
-const siteOrigin =
-  typeof process.env.NEXT_PUBLIC_SITE_URL === "string" && process.env.NEXT_PUBLIC_SITE_URL.trim()
-    ? process.env.NEXT_PUBLIC_SITE_URL.trim().replace(/\/$/, "")
-    : "http://localhost:3000";
+const siteOrigin = getSiteOriginFromEnv();
 
 const assessmentUrl = `${siteOrigin}/assessment`;
 

@@ -2,6 +2,7 @@ import { loadAgentPrompt } from "@/lib/ai/agent-loader";
 import type { AgentId } from "@/lib/ai/agent-registry";
 import { SalesResponderOutputSchema } from "@/lib/ai/schemas";
 import type { LeadTriageOutput, SalesResponderOutput } from "@/lib/ai/schemas";
+import { OPENAI_CHAT_COMPLETIONS_URL } from "@/lib/config/urls";
 
 type OpenAIMessage = {
   role: "system" | "user";
@@ -78,7 +79,7 @@ async function runChatCompletion(
     payload.response_format = { type: "json_object" };
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
