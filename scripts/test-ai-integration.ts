@@ -1,6 +1,7 @@
 import { getServerSupabase } from "@/lib/supabase/server";
 import { rateLimiter } from "@/lib/ai/rate-limiter";
 import { getClaudeCacheStats, safeClaudeCall } from "@/lib/ai/claude";
+import { logger } from "@/lib/logger";
 import {
   analyzeLeadComplete,
   classifyLeadIntent,
@@ -19,7 +20,7 @@ type HealthResponse = Readonly<{
 }>;
 
 function logSection(title: string) {
-  console.log(`\n=== ${title} ===`);
+  logger.info(`=== ${title} ===`);
 }
 
 async function callHealth(baseUrl: string) {
@@ -136,7 +137,7 @@ async function main() {
   logSection("1) Health check");
   try {
     const health = await callHealth(baseUrl);
-    console.log("Health response:", JSON.stringify(health, null, 2));
+    logger.info("Health response", { health });
     const healthTyped = health as unknown as HealthResponse;
     const status = healthTyped.status ?? "unknown";
     const ok = status !== "unhealthy";
@@ -190,9 +191,9 @@ async function main() {
   logSection("5) Final report");
   const okCount = stepResults.filter((s) => s.ok).length;
   const failed = stepResults.filter((s) => !s.ok);
-  console.log("Steps:", stepResults);
-  console.log(`OK: ${okCount}/${stepResults.length}`);
-  console.log(`Elapsed: ${Date.now() - startAll}ms`);
+  logger.info("Steps", { stepResults });
+  logger.info("OK", { okCount, total: stepResults.length });
+  logger.info("Elapsed", { elapsedMs: Date.now() - startAll });
   if (failed.length > 0) {
     console.error("Failures:", failed);
     process.exitCode = 1;

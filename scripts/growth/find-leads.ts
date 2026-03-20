@@ -7,6 +7,7 @@
 
 import { discoverRedditLeads } from "./reddit-lead-discovery";
 import { generateRedditReply } from "../../lib/ai/reddit-responder";
+import { logger } from "@/lib/logger";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -25,17 +26,17 @@ type OutputPost = {
 };
 
 async function main() {
-  console.log("Discovering Reddit leads...");
+  logger.info("Discovering Reddit leads...");
   const posts = await discoverRedditLeads();
   const top = posts.slice(0, TOP_N);
-  console.log(`Found ${posts.length} matching posts. Top ${top.length}:\n`);
+  logger.info(`Found ${posts.length} matching posts. Top ${top.length}:\n`);
 
   const hasOpenAI = !!process.env.OPENAI_API_KEY;
   const output: OutputPost[] = [];
 
   for (let i = 0; i < top.length; i++) {
     const p = top[i];
-    console.log(`${i + 1}. [r/${p.subreddit}] ${p.post_title.slice(0, 60)}...`);
+    logger.info(`${i + 1}. [r/${p.subreddit}] ${p.post_title.slice(0, 60)}...`);
     const row: OutputPost = {
       post_title: p.post_title,
       post_url: p.post_url,
@@ -59,9 +60,9 @@ async function main() {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(output, null, 2), "utf8");
-  console.log(`\nWrote ${output.length} leads to ${OUTPUT_FILE}`);
+  logger.info(`\nWrote ${output.length} leads to ${OUTPUT_FILE}`);
   if (!hasOpenAI) {
-    console.log("Set OPENAI_API_KEY to generate draft replies.");
+    logger.info("Set OPENAI_API_KEY to generate draft replies.");
   }
 }
 

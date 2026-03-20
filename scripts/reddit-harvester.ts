@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { discoverRedditLeads } from "./growth/reddit-lead-discovery";
+import { logger } from "@/lib/logger";
 
 type HarvesterStatus =
   | "discovered"
@@ -63,9 +64,9 @@ function computeScore(content: string): { score: "high" | "medium" | "low"; reas
 }
 
 async function main() {
-  console.log("Running Reddit harvester...");
+  logger.info("Running Reddit harvester...");
   const leads = await discoverRedditLeads();
-  console.log(`Discovered ${leads.length} candidate posts from Reddit.`);
+  logger.info(`Discovered ${leads.length} candidate posts from Reddit.`);
 
   const records: ExternalLeadRecord[] = leads.map((post, index) => {
     // naive keyword extraction: pick first matching keyword in title/summary
@@ -100,8 +101,7 @@ async function main() {
   const outPath = path.join(dataDir, "external_leads.json");
   await fs.mkdir(dataDir, { recursive: true });
   await fs.writeFile(outPath, JSON.stringify(records, null, 2), "utf8");
-
-  console.log(`Wrote ${records.length} external leads to ${outPath}`);
+  logger.info(`Wrote ${records.length} external leads to ${outPath}`);
 }
 
 main().catch((err) => {
