@@ -1,15 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { branding } from "@/lib/branding";
 import { getPublishedPackageBySlug, getPackageById } from "@/lib/packages";
 import { getLeadByIdForMatching } from "@/lib/leads";
 import { getRecommendedSpecialist } from "@/lib/specialists";
 import { WhatsAppButton } from "../components/WhatsAppButton";
+import { absoluteUrl } from "@/lib/seo";
 import RecommendedDoctorCard from "../components/booking/RecommendedDoctorCard";
 
 const RECOMMENDATION_DISCLAIMER =
   "This recommendation is based on the information provided and serves as an orientation only. Final treatment planning belongs to the specialist.";
 
 type Props = Readonly<{ searchParams: Promise<{ lead_id?: string; recommended_package_slug?: string }> }>;
+
+export const metadata: Metadata = {
+  title: `Thank You | ${branding.productName}`,
+  description: "Your assessment has been received. Our team will contact you with your personalized recommendation.",
+  alternates: {
+    canonical: absoluteUrl("/thank-you"),
+  },
+};
 
 export default async function ThankYouPage({ searchParams }: Props) {
   const { lead_id, recommended_package_slug } = await searchParams;

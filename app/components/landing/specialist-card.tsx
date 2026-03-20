@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { SpecialistRow } from "@/lib/specialists";
 
 function getInitials(name: string): string {
@@ -22,12 +23,12 @@ export default function SpecialistCard({ specialist, imageUrl }: Props) {
     <>
       <div className="relative flex h-40 items-center justify-center bg-zinc-800">
         {imageUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={imageUrl}
             alt=""
-            className="h-full w-full object-cover"
-            loading="lazy"
+            className="object-cover"
+            fill
+            unoptimized
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         ) : (

@@ -1,4 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import type { Metadata } from "next";
 import { branding } from "@/lib/branding";
 import { getPublishedPackages } from "@/lib/packages";
 import { getPublishedAssets } from "@/lib/assets";
@@ -10,8 +13,26 @@ import SpecialistCard from "./components/landing/specialist-card";
 import ExperienceCard from "./components/landing/experience-card";
 import PartnerInstitutionCard from "./components/landing/partner-institution-card";
 import ImagePlaceholder from "./components/landing/image-placeholder";
-import AuthorityBar from "./components/landing/AuthorityBar";
 import type { PublicAsset } from "@/lib/assets";
+import { absoluteUrl } from "@/lib/seo";
+
+const AuthorityBar = dynamic(() => import("./components/landing/AuthorityBar"));
+
+export const metadata: Metadata = {
+  title: `${branding.productName} | Premium Dental Travel in Colombia`,
+  description:
+    "Plan your dental treatment journey in Medellin and Manizales with vetted clinics, transparent packages, and concierge coordination.",
+  alternates: {
+    canonical: absoluteUrl("/"),
+  },
+  openGraph: {
+    title: `${branding.productName} | Premium Dental Travel in Colombia`,
+    description:
+      "Plan your dental treatment journey in Medellin and Manizales with vetted clinics, transparent packages, and concierge coordination.",
+    url: absoluteUrl("/"),
+    type: "website",
+  },
+};
 
 function getPackageImage(assets: PublicAsset[], location: string): PublicAsset | null {
   const match = assets.find((a) => a.location === location && a.url);
@@ -198,12 +219,14 @@ export default async function Home() {
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 md:aspect-square">
               {heroImage?.url ? (
                 <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={heroImage.url}
                     alt={heroImage.alt_text ?? heroImage.title ?? `${branding.productName} — Medellín and Manizales`}
                     className="h-full w-full object-cover"
-                    fetchPriority="high"
+                    fill
+                    unoptimized
+                    priority
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-zinc-950/20 to-transparent" />
                 </>

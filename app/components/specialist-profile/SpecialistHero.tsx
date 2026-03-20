@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { WhatsAppButton } from "@/app/components/WhatsAppButton";
 
 type Props = {
@@ -47,8 +48,7 @@ export default function SpecialistHero({ name, specialty, city, clinicOrInstitut
         <div className="aspect-[4/3] md:aspect-square bg-zinc-800 relative flex items-center justify-center">
           {imageUrl ? (
             <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+              <Image src={imageUrl} alt="" className="object-cover" fill unoptimized sizes="(max-width: 768px) 100vw, 50vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 to-transparent" />
             </>
           ) : (

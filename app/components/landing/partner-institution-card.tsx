@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 /**
  * Reusable card for partner institutions (e.g. clinics, hospitals).
@@ -29,8 +30,7 @@ export default function PartnerInstitutionCard({
       <div className="aspect-[16/10] w-full bg-zinc-800 relative">
         {image ? (
           <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt="" className="h-full w-full object-cover" />
+            <Image src={image} alt="" className="object-cover" fill unoptimized sizes="(max-width: 768px) 100vw, 33vw" />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 to-transparent" />
           </>
         ) : (

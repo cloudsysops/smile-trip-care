@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { branding } from "@/lib/branding";
 import { getSpecialistBySlug } from "@/lib/specialists";
@@ -8,6 +9,7 @@ import SpecialistClinic from "@/app/components/specialist-profile/SpecialistClin
 import SpecialistTreatments from "@/app/components/specialist-profile/SpecialistTreatments";
 import SpecialistJourney from "@/app/components/specialist-profile/SpecialistJourney";
 import SpecialistGallery from "@/app/components/specialist-profile/SpecialistGallery";
+import { absoluteUrl } from "@/lib/seo";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -19,6 +21,20 @@ const DEFAULT_TREATMENTS = [
   "Cosmetic Dentistry",
   "Diagnostic Evaluation",
 ];
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const specialist = await getSpecialistBySlug(slug);
+  const title = specialist ? `${specialist.name} | ${branding.productName}` : `Specialist | ${branding.productName}`;
+  const description = specialist?.description ?? "Meet one of our vetted specialists in Colombia.";
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: absoluteUrl(`/specialists/${slug}`),
+    },
+  };
+}
 
 export default async function SpecialistProfilePage({ params }: PageProps) {
   const { slug } = await params;

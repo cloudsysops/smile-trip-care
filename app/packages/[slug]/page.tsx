@@ -1,9 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { branding } from "@/lib/branding";
 import { getPublishedPackageBySlug } from "@/lib/packages";
 import { getPublishedAssets } from "@/lib/assets";
 import { WhatsAppButton } from "@/app/components/WhatsAppButton";
+import { absoluteUrl } from "@/lib/seo";
 
 type SearchValue = string | string[] | undefined;
 type Props = {
@@ -11,7 +14,7 @@ type Props = {
   searchParams: Promise<Record<string, SearchValue>>;
 };
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const pkg = await getPublishedPackageBySlug(slug);
 
@@ -23,6 +26,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    alternates: {
+      canonical: absoluteUrl(`/packages/${slug}`),
+    },
+    openGraph: {
+      title,
+      description,
+      url: absoluteUrl(`/packages/${slug}`),
+      type: "website",
+    },
   };
 }
 
@@ -144,13 +156,15 @@ export default async function PackagePage({ params, searchParams }: Props) {
                 asset.url ? (
                   <li
                     key={asset.id}
-                    className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/60 shadow-sm"
+                    className="relative h-44 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/60 shadow-sm"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={asset.url}
                       alt={asset.alt_text ?? asset.title ?? "Package image"}
-                      className="h-44 w-full object-cover"
+                      className="object-cover"
+                      fill
+                      unoptimized
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                     />
                   </li>
                 ) : null,

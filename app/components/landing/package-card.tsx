@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { PackageRow } from "@/lib/packages";
 import type { PublicAsset } from "@/lib/assets";
 
@@ -57,12 +58,12 @@ export default function PackageCard({ pkg, image, featured = false, recommended 
     >
       <div className={`relative overflow-hidden bg-zinc-800 ${featured ? "aspect-[16/10]" : "aspect-video"}`}>
         {image?.url ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={image.url}
             alt={image.alt_text ?? pkg.name}
-            className="h-full w-full object-cover"
-            loading="lazy"
+            className="object-cover"
+            fill
+            unoptimized
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         ) : (
