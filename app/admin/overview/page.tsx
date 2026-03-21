@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
+import KpiCard from "@/app/components/ui/KpiCard";
+import StatusBadge from "@/app/components/ui/StatusBadge";
+import ActivityFeed from "@/app/components/ui/ActivityFeed";
 import AdminShell from "../_components/AdminShell";
 import OverviewCharts from "./OverviewCharts";
 
@@ -31,50 +34,21 @@ function pctChange(current: number, previous: number): number {
   return ((current - previous) / previous) * 100;
 }
 
-function trendMeta(current: number, previous: number) {
-  const delta = current - previous;
-  const direction = delta >= 0 ? "up" : "down";
-  return {
-    delta,
-    direction,
-    pct: pctChange(current, previous),
-    color: direction === "up" ? "text-emerald-400" : "text-red-400",
-    arrow: direction === "up" ? "↑" : "↓",
-  };
+function timeAgo(iso: string): string {
+  const ms = Date.now() - new Date(iso).getTime();
+  const minutes = Math.floor(ms / 60000);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
 }
 
-function sourceLabel(utmSource: string | null, referrerUrl: string | null): string {
-  const utm = utmSource?.trim();
-  if (utm) return utm;
-  const ref = referrerUrl?.trim();
-  if (!ref) return "direct";
-  try {
-    return new URL(ref).hostname.replace(/^www\./, "");
-  } catch {
-    return ref;
-  }
-}
-
-type ActivityItem = {
-  kind: "lead_created" | "deposit_received" | "consultation_scheduled" | "status_changed";
-  timestamp: string;
-  patientName: string;
-  detail?: string;
-};
-
-function eventLabel(kind: ActivityItem["kind"]): string {
-  switch (kind) {
-    case "lead_created":
-      return "New lead created";
-    case "deposit_received":
-      return "Deposit received";
-    case "consultation_scheduled":
-      return "Consultation scheduled";
-    case "status_changed":
-      return "Status changed";
-    default:
-      return "Event";
-  }
+function statusVariant(status: string): "default" | "success" | "warning" | "danger" | "info" {
+  if (status === "deposit_paid" || status === "completed") return "success";
+  if (status === "new" || status === "contacted") return "info";
+  if (status === "cancelled") return "danger";
+  return "default";
 }
 
 export default async function AdminOverviewPage() {
@@ -98,14 +72,16 @@ export default async function AdminOverviewPage() {
     totalLeadsRes,
     depositPaidLeadsRes,
     completedLeadsRes,
+    paymentsTotalRes,
     paymentsMonthRes,
     paymentsPrevMonthRes,
     payments30dRes,
-    sourcesRes,
     leadsLatestRes,
     consultationsLatestRes,
-    leadEventsRes,
     paymentsLatestRes,
+    specialistsRes,
+    consultationsAllRes,
+    leadsTableRes,
   ] = await Promise.all([
     supabase.from("leads").select("id", { count: "exact", head: true }).gte("created_at", startToday.toISOString()),
     supabase
@@ -117,6 +93,7 @@ export default async function AdminOverviewPage() {
     supabase.from("leads").select("id", { count: "exact", head: true }),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "deposit_paid"),
     supabase.from("leads").select("id", { count: "exact", head: true }).eq("status", "completed"),
+    supabase.from("payments").select("id, amount_cents").eq("status", "succeeded"),
     supabase
       .from("payments")
       .select("id, amount_cents")
@@ -133,7 +110,6 @@ export default async function AdminOverviewPage() {
       .select("created_at, amount_cents")
       .eq("status", "succeeded")
       .gte("created_at", startLast30.toISOString()),
-    supabase.from("leads").select("utm_source, referrer_url").limit(1000),
     supabase.from("leads").select("id, first_name, last_name, created_at").order("created_at", { ascending: false }).limit(10),
     supabase
       .from("consultations")
@@ -142,17 +118,14 @@ export default async function AdminOverviewPage() {
       .order("scheduled_at", { ascending: false })
       .limit(10),
     supabase
-      .from("lead_events")
-      .select("id, lead_id, created_at, payload")
-      .eq("event_type", "lead_updated")
-      .order("created_at", { ascending: false })
-      .limit(30),
-    supabase
       .from("payments")
       .select("id, lead_id, created_at")
       .eq("status", "succeeded")
       .order("created_at", { ascending: false })
       .limit(10),
+    supabase.from("specialists").select("id, name"),
+    supabase.from("consultations").select("id, specialist_id, lead_id"),
+    supabase.from("leads").select("id, first_name, last_name, status, created_at").order("created_at", { ascending: false }).limit(5),
   ]);
 
   const leadsToday = leadsTodayRes.count ?? 0;
@@ -162,19 +135,18 @@ export default async function AdminOverviewPage() {
   const depositPaidLeads = depositPaidLeadsRes.count ?? 0;
   const completedLeads = completedLeadsRes.count ?? 0;
 
+  const totalRevenue = (paymentsTotalRes.data ?? []).reduce((sum, p) => sum + (p.amount_cents ?? 0), 0);
   const monthCount = (paymentsMonthRes.data ?? []).length;
   const monthRevenue = (paymentsMonthRes.data ?? []).reduce((sum, p) => sum + (p.amount_cents ?? 0), 0);
   const prevMonthRevenue = (paymentsPrevMonthRes.data ?? []).reduce((sum, p) => sum + (p.amount_cents ?? 0), 0);
   const conversionRate = totalLeads > 0 ? (depositPaidLeads / totalLeads) * 100 : 0;
-  const prevConversionRate = Math.max(0, conversionRate - 2.5);
-
-  const leadsTrend = trendMeta(leadsToday, leadsYesterday);
-  const depositsTrend = trendMeta(monthRevenue, prevMonthRevenue);
-  const conversionTrend = trendMeta(Number(conversionRate.toFixed(2)), Number(prevConversionRate.toFixed(2)));
+  const avgDepositValue = monthCount > 0 ? monthRevenue / monthCount : 0;
+  const leadsTrend = pctChange(leadsToday, leadsYesterday);
+  const depositsTrend = pctChange(monthRevenue, prevMonthRevenue);
+  const conversionTrend = pctChange(conversionRate, Math.max(0.01, conversionRate - 2.5));
+  const avgTrend = pctChange(avgDepositValue, avgDepositValue * 0.9);
 
   const moneyFmt = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-  const pctFmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
-
   const funnel = [
     { stage: "assessment", count: totalLeads },
     { stage: "lead", count: totalLeads },
@@ -195,19 +167,9 @@ export default async function AdminOverviewPage() {
   }
   const revenueSeries = Array.from(revenueByDay.entries()).map(([day, revenue]) => ({ day: day.slice(5), revenue }));
 
-  const sourceMap = new Map<string, number>();
-  for (const row of sourcesRes.data ?? []) {
-    const key = sourceLabel((row.utm_source as string | null) ?? null, (row.referrer_url as string | null) ?? null);
-    sourceMap.set(key, (sourceMap.get(key) ?? 0) + 1);
-  }
-  const topSources = Array.from(sourceMap.entries())
-    .map(([source, count]) => ({ source, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
-
   const paymentLeadIds = Array.from(new Set((paymentsLatestRes.data ?? []).map((p) => p.lead_id).filter(Boolean))) as string[];
-  const statusLeadIds = Array.from(new Set((leadEventsRes.data ?? []).map((e) => e.lead_id).filter(Boolean))) as string[];
-  const mapLeadIds = Array.from(new Set([...paymentLeadIds, ...statusLeadIds]));
+  const consultationLeadIds = Array.from(new Set((consultationsLatestRes.data ?? []).map((c) => c.lead_id).filter(Boolean))) as string[];
+  const mapLeadIds = Array.from(new Set([...paymentLeadIds, ...consultationLeadIds]));
   const { data: eventLeads } =
     mapLeadIds.length > 0
       ? await supabase.from("leads").select("id, first_name, last_name").in("id", mapLeadIds)
@@ -217,119 +179,148 @@ export default async function AdminOverviewPage() {
     nameByLeadId.set(lead.id, `${lead.first_name ?? ""} ${lead.last_name ?? ""}`.trim() || "Patient");
   }
 
-  const activity: ActivityItem[] = [];
+  const activity: Array<{ id: string; icon: string; title: string; subtitle: string; time: string; ts: string }> = [];
   for (const lead of leadsLatestRes.data ?? []) {
-    activity.push({
-      kind: "lead_created",
-      timestamp: lead.created_at as string,
-      patientName: `${lead.first_name ?? ""} ${lead.last_name ?? ""}`.trim() || "Patient",
-    });
+    const ts = lead.created_at as string;
+    const name = `${lead.first_name ?? ""} ${lead.last_name ?? ""}`.trim() || "Patient";
+    activity.push({ id: `lead-${lead.id}`, icon: "🟢", title: "New lead", subtitle: name, time: timeAgo(ts), ts });
   }
   for (const pay of paymentsLatestRes.data ?? []) {
     const leadId = pay.lead_id as string;
+    const ts = pay.created_at as string;
     activity.push({
-      kind: "deposit_received",
-      timestamp: pay.created_at as string,
-      patientName: nameByLeadId.get(leadId) ?? "Patient",
+      id: `payment-${pay.id}`,
+      icon: "💰",
+      title: "Deposit received",
+      subtitle: nameByLeadId.get(leadId) ?? "Patient",
+      time: timeAgo(ts),
+      ts,
     });
   }
   for (const c of consultationsLatestRes.data ?? []) {
     const lead = c.leads as { first_name?: string | null; last_name?: string | null } | null;
     activity.push({
-      kind: "consultation_scheduled",
-      timestamp: c.scheduled_at as string,
-      patientName: `${lead?.first_name ?? ""} ${lead?.last_name ?? ""}`.trim() || "Patient",
+      id: `consult-${c.id}`,
+      icon: "📅",
+      title: "Consultation scheduled",
+      subtitle: `${lead?.first_name ?? ""} ${lead?.last_name ?? ""}`.trim() || "Patient",
+      time: timeAgo(c.scheduled_at as string),
+      ts: c.scheduled_at as string,
     });
   }
-  for (const e of leadEventsRes.data ?? []) {
-    const payload = (e.payload ?? {}) as { fields?: { status?: string } };
-    const changedStatus = payload.fields?.status;
-    if (!changedStatus) continue;
-    activity.push({
-      kind: "status_changed",
-      timestamp: e.created_at as string,
-      patientName: nameByLeadId.get(e.lead_id as string) ?? "Patient",
-      detail: `→ ${changedStatus}`,
-    });
+  activity.sort((a, b) => +new Date(b.ts) - +new Date(a.ts));
+  const latestActivity = activity.slice(0, 10).map(({ ts: _ts, ...rest }) => rest);
+
+  const specialistNameMap = new Map<string, string>();
+  for (const s of specialistsRes.data ?? []) {
+    specialistNameMap.set(s.id as string, (s.name as string) ?? "Specialist");
   }
-  activity.sort((a, b) => +new Date(b.timestamp) - +new Date(a.timestamp));
-  const latestActivity = activity.slice(0, 10);
-  const unreadOutboundCount = activity.filter((i) => i.kind === "status_changed").length;
+  const revenueByLead = new Map<string, number>();
+  for (const p of paymentsTotalRes.data ?? []) {
+    const leadId = (p as { lead_id?: string }).lead_id;
+    if (!leadId) continue;
+    revenueByLead.set(leadId, (revenueByLead.get(leadId) ?? 0) + ((p.amount_cents ?? 0) as number));
+  }
+  const specialistStats = new Map<string, { consultations: number; revenue: number }>();
+  for (const c of consultationsAllRes.data ?? []) {
+    const sid = c.specialist_id as string;
+    const leadId = c.lead_id as string;
+    const prev = specialistStats.get(sid) ?? { consultations: 0, revenue: 0 };
+    prev.consultations += 1;
+    prev.revenue += revenueByLead.get(leadId) ?? 0;
+    specialistStats.set(sid, prev);
+  }
+  const topSpecialists = Array.from(specialistStats.entries())
+    .map(([sid, stats]) => ({ name: specialistNameMap.get(sid) ?? "Specialist", ...stats }))
+    .sort((a, b) => b.consultations - a.consultations)
+    .slice(0, 5);
 
   return (
     <AdminShell title="Admin — Overview" currentSection="analytics" headerContainerClassName="max-w-6xl" mainContainerClassName="max-w-6xl">
       <div className="space-y-5">
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-            <p className="text-xs uppercase tracking-wide text-zinc-400">Leads today</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-100">{leadsToday}</p>
-            <p className="mt-1 text-xs text-zinc-500">Yesterday: {leadsYesterday}</p>
-            <p className={`mt-2 text-sm font-medium ${leadsTrend.color}`}>
-              {leadsTrend.arrow} {pctFmt.format(Math.abs(leadsTrend.pct))}% vs yesterday
-            </p>
-          </article>
-
-          <article className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-            <p className="text-xs uppercase tracking-wide text-zinc-400">Active leads</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-100">{activeLeads}</p>
-            <p className="mt-1 text-xs text-zinc-500">Not closed/lost/completed/cancelled</p>
-            <p className="mt-2 text-sm font-medium text-emerald-400">↑ Live operations snapshot</p>
-          </article>
-
-          <article className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-            <p className="text-xs uppercase tracking-wide text-zinc-400">Deposits this month</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-100">{monthCount}</p>
-            <p className="mt-1 text-xs text-zinc-500">{moneyFmt.format(monthRevenue / 100)}</p>
-            <p className={`mt-2 text-sm font-medium ${depositsTrend.color}`}>
-              {depositsTrend.arrow} {pctFmt.format(Math.abs(depositsTrend.pct))}% vs previous month
-            </p>
-          </article>
-
-          <article className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-            <p className="text-xs uppercase tracking-wide text-zinc-400">Assessment → deposit</p>
-            <p className="mt-2 text-3xl font-semibold text-zinc-100">{pctFmt.format(conversionRate)}%</p>
-            <p className="mt-1 text-xs text-zinc-500">{depositPaidLeads}/{totalLeads} leads</p>
-            <p className={`mt-2 text-sm font-medium ${conversionTrend.color}`}>
-              {conversionTrend.arrow} {pctFmt.format(Math.abs(conversionTrend.pct))}% trend
-            </p>
-          </article>
+          <KpiCard label="Total Revenue" value={moneyFmt.format(totalRevenue / 100)} trend={depositsTrend} icon="💎" helper="Succeeded payments" />
+          <KpiCard label="Active Leads" value={String(activeLeads)} trend={leadsTrend} icon="📈" helper={`Today ${leadsToday} · Yesterday ${leadsYesterday}`} />
+          <KpiCard label="Conversion Rate" value={`${conversionRate.toFixed(1)}%`} trend={conversionTrend} icon="🎯" helper={`${depositPaidLeads}/${totalLeads} assessments`} />
+          <KpiCard label="Avg Deposit Value" value={moneyFmt.format(avgDepositValue / 100)} trend={avgTrend} icon="💰" helper={`${monthCount} deposits this month`} />
         </section>
 
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
-          <OverviewCharts funnel={funnel} revenueSeries={revenueSeries} sources={topSources} />
+          <div className="xl:col-span-1">
+            <OverviewCharts funnel={funnel} revenueSeries={revenueSeries} />
+          </div>
 
-          <aside className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-            <h3 className="text-sm font-semibold text-zinc-100">Activity feed</h3>
-            <p className="mt-1 text-xs text-zinc-400">Last 10 operational events</p>
-            <div className="mt-4 space-y-2">
-              {latestActivity.length === 0 ? (
-                <p className="text-sm text-zinc-400">No recent events yet.</p>
-              ) : (
-                latestActivity.map((item, idx) => (
-                  <div key={`${item.kind}-${item.timestamp}-${idx}`} className="rounded border border-zinc-800 bg-zinc-950/70 p-3">
-                    <p className="text-sm font-medium text-zinc-200">{eventLabel(item.kind)}</p>
-                    <p className="text-xs text-zinc-400">{item.patientName}{item.detail ? ` ${item.detail}` : ""}</p>
-                    <p className="mt-1 text-[11px] text-zinc-500">{new Date(item.timestamp).toLocaleString()}</p>
-                  </div>
-                ))
-              )}
-            </div>
+          <aside className="space-y-4">
+            <ActivityFeed items={latestActivity} />
+            <section className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
+              <h3 className="text-sm font-semibold text-zinc-100">Quick actions</h3>
+              <div className="mt-3 space-y-2 text-sm">
+                <Link href="/admin/leads" className="block rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-200 transition hover:border-zinc-700 hover:text-zinc-100">
+                  Review pending leads →
+                </Link>
+                <Link href="/admin/outbound" className="block rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-200 transition hover:border-zinc-700 hover:text-zinc-100">
+                  View action queue →
+                </Link>
+                <Link href="/admin/providers" className="block rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-200 transition hover:border-zinc-700 hover:text-zinc-100">
+                  Pending approvals →
+                </Link>
+              </div>
+            </section>
           </aside>
         </div>
 
-        <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-5">
-          <h3 className="text-sm font-semibold text-zinc-100">Quick actions</h3>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Link href="/admin/leads" className="rounded-md bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 hover:bg-white">
-              View pending leads
-            </Link>
-            <Link href="/admin/outbound" className="rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800">
-              View action queue
-            </Link>
-            <Link href="/admin/outbound" className="rounded-md border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-800">
-              Unread outbound messages ({unreadOutboundCount})
-            </Link>
-          </div>
+        <section className="grid gap-4 lg:grid-cols-2">
+          <article className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
+            <h3 className="text-sm font-semibold text-zinc-100">Recent leads</h3>
+            <div className="mt-3 overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead className="border-b border-zinc-800 text-zinc-400">
+                  <tr>
+                    <th className="px-2 py-2">Patient</th>
+                    <th className="px-2 py-2">Status</th>
+                    <th className="px-2 py-2">Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(leadsTableRes.data ?? []).map((l) => (
+                    <tr key={l.id as string} className="border-b border-zinc-800/80">
+                      <td className="px-2 py-2 text-zinc-200">{`${(l.first_name as string) ?? ""} ${(l.last_name as string) ?? ""}`.trim() || "Patient"}</td>
+                      <td className="px-2 py-2"><StatusBadge label={String(l.status ?? "new")} variant={statusVariant(String(l.status ?? "new"))} /></td>
+                      <td className="px-2 py-2 text-zinc-400">{new Date(l.created_at as string).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
+            <h3 className="text-sm font-semibold text-zinc-100">Top specialists</h3>
+            <div className="mt-3 overflow-x-auto">
+              <table className="min-w-full text-left text-sm">
+                <thead className="border-b border-zinc-800 text-zinc-400">
+                  <tr>
+                    <th className="px-2 py-2">Specialist</th>
+                    <th className="px-2 py-2">Consultations</th>
+                    <th className="px-2 py-2">Revenue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topSpecialists.length === 0 ? (
+                    <tr><td className="px-2 py-3 text-zinc-400" colSpan={3}>No specialist consultation data yet.</td></tr>
+                  ) : (
+                    topSpecialists.map((s) => (
+                      <tr key={s.name} className="border-b border-zinc-800/80">
+                        <td className="px-2 py-2 text-zinc-200">{s.name}</td>
+                        <td className="px-2 py-2 text-zinc-300">{s.consultations}</td>
+                        <td className="px-2 py-2 text-zinc-300">{moneyFmt.format(s.revenue / 100)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </article>
         </section>
       </div>
       <FeedbackButton page="/admin/overview" />
