@@ -81,13 +81,13 @@ export function SpecialistStatsRow({ cards }: { cards: StatCard[] }) {
   return (
     <section className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
       {cards.map((card) => (
-        <article key={card.label} className="min-w-0 rounded-xl border border-zinc-800 bg-zinc-900/70 p-3 sm:p-4">
+        <article key={card.label} className="min-w-0 rounded-xl border border-zinc-800 bg-zinc-900/70 p-4 sm:p-5">
           <p className="text-[10px] uppercase tracking-wide text-zinc-400 sm:text-xs">{card.label}</p>
           <p className="mt-1 text-2xl font-bold tabular-nums text-zinc-100 sm:mt-2 sm:text-3xl">{card.value}</p>
           <p className={`mt-0.5 text-[11px] sm:mt-1 sm:text-xs ${card.trend >= 0 ? "text-emerald-400" : "text-red-400"}`}>
             {card.trend >= 0 ? "↑" : "↓"} {Math.abs(card.trend).toFixed(1)}%
           </p>
-          <div className="relative mt-2 min-h-[48px] w-full min-w-0 sm:mt-3">
+          <div className="relative mt-2 hidden min-h-[48px] w-full min-w-0 sm:mt-3 sm:block">
             <SparklineSvg data={card.spark} accent={card.accent} />
           </div>
         </article>

@@ -3,7 +3,6 @@ import { Instrument_Serif, Inter } from "next/font/google";
 import "./globals.css";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import { ThemeProvider } from "./components/ThemeProvider";
-import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { branding } from "@/lib/branding";
 
 const instrumentSerif = Instrument_Serif({
@@ -46,12 +45,6 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <div className="relative min-h-screen bg-(--color-background) text-(--color-foreground)">
-            {/* Global theme toggle, fixed at the top-right on all pages */}
-            <div className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-end px-4 pt-4">
-              <div className="pointer-events-auto">
-                <ThemeToggle />
-              </div>
-            </div>
             {children}
             <WhatsAppFloat />
           </div>

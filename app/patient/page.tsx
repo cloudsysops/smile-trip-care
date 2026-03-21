@@ -4,7 +4,7 @@ import { requirePatient } from "@/lib/auth";
 import { branding } from "@/lib/branding";
 import { createLogger } from "@/lib/logger";
 import { getPatientDashboardData } from "@/lib/dashboard-data";
-import { getPublishedPackages } from "@/lib/packages";
+import { getPublishedPackageBySlug, getPublishedPackages, type PackageRow } from "@/lib/packages";
 import { getProgressForPatient } from "@/lib/clinical/progress";
 import JourneyTimeline from "@/app/components/ui/JourneyTimeline";
 import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
@@ -13,6 +13,21 @@ function stepStatus(index: number, active: number): "completed" | "active" | "pe
   if (index < active) return "completed";
   if (index === active) return "active";
   return "pending";
+}
+
+function packageDestinationLabel(p: PackageRow): string | null {
+  const loc = p.location?.trim();
+  if (loc) return loc;
+  const dest = p.destination_city?.trim();
+  if (dest) return dest;
+  const rec = p.recovery_city?.trim();
+  if (rec) return rec;
+  return null;
+}
+
+function packageDurationLabel(p: PackageRow): string | null {
+  if (p.duration_days != null && p.duration_days > 0) return `${p.duration_days} days`;
+  return null;
 }
 
 export default async function PatientDashboardPage() {
@@ -67,11 +82,20 @@ export default async function PatientDashboardPage() {
     created_at: string;
   }>;
 
-  const packageBySlug = new Map(packages.map((p) => [p.slug, p]));
+  const packageByExact = new Map(packages.map((p) => [p.slug, p]));
+  const packageBySlugLower = new Map(packages.map((p) => [p.slug.toLowerCase(), p]));
   const lead = leads[0] ?? null;
   const patientName = (profile.full_name ?? `${lead?.first_name ?? ""} ${lead?.last_name ?? ""}`).trim() || "there";
-  const selectedSlug = lead ? (lead.recommended_package_slug ?? lead.package_slug) : null;
-  const selectedPackage = selectedSlug ? packageBySlug.get(selectedSlug.trim()) : null;
+  const rawSlug =
+    lead?.recommended_package_slug?.trim() || lead?.package_slug?.trim() || null;
+  let selectedPackage: PackageRow | null = null;
+  if (rawSlug) {
+    selectedPackage =
+      packageByExact.get(rawSlug) ?? packageBySlugLower.get(rawSlug.toLowerCase()) ?? null;
+    if (!selectedPackage) {
+      selectedPackage = await getPublishedPackageBySlug(rawSlug);
+    }
+  }
   const booking = lead ? bookings.find((b) => b.lead_id === lead.id) : null;
   const consult = lead
     ? consultations
@@ -81,6 +105,10 @@ export default async function PatientDashboardPage() {
   const totalPaid = payments.reduce((sum, p) => sum + (p.amount_cents ?? 0), 0);
   const depositPaid = lead?.status === "deposit_paid" || booking?.deposit_paid === true;
   const nextAppointment = consult?.scheduled_at ? new Date(consult.scheduled_at).toLocaleString() : "To be scheduled";
+
+  const durationLine = selectedPackage ? packageDurationLabel(selectedPackage) : null;
+  const destinationLine = selectedPackage ? packageDestinationLabel(selectedPackage) : null;
+  const planDetailParts = [durationLine, destinationLine].filter(Boolean) as string[];
 
   const progressIndex = depositPaid ? 2 : selectedPackage ? 1 : 0;
   const steps = [
@@ -137,11 +165,27 @@ export default async function PatientDashboardPage() {
         <section className="grid gap-4 md:grid-cols-3">
           <article className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <p className="text-sm font-semibold">Treatment plan 🦷</p>
-            <p className="mt-2 text-sm text-zinc-700">{selectedPackage?.name ?? "Preparing your personalized plan"}</p>
-            <p className="text-xs text-zinc-500">
-              {selectedPackage?.duration_days ? `${selectedPackage.duration_days} days` : "Duration pending"} · {selectedPackage?.location ?? "Destination pending"}
-            </p>
-            <Link href="/packages" className="mt-3 inline-block text-sm font-medium text-emerald-700 hover:underline">View details →</Link>
+            {selectedPackage ? (
+              <>
+                <p className="mt-2 text-sm text-zinc-700">{selectedPackage.name}</p>
+                <p className="text-xs text-zinc-500">
+                  {planDetailParts.length > 0 ? planDetailParts.join(" · ") : "Details in your confirmation"}
+                </p>
+                <Link href={rawSlug ? `/packages/${encodeURIComponent(rawSlug)}` : "/packages"} className="mt-3 inline-block text-sm font-medium text-emerald-700 hover:underline">
+                  View details →
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-sm text-zinc-700">
+                  {rawSlug ? "Your treatment package" : "Preparing your personalized plan"}
+                </p>
+                <p className="text-xs text-zinc-500">Your coordinator will confirm details soon</p>
+                <Link href="/packages" className="mt-3 inline-block text-sm font-medium text-emerald-700 hover:underline">
+                  Browse packages →
+                </Link>
+              </>
+            )}
           </article>
 
           <article className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">

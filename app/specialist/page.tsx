@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getEffectiveRoleForProfile, requireSpecialist, type ProfileRole } from "@/lib/auth";
 import { getProfileRoles } from "@/lib/services/roles.service";
 import { getSpecialistDashboardData, type SpecialistConsultationListRow } from "@/lib/dashboard-data";
+import { specialistHonorificName } from "@/lib/display-names";
 import RoleSwitcher from "@/app/components/dashboard/RoleSwitcher";
 import StatusBadge from "@/app/components/ui/StatusBadge";
 import CaseCard from "@/app/components/ui/CaseCard";
@@ -122,7 +123,7 @@ export default async function SpecialistDashboardPage() {
               SMILETRIPCARE
             </Link>
             <p className="hidden min-w-0 truncate text-xs text-zinc-300 sm:block sm:text-sm">
-              Dr. {specialist?.name ?? "Specialist"}
+              {specialistHonorificName(specialist?.name)}
             </p>
             {/* Icon-only nav — mobile */}
             <nav className="flex items-center gap-1 md:hidden" aria-label="Primary">
