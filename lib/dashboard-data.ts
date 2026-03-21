@@ -108,6 +108,17 @@ export async function getSpecialistDashboardData(specialistId: string) {
     };
   });
 
+  if (process.env.NODE_ENV === "development") {
+    // Trace specialist dashboard data (remove or gate if noisy)
+    console.log("[getSpecialistDashboardData]", {
+      specialistId,
+      specialistOk: !specialistRes.error,
+      specialistError: specialistRes.error?.message,
+      consultationsCount: consultations.length,
+      consultationsError: consultationsRes.error?.message,
+    });
+  }
+
   return {
     specialist: specialistRes.data ?? null,
     consultations,
