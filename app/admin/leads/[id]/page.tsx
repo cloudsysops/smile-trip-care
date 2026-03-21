@@ -16,6 +16,7 @@ import { ItineraryOutputSchema, LeadTriageOutputSchema, SalesResponderOutputSche
 import { getLatestProgressForLead } from "@/lib/clinical/progress";
 import AdminShell from "../../_components/AdminShell";
 import AISummaryButton from "@/app/components/ai/AISummaryButton";
+import LeadConsultationsSection, { type LeadConsultationListItem } from "./LeadConsultationsSection";
 
 type Props = Readonly<{ params: Promise<{ id: string }> }>;
 const StoredMessageSchema = SalesResponderOutputSchema.extend({
@@ -112,6 +113,26 @@ export default async function AdminLeadDetailPage({ params }: Props) {
     .select("id, status, amount_cents, created_at, stripe_checkout_session_id")
     .eq("lead_id", id)
     .order("created_at", { ascending: false });
+
+  const { data: consultationRows } = await supabase
+    .from("consultations")
+    .select("id, specialist_id, status, scheduled_at, requested_at, case_priority, notes, created_at, specialists(name)")
+    .eq("lead_id", id)
+    .order("created_at", { ascending: false });
+
+  const leadConsultations: LeadConsultationListItem[] = (consultationRows ?? []).map((row) => {
+    const spec = row.specialists as { name?: string | null } | null | undefined;
+    return {
+      id: row.id as string,
+      specialist_id: row.specialist_id as string,
+      status: String(row.status ?? ""),
+      scheduled_at: (row.scheduled_at as string | null) ?? null,
+      requested_at: (row.requested_at as string | null) ?? null,
+      case_priority: (row.case_priority as string | null) ?? null,
+      notes: (row.notes as string | null) ?? null,
+      specialist_name: spec?.name?.trim() ? spec.name : null,
+    };
+  });
 
   const publishedPackages = await getPublishedPackages();
   const packageOptions = publishedPackages.map((p) => ({ id: p.id, slug: p.slug, name: p.name }));
@@ -294,6 +315,8 @@ export default async function AdminLeadDetailPage({ params }: Props) {
             </ul>
           )}
         </section>
+
+        <LeadConsultationsSection leadId={lead.id} initialConsultations={leadConsultations} />
 
         <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6">
           <h2 className="text-sm font-semibold text-zinc-100">Activity timeline</h2>
