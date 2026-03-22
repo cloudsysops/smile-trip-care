@@ -181,6 +181,19 @@ export async function requireSpecialist(): Promise<{ user: User; profile: Profil
 }
 
 /**
+ * Require host: role must be host or admin. Throws otherwise.
+ */
+export async function requireHost(): Promise<{ user: User; profile: Profile }> {
+  const ctx = await getCurrentProfile();
+  if (!ctx) throw new Error("Unauthorized");
+  const effectiveRole = await getEffectiveRoleForProfile(ctx.profile);
+  if (effectiveRole !== "host" && effectiveRole !== "admin") {
+    throw new Error("Forbidden");
+  }
+  return { user: ctx.user, profile: ctx.profile };
+}
+
+/**
  * Require patient: role must be patient, user (legacy), or admin. Throws otherwise.
  */
 export async function requirePatient(): Promise<{ user: User; profile: Profile }> {
