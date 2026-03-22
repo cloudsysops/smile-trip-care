@@ -23,10 +23,10 @@ function statusVariant(status: string): "default" | "success" | "warning" | "inf
 
 export default function CaseCard({ caseId, patientName, treatment, priority, status }: Props) {
   return (
-    <article className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4 transition hover:border-zinc-700 hover:bg-zinc-900">
+    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5 transition-colors hover:bg-zinc-800/60">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-zinc-100">{patientName}</p>
+          <p className="text-sm font-semibold text-white">{patientName}</p>
           <p className="text-xs text-zinc-400">{treatment}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

@@ -19,19 +19,21 @@ export default function JourneyTimeline({ steps }: { steps: Step[] }) {
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full border text-sm ${
                   done
-                    ? "border-emerald-300 bg-emerald-100 text-emerald-700"
+                    ? "border-emerald-500/60 bg-emerald-500/15 text-emerald-300"
                     : active
-                      ? "border-emerald-300 bg-white text-emerald-600"
-                      : "border-zinc-300 bg-zinc-100 text-zinc-500"
+                      ? "border-emerald-400/70 bg-zinc-800 text-emerald-300"
+                      : "border-zinc-700 bg-zinc-900 text-zinc-500"
                 }`}
               >
                 {step.icon}
               </div>
-              {idx < steps.length - 1 ? <div className={`mt-1 h-8 w-px ${done ? "bg-emerald-300" : "bg-zinc-300"}`} /> : null}
+              {idx < steps.length - 1 ? (
+                <div className={`mt-1 h-8 w-px ${done ? "bg-emerald-500/40" : "bg-zinc-700"}`} />
+              ) : null}
             </div>
             <div className="pb-2">
-              <p className="text-sm font-semibold text-zinc-900">{step.title}</p>
-              <p className="text-sm text-zinc-600">{step.subtitle}</p>
+              <p className="text-sm font-semibold text-white">{step.title}</p>
+              <p className="text-sm text-zinc-400">{step.subtitle}</p>
               {step.date ? <p className="text-xs text-zinc-500">{step.date}</p> : null}
             </div>
           </div>
