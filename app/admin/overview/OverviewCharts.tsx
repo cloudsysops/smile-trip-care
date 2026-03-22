@@ -28,11 +28,15 @@ const tooltipStyle = {
   color: "#f4f4f5",
 };
 
+const CARD =
+  "rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5 transition-colors hover:bg-zinc-800/60";
+const TITLE = "text-xs font-semibold uppercase tracking-wider text-zinc-400";
+
 export default function OverviewCharts({ funnel, revenueSeries }: Props) {
   return (
     <div className="grid gap-4 xl:grid-cols-2">
-      <section className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
-        <h3 className="text-sm font-semibold text-zinc-100">Revenue (30 days)</h3>
+      <section className={CARD}>
+        <h3 className={TITLE}>Revenue (30 days)</h3>
         <p className="mt-1 text-xs text-zinc-400">Succeeded payments by day</p>
         <div className="mt-4 h-72">
           <ResponsiveContainer width="100%" height="100%">
@@ -47,8 +51,8 @@ export default function OverviewCharts({ funnel, revenueSeries }: Props) {
         </div>
       </section>
 
-      <section className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
-        <h3 className="text-sm font-semibold text-zinc-100">Lead funnel</h3>
+      <section className={CARD}>
+        <h3 className={TITLE}>Lead funnel</h3>
         <p className="mt-1 text-xs text-zinc-400">Assessment → lead → deposit → complete</p>
         <div className="mt-4 h-72">
           <ResponsiveContainer width="100%" height="100%">

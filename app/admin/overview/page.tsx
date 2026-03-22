@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { getServerSupabase } from "@/lib/supabase/server";
 import { FeedbackButton } from "@/app/components/feedback/FeedbackButton";
-import KpiCard from "@/app/components/ui/KpiCard";
+import DashboardShellHeader from "@/app/components/dashboard/DashboardShellHeader";
+import { DashboardStatsRow, type DashboardStatCard } from "@/app/components/dashboard/DashboardStatsRow";
 import StatusBadge from "@/app/components/ui/StatusBadge";
 import ActivityFeed from "@/app/components/ui/ActivityFeed";
-import AdminShell from "../_components/AdminShell";
 import OverviewCharts from "./OverviewCharts";
 
 function startOfTodayUTC(): Date {
@@ -42,6 +42,14 @@ function timeAgo(iso: string): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   return `${days}d ago`;
+}
+
+function sparkFromCount(n: number): { day: string; value: number }[] {
+  const len = Math.min(14, Math.max(1, n || 1));
+  return Array.from({ length: len }, (_, i) => ({
+    day: String(i + 1),
+    value: n > 0 ? 1 + (i % 3) : 0,
+  }));
 }
 
 function statusVariant(status: string): "default" | "success" | "warning" | "danger" | "info" {
@@ -209,7 +217,10 @@ export default async function AdminOverviewPage() {
     });
   }
   activity.sort((a, b) => +new Date(b.ts) - +new Date(a.ts));
-  const latestActivity = activity.slice(0, 10).map(({ ts: _ts, ...rest }) => rest);
+  const latestActivity = activity.slice(0, 10).map(({ ts, ...rest }) => {
+    void ts;
+    return rest;
+  });
 
   const specialistNameMap = new Map<string, string>();
   for (const s of specialistsRes.data ?? []) {
@@ -235,15 +246,66 @@ export default async function AdminOverviewPage() {
     .sort((a, b) => b.consultations - a.consultations)
     .slice(0, 5);
 
+  const revenueSpark = revenueSeries.slice(-14).map((r, i) => ({ day: String(i + 1), value: r.revenue }));
+  const revenueSparkSafe = revenueSpark.length > 0 ? revenueSpark : [{ day: "1", value: 0 }];
+
+  const overviewStatCards: DashboardStatCard[] = [
+    {
+      label: "Total revenue",
+      value: Math.max(0, Math.round(totalRevenue / 100)),
+      displayValue: moneyFmt.format(totalRevenue / 100),
+      trend: depositsTrend,
+      spark: revenueSparkSafe,
+      accent: "#10b981",
+    },
+    {
+      label: "Active leads",
+      value: activeLeads,
+      trend: leadsTrend,
+      spark: sparkFromCount(activeLeads),
+      accent: "#22d3ee",
+    },
+    {
+      label: "Conversion rate",
+      value: Math.round(conversionRate),
+      displayValue: `${conversionRate.toFixed(1)}%`,
+      trend: conversionTrend,
+      spark: sparkFromCount(depositPaidLeads),
+      accent: "#f59e0b",
+    },
+    {
+      label: "Avg deposit",
+      value: Math.max(0, Math.round(avgDepositValue / 100)),
+      displayValue: moneyFmt.format(avgDepositValue / 100),
+      trend: avgTrend,
+      spark: sparkFromCount(monthCount),
+      accent: "#a78bfa",
+    },
+  ];
+
+  const adminMobileNav = [
+    { href: "/admin/overview", icon: "▣", label: "Overview", active: true },
+    { href: "/admin/leads", icon: "📋", label: "Leads" },
+    { href: "/admin/outbound", icon: "✉️", label: "Outbound" },
+    { href: "/admin/analytics", icon: "📊", label: "Analytics" },
+    { href: "/admin/assets", icon: "🖼️", label: "Assets" },
+    { href: "/admin/status", icon: "📡", label: "Status" },
+  ] as const;
+  const adminDesktopNav = [
+    { href: "/admin/overview", label: "Overview", active: true },
+    { href: "/admin/leads", label: "Leads" },
+    { href: "/admin/outbound", label: "Outbound" },
+    { href: "/admin/analytics", label: "Analytics" },
+    { href: "/admin/assets", label: "Assets" },
+    { href: "/admin/status", label: "Status" },
+  ] as const;
+
   return (
-    <AdminShell title="Admin — Overview" currentSection="analytics" headerContainerClassName="max-w-6xl" mainContainerClassName="max-w-6xl">
-      <div className="space-y-5">
-        <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <KpiCard label="Total Revenue" value={moneyFmt.format(totalRevenue / 100)} trend={depositsTrend} icon="💎" helper="Succeeded payments" />
-          <KpiCard label="Active Leads" value={String(activeLeads)} trend={leadsTrend} icon="📈" helper={`Today ${leadsToday} · Yesterday ${leadsYesterday}`} />
-          <KpiCard label="Conversion Rate" value={`${conversionRate.toFixed(1)}%`} trend={conversionTrend} icon="🎯" helper={`${depositPaidLeads}/${totalLeads} assessments`} />
-          <KpiCard label="Avg Deposit Value" value={moneyFmt.format(avgDepositValue / 100)} trend={avgTrend} icon="💰" helper={`${monthCount} deposits this month`} />
-        </section>
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+      <DashboardShellHeader subtitle="Admin" mobileNav={adminMobileNav} desktopNav={adminDesktopNav} />
+
+      <main className="mx-auto max-w-6xl space-y-4 px-3 py-6 sm:px-6 sm:py-8">
+        <DashboardStatsRow cards={overviewStatCards} />
 
         <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
           <div className="xl:col-span-1">
@@ -252,16 +314,25 @@ export default async function AdminOverviewPage() {
 
           <aside className="space-y-4">
             <ActivityFeed items={latestActivity} />
-            <section className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
-              <h3 className="text-sm font-semibold text-zinc-100">Quick actions</h3>
+            <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5 transition-colors hover:bg-zinc-800/60">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Quick actions</h3>
               <div className="mt-3 space-y-2 text-sm">
-                <Link href="/admin/leads" className="block rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-200 transition hover:border-zinc-700 hover:text-zinc-100">
+                <Link
+                  href="/admin/leads"
+                  className="block rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 transition-colors hover:bg-zinc-800/60"
+                >
                   Review pending leads →
                 </Link>
-                <Link href="/admin/outbound" className="block rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-200 transition hover:border-zinc-700 hover:text-zinc-100">
+                <Link
+                  href="/admin/outbound"
+                  className="block rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 transition-colors hover:bg-zinc-800/60"
+                >
                   View action queue →
                 </Link>
-                <Link href="/admin/providers" className="block rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-200 transition hover:border-zinc-700 hover:text-zinc-100">
+                <Link
+                  href="/admin/providers"
+                  className="block rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-zinc-100 transition-colors hover:bg-zinc-800/60"
+                >
                   Pending approvals →
                 </Link>
               </div>
@@ -270,10 +341,10 @@ export default async function AdminOverviewPage() {
         </div>
 
         <section className="grid gap-4 lg:grid-cols-2">
-          <article className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
-            <h3 className="text-sm font-semibold text-zinc-100">Recent leads</h3>
+          <article className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5 transition-colors hover:bg-zinc-800/60">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Recent leads</h3>
             <div className="mt-3 overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
+              <table className="min-w-full text-left text-xs sm:text-sm">
                 <thead className="border-b border-zinc-800 text-zinc-400">
                   <tr>
                     <th className="px-2 py-2">Patient</th>
@@ -283,9 +354,13 @@ export default async function AdminOverviewPage() {
                 </thead>
                 <tbody>
                   {(leadsTableRes.data ?? []).map((l) => (
-                    <tr key={l.id as string} className="border-b border-zinc-800/80">
-                      <td className="px-2 py-2 text-zinc-200">{`${(l.first_name as string) ?? ""} ${(l.last_name as string) ?? ""}`.trim() || "Patient"}</td>
-                      <td className="px-2 py-2"><StatusBadge label={String(l.status ?? "new")} variant={statusVariant(String(l.status ?? "new"))} /></td>
+                    <tr key={l.id as string} className="border-b border-zinc-800/80 transition-colors hover:bg-zinc-800/60">
+                      <td className="px-2 py-2 text-zinc-100">
+                        {`${(l.first_name as string) ?? ""} ${(l.last_name as string) ?? ""}`.trim() || "Patient"}
+                      </td>
+                      <td className="px-2 py-2">
+                        <StatusBadge label={String(l.status ?? "new")} variant={statusVariant(String(l.status ?? "new"))} />
+                      </td>
                       <td className="px-2 py-2 text-zinc-400">{new Date(l.created_at as string).toLocaleDateString()}</td>
                     </tr>
                   ))}
@@ -294,10 +369,10 @@ export default async function AdminOverviewPage() {
             </div>
           </article>
 
-          <article className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-5">
-            <h3 className="text-sm font-semibold text-zinc-100">Top specialists</h3>
+          <article className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5 transition-colors hover:bg-zinc-800/60">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Top specialists</h3>
             <div className="mt-3 overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
+              <table className="min-w-full text-left text-xs sm:text-sm">
                 <thead className="border-b border-zinc-800 text-zinc-400">
                   <tr>
                     <th className="px-2 py-2">Specialist</th>
@@ -307,11 +382,15 @@ export default async function AdminOverviewPage() {
                 </thead>
                 <tbody>
                   {topSpecialists.length === 0 ? (
-                    <tr><td className="px-2 py-3 text-zinc-400" colSpan={3}>No specialist consultation data yet.</td></tr>
+                    <tr>
+                      <td className="px-2 py-3 text-zinc-400" colSpan={3}>
+                        No specialist consultation data yet.
+                      </td>
+                    </tr>
                   ) : (
                     topSpecialists.map((s) => (
-                      <tr key={s.name} className="border-b border-zinc-800/80">
-                        <td className="px-2 py-2 text-zinc-200">{s.name}</td>
+                      <tr key={s.name} className="border-b border-zinc-800/80 transition-colors hover:bg-zinc-800/60">
+                        <td className="px-2 py-2 text-zinc-100">{s.name}</td>
                         <td className="px-2 py-2 text-zinc-300">{s.consultations}</td>
                         <td className="px-2 py-2 text-zinc-300">{moneyFmt.format(s.revenue / 100)}</td>
                       </tr>
@@ -322,8 +401,8 @@ export default async function AdminOverviewPage() {
             </div>
           </article>
         </section>
-      </div>
+      </main>
       <FeedbackButton page="/admin/overview" />
-    </AdminShell>
+    </div>
   );
 }
