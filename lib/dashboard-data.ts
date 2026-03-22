@@ -172,3 +172,22 @@ export async function getPatientDashboardData(email: string) {
     payments: pRes.data ?? [],
   };
 }
+
+/** Trip builder: count + estimated add-on total for patient's leads (services marketplace). */
+export async function getPatientTripItineraryStats(leadIds: string[]): Promise<{ count: number; total_cents: number }> {
+  if (leadIds.length === 0) return { count: 0, total_cents: 0 };
+  const supabase = getServerSupabase();
+  const { data, error } = await supabase.from("itinerary_items").select("price_cents").in("lead_id", leadIds);
+  if (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[getPatientTripItineraryStats]", error.message);
+    }
+    return { count: 0, total_cents: 0 };
+  }
+  let total_cents = 0;
+  for (const row of data ?? []) {
+    const c = row.price_cents;
+    if (typeof c === "number" && Number.isFinite(c)) total_cents += c;
+  }
+  return { count: data?.length ?? 0, total_cents };
+}

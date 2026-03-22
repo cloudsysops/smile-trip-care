@@ -1,20 +1,8 @@
 import { redirect } from "next/navigation";
-import DashboardShellHeader from "@/app/components/dashboard/DashboardShellHeader";
 import { requirePatient } from "@/lib/auth";
 import { getPatientDashboardData } from "@/lib/dashboard-data";
 import { getTripAnchorDateForLead, listItineraryItemsForLead } from "@/lib/patient-itinerary";
 import PatientTripBuilder from "./PatientTripBuilder";
-
-const patientTripMobileNav = [
-  { href: "/patient", icon: "▣", label: "Dashboard" },
-  { href: "/patient/trip", icon: "🗺️", label: "My Trip", active: true as const },
-  { href: "/services", icon: "🛎️", label: "Services" },
-] as const;
-const patientTripDesktopNav = [
-  { href: "/patient", label: "Dashboard" },
-  { href: "/patient/trip", label: "My Trip", active: true as const },
-  { href: "/services", label: "Services" },
-] as const;
 
 type Search = Promise<{ addService?: string }>;
 
@@ -54,18 +42,11 @@ export default async function PatientTripPage({ searchParams }: Readonly<{ searc
   ]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-50">
-      <DashboardShellHeader
-        subtitle="My trip"
-        mobileNav={patientTripMobileNav}
-        desktopNav={patientTripDesktopNav}
-      />
-      <PatientTripBuilder
-        leadId={lead.id}
-        anchorDate={anchor}
-        initialItems={items}
-        presetServiceId={sp.addService?.trim() || undefined}
-      />
-    </div>
+    <PatientTripBuilder
+      leadId={lead.id}
+      anchorDate={anchor}
+      initialItems={items}
+      presetServiceId={sp.addService?.trim() || undefined}
+    />
   );
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePatient } from "@/lib/auth";
 import { createLogger } from "@/lib/logger";
-import { getPatientDashboardData } from "@/lib/dashboard-data";
+import { getPatientDashboardData, getPatientTripItineraryStats } from "@/lib/dashboard-data";
 import { getPublishedPackageBySlug, getPublishedPackages, type PackageRow } from "@/lib/packages";
 import { getProgressForPatient } from "@/lib/clinical/progress";
 import DashboardShellHeader from "@/app/components/dashboard/DashboardShellHeader";
@@ -65,6 +65,9 @@ export default async function PatientDashboardPage() {
     getPublishedPackages(),
     getProgressForPatient(profile.id),
   ]);
+
+  const leadIdsForTrip = (data.leads as { id: string }[]).map((l) => l.id);
+  const tripStats = await getPatientTripItineraryStats(leadIdsForTrip);
 
   const leads = data.leads as Array<{
     id: string;
@@ -221,12 +224,16 @@ export default async function PatientDashboardPage() {
 
   const mobileNav = [
     { href: "/patient", icon: "▣", label: "Dashboard", active: true },
-    { href: "/patient#journey", icon: "🗺️", label: "Journey" },
+    { href: "/patient/trip", icon: "🗺️", label: "My Trip" },
+    { href: "/services", icon: "🛎️", label: "Services" },
+    { href: "/patient#journey", icon: "📍", label: "Journey" },
     { href: "/patient#appointments", icon: "📅", label: "Appointments" },
     { href: "/patient#payments", icon: "💳", label: "Payments" },
   ] as const;
   const desktopNav = [
     { href: "/patient", label: "Dashboard", active: true },
+    { href: "/patient/trip", label: "My Trip" },
+    { href: "/services", label: "Services" },
     { href: "/patient#journey", label: "Journey" },
     { href: "/patient#appointments", label: "Appointments" },
     { href: "/patient#payments", label: "Payments" },
@@ -262,7 +269,23 @@ export default async function PatientDashboardPage() {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3" id="payments">
+        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" id="payments">
+          <article className={CARD}>
+            <p className={SECTION_TITLE}>My trip 🗺️</p>
+            <p className="mt-2 text-2xl font-semibold text-white">{tripStats.count}</p>
+            <p className="text-xs text-zinc-400">services in your itinerary</p>
+            <p className="mt-2 text-sm text-zinc-300">
+              Est. add-ons:{" "}
+              <span className="font-semibold text-emerald-300">${(tripStats.total_cents / 100).toFixed(2)}</span>
+            </p>
+            <Link
+              href="/patient/trip"
+              className="mt-3 inline-block text-sm font-medium text-emerald-400 hover:underline"
+            >
+              Build my trip →
+            </Link>
+          </article>
+
           <article className={CARD}>
             <p className={SECTION_TITLE}>Treatment plan 🦷</p>
             {selectedPackage ? (
